@@ -83,6 +83,57 @@ async def imprimir_etiqueta(
         raise HTTPException(status_code=503, detail=f"Servicio de impresión no disponible ({type(exc).__name__})")
 
 
+@router.post("/imprimir-lote/{lote_id}", status_code=200)
+async def imprimir_lote(
+    lote_id: str,
+    db: Session = Depends(get_db),
+    _=Depends(auth.get_current_user),
+):
+    lote = db.query(models.LotePreparado).options(
+        joinedload(models.LotePreparado.formulacion).joinedload(models.Formulacion.componentes).joinedload(models.FormulacionComponente.reactivo),
+        joinedload(models.LotePreparado.preparado_por)
+    ).filter(models.LotePreparado.id == lote_id).first()
+    
+    if not lote:
+        raise HTTPException(status_code=404, detail="Lote no encontrado")
+
+    # Calcular ratio para componentes
+    ratio = (lote.volumen_l / lote.formulacion.volumen_base_l) * lote.concentracion_x
+    
+    # Construir lista de componentes para la etiqueta
+    comps = []
+    peligros = set()
+    for c in lote.formulacion.componentes:
+        cant = c.cantidad_base * ratio
+        unit = c.reactivo.unidad_medida
+        comps.append(f"{c.reactivo.nombre}: {cant:.2f}{unit}")
+        if c.reactivo.peligrosidad:
+            peligros.update(c.reactivo.peligrosidad)
+
+    payload = {
+        "modo": "reactivo",
+        "arg1": lote.formulacion.nombre,
+        "arg2": lote.uid,
+        "arg3": lote.fecha_expiracion.strftime("%Y-%m-%d") if lote.fecha_expiracion else "N/A",
+        "extra": {
+            "preparador": lote.preparado_por.nombre,
+            "volumen": f"{lote.volumen_l}L",
+            "concentracion": f"{lote.concentracion_x}x",
+            "componentes": ", ".join(comps),
+            "peligros": list(peligros)
+        }
+    }
+
+    try:
+        async with httpx.AsyncClient(timeout=15) as client:
+            r = await client.post(f"{PRINTER_URL}/imprimir", json=payload)
+        if r.status_code != 200:
+            raise HTTPException(status_code=502, detail=f"Error de impresora: {r.text}")
+        return {"status": "impreso", "uid": lote.uid}
+    except httpx.RequestError as exc:
+        raise HTTPException(status_code=503, detail=f"Servicio de impresión no disponible ({type(exc).__name__})")
+
+
 @router.get("/generar-uid", status_code=200)
 def generar_uid(especie_id: UUID, db: Session = Depends(get_db), _=Depends(auth.get_current_user)):
     """Genera un UID compuesto: CODE-YYMMDDHH-INDEX."""

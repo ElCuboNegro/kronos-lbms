@@ -340,3 +340,66 @@ class RegistroEvolucion(Base):
     registrado_por = relationship("Usuario")
     sustrato_rel = relationship("Sustrato")
     protocolo_clonacion = relationship("Protocolo")
+
+
+# ── Reactivos y Formulaciones ───────────────────────────────────────────────
+
+class Reactivo(Base):
+    __tablename__ = "reactivos"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    nombre = Column(String(255), nullable=False)
+    formula_quimica = Column(String(255), nullable=True)
+    marca = Column(String(100), nullable=True)
+    pureza_pct = Column(Float, nullable=True)
+    unidad_medida = Column(String(20), default="g")
+    peligrosidad = Column(JSONB, default=list) # ['inflamable', 'corrosivo']
+    notas = Column(Text, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+
+class Formulacion(Base):
+    __tablename__ = "formulaciones"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    nombre = Column(String(255), nullable=False)
+    codigo_referencia = Column(String(50), unique=True, nullable=True)
+    descripcion = Column(Text, nullable=True)
+    procedimiento = Column(Text, nullable=True)
+    volumen_base_l = Column(Float, default=1.0)
+    caducidad_dias = Column(Integer, default=30)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    componentes = relationship("FormulacionComponente", back_populates="formulacion", cascade="all, delete-orphan")
+
+
+class FormulacionComponente(Base):
+    __tablename__ = "formulacion_componentes"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    formulacion_id = Column(UUID(as_uuid=True), ForeignKey("formulaciones.id", ondelete="CASCADE"))
+    reactivo_id = Column(UUID(as_uuid=True), ForeignKey("reactivos.id"))
+    cantidad_base = Column(Float, nullable=False)
+    notas_pesaje = Column(Text, nullable=True)
+
+    formulacion = relationship("Formulacion", back_populates="componentes")
+    reactivo = relationship("Reactivo")
+
+
+class LotePreparado(Base):
+    __tablename__ = "lotes_preparados"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    uid = Column(String(100), unique=True, nullable=False)
+    formulacion_id = Column(UUID(as_uuid=True), ForeignKey("formulaciones.id"))
+    preparado_por_id = Column(UUID(as_uuid=True), ForeignKey("usuarios.id"))
+    fecha_preparacion = Column(DateTime, default=datetime.utcnow)
+    fecha_expiracion = Column(DateTime, nullable=True)
+    volumen_l = Column(Float, nullable=False)
+    concentracion_x = Column(Float, default=1.0)
+    ph_final = Column(Float, nullable=True)
+    estado = Column(String(30), default="disponible")
+    notas = Column(Text, nullable=True)
+
+    formulacion = relationship("Formulacion")
+    preparado_por = relationship("Usuario")

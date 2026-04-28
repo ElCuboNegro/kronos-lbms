@@ -638,3 +638,77 @@ class ScanResult(BaseModel):
     tipo: str  # "especimen" | "elemento" | "desconocido"
     especimen: Optional[EspecimenOut] = None
     elemento: Optional[ElementoOut] = None
+
+
+# ── Reactivos y Formulaciones ───────────────────────────────────────────────
+
+class ReactivoBase(BaseModel):
+    nombre: str
+    formula_quimica: Optional[str] = None
+    marca: Optional[str] = None
+    pureza_pct: Optional[float] = None
+    unidad_medida: str = "g"
+    peligrosidad: list[str] = []
+    notas: Optional[str] = None
+
+class ReactivoCreate(ReactivoBase):
+    pass
+
+class ReactivoOut(ReactivoBase):
+    id: UUID
+    created_at: datetime
+    model_config = {"from_attributes": True}
+
+class ComponenteCreate(BaseModel):
+    reactivo_id: UUID
+    cantidad_base: float
+    notas_pesaje: Optional[str] = None
+
+class ComponenteOut(BaseModel):
+    id: UUID
+    reactivo: ReactivoOut
+    cantidad_base: float
+    notas_pesaje: Optional[str]
+    model_config = {"from_attributes": True}
+
+class FormulacionCreate(BaseModel):
+    nombre: str
+    codigo_referencia: Optional[str] = None
+    descripcion: Optional[str] = None
+    procedimiento: Optional[str] = None
+    volumen_base_l: float = 1.0
+    caducidad_dias: int = 30
+    componentes: list[ComponenteCreate]
+
+class FormulacionOut(BaseModel):
+    id: UUID
+    nombre: str
+    codigo_referencia: Optional[str]
+    descripcion: Optional[str]
+    procedimiento: Optional[str]
+    volumen_base_l: float
+    caducidad_dias: int
+    created_at: datetime
+    componentes: list[ComponenteOut]
+    model_config = {"from_attributes": True}
+
+class LotePreparadoCreate(BaseModel):
+    formulacion_id: UUID
+    volumen_l: float
+    concentracion_x: float = 1.0
+    ph_final: Optional[float] = None
+    notas: Optional[str] = None
+
+class LotePreparadoOut(BaseModel):
+    id: UUID
+    uid: str
+    formulacion: FormulacionOut
+    preparado_por_nombre: str
+    fecha_preparacion: datetime
+    fecha_expiracion: datetime
+    volumen_l: float
+    concentracion_x: float
+    ph_final: Optional[float]
+    estado: str
+    notas: Optional[str]
+    model_config = {"from_attributes": True}

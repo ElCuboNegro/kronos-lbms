@@ -2,7 +2,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.database import engine, Base
-from app.routers import auth, especimenes, elementos, eventos, scan, especies, protocolos, experimentos, evolucion, printer, sustratos
+from app.routers import auth, especimenes, elementos, eventos, scan, especies, protocolos, experimentos, evolucion, printer, sustratos, reactivos
 
 
 @asynccontextmanager
@@ -32,6 +32,7 @@ app.include_router(evolucion.router)
 app.include_router(printer.router)
 app.include_router(scan.router)
 app.include_router(sustratos.router)
+app.include_router(reactivos.router)
 
 
 @app.get("/health")
