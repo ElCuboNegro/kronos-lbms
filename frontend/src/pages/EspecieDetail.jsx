@@ -654,7 +654,7 @@ function SustratosPanel({ navigate }) {
     <div style={s.section}>
       <div style={s.sectionHeader}>
         <h3 style={s.sectionTitle}>Formulaciones de Sustrato</h3>
-        <button style={s.btnSec} onClick={() => navigate('/sustratos')}>Gestionar 🧪</button>
+        <button style={s.btnSec} onClick={() => navigate('/medios')}>Gestionar 🧪</button>
       </div>
       {sustratos.length === 0 ? <p style={s.muted}>Sin sustratos registrados</p> : (
         sustratos.map(su => (

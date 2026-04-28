@@ -483,6 +483,7 @@ class EventoOut(BaseModel):
 
 class SustratoCreate(BaseModel):
     codigo_formulacion: str
+    tipo: str = "sustrato"
     nombre: str
     descripcion: Optional[str] = None
     componentes: Optional[dict[str, float]] = None
@@ -493,6 +494,7 @@ class SustratoCreate(BaseModel):
 class SustratoOut(BaseModel):
     id: UUID
     codigo_formulacion: str
+    tipo: str
     nombre: str
     descripcion: Optional[str]
     componentes: Optional[dict[str, float]]

@@ -9,7 +9,7 @@ import ElementoDetail from './pages/ElementoDetail'
 import EspeciesList from './pages/EspeciesList'
 import EspecieDetail from './pages/EspecieDetail'
 import ExperimentoDetail from './pages/ExperimentoDetail'
-import SustratosList from './pages/SustratosList'
+import MediosList from './pages/MediosList'
 import IndividuoCreate from './pages/IndividuoCreate'
 import IndividuoMultiCreate from './pages/IndividuoMultiCreate'
 
@@ -43,6 +43,8 @@ function Layout({ children }) {
           icon={<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>} />
         <NavBtn label="Especies" path="/especies" current={location.pathname} onClick={() => navigate('/especies')}
           icon={<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 22V12M12 12C12 7 7 4 2 5c0 5 3 9 10 7M12 12c0-5 5-8 10-7-1 5-4 9-10 7"/></svg>} />
+        <NavBtn label="Medios" path="/medios" current={location.pathname} onClick={() => navigate('/medios')}
+          icon={<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 2v10m0 0l-4-4m4 4l4-4M5 20h14a2 2 0 002-2V7a2 2 0 00-2-2h-3l-2-2H8L6 5H3a2 2 0 00-2 2v11a2 2 0 002 2z"/></svg>} />
       </nav>
     </div>
   )
@@ -78,7 +80,7 @@ export default function App() {
                   <Route path="/especies" element={<EspeciesList />} />
                   <Route path="/especies/:id" element={<EspecieDetail />} />
                   <Route path="/experimentos/:id" element={<ExperimentoDetail />} />
-                  <Route path="/sustratos" element={<SustratosList />} />
+                  <Route path="/medios" element={<MediosList />} />
                   <Route path="*" element={<ComingSoon />} />
                 </Routes>
               </Layout>

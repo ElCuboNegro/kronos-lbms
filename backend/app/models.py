@@ -278,6 +278,8 @@ class Sustrato(Base):
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     codigo_formulacion = Column(String(50), unique=True, nullable=False)
+    tipo = Column(String(50), nullable=False, default="sustrato")
+    # sustrato, agar, mezcla, otro
     nombre = Column(String(255), nullable=False)
     descripcion = Column(Text, nullable=True)
     componentes = Column(JSONB, nullable=True)

@@ -33,7 +33,7 @@ export default function EspeciesList() {
           value={busqueda}
           onChange={e => setBusqueda(e.target.value)}
         />
-        <button style={s.btnSustratos} onClick={() => navigate('/sustratos')} title="Sustratos">🧪</button>
+        <button style={s.btnSustratos} onClick={() => navigate('/medios')} title="Medios">🧪</button>
         <button style={s.btnAdd} onClick={() => setShowForm(true)}>+</button>
       </div>
 
