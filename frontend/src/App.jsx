@@ -20,6 +20,7 @@ import IndividuoMultiCreate from './pages/IndividuoMultiCreate'
 import Calculators from './pages/Calculators'
 import ProtocolosList from './pages/ProtocolosList'
 import ProtocolExecution from './pages/ProtocolExecution'
+import ProtocoloEditor from './pages/ProtocoloEditor'
 import ElementosList from './pages/ElementosList'
 
 function PrivateRoute({ children }) {
@@ -131,6 +132,8 @@ export default function App() {
                       <Route path="/especies/:id" element={<EspecieDetail />} />
                       <Route path="/experimentos/:id" element={<ExperimentoDetail />} />
                       <Route path="/protocolos" element={<ProtocolosList />} />
+                      <Route path="/protocolos/nuevo" element={<ProtocoloEditor />} />
+                      <Route path="/protocolos/:id" element={<ProtocoloEditor />} />
                       <Route path="/protocolos/:id/ejecutar" element={<ProtocolExecution />} />
                       <Route path="/lab" element={<MediosList />} />
                       <Route path="/reactivos" element={<ReactivosList />} />

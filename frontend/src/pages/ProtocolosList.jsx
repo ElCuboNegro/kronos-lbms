@@ -44,9 +44,7 @@ export default function ProtocolosList() {
       const json = await res.json()
       if (!res.ok) throw new Error(json.detail || 'Error en la extracción AI')
 
-      // Auto-save the extracted draft protocol
-      await api.post('/protocolos', json)
-      await fetchProtocolos()
+      navigate('/protocolos/nuevo', { state: { draft: json } })
       
     } catch (err) {
       setError(err.message)
@@ -60,6 +58,7 @@ export default function ProtocolosList() {
     <div className="page-container" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
       <div className="page-header" style={{ marginBottom: 0 }}>
         <h2 className="page-title text-primary" style={{ margin: 0 }}>Protocolos</h2>
+        <button className="btn btn--primary" onClick={() => navigate('/protocolos/nuevo')}>+ Nuevo Manualmente</button>
       </div>
       
       <p className="text-muted" style={{ margin: 0, fontSize: '0.9rem' }}>
@@ -67,10 +66,10 @@ export default function ProtocolosList() {
       </p>
 
       {/* AI Importer Section */}
-      <div className="card" style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem', background: 'rgba(125, 202, 143, 0.05)', border: '1px solid var(--bio-primary)' }}>
+      <div className="card" style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem', background: 'rgba(125, 202, 143, 0.05)', border: '1px solid var(--theme-secondary)' }}>
         <h3 className="text-primary" style={{ margin: 0, fontSize: '1rem' }}>🤖 Importación AI</h3>
         <p className="text-muted" style={{ margin: 0, fontSize: '0.85rem' }}>
-          Sube una foto o un PDF de un protocolo impreso. Nuestra IA de Gemini extraerá los materiales y pasos, y lo guardará como borrador automáticamente.
+          Sube una foto o un PDF de un protocolo impreso. Nuestra IA extraerá los materiales y pasos, y abrirá el editor para que puedas validarlos y usar formato Wikilinks.
         </p>
         
         {error && <p className="text-danger" style={{ fontSize: '0.85rem', margin: 0 }}>{error}</p>}
@@ -85,8 +84,8 @@ export default function ProtocolosList() {
           />
           <label 
             htmlFor="protocolo-upload" 
-            className="btn btn--primary" 
-            style={{ display: 'inline-block', width: '100%', textAlign: 'center' }}
+            className="btn btn--secondary" 
+            style={{ display: 'inline-block', width: '100%', textAlign: 'center', cursor: 'pointer' }}
           >
             {uploading ? 'Extrayendo datos...' : 'Subir Documento / Imagen'}
           </label>
@@ -109,9 +108,14 @@ export default function ProtocolosList() {
               </div>
               <h4 className="text-primary" style={{ margin: '0 0 0.2rem', fontSize: '1.1rem' }}>{p.nombre}</h4>
               <p className="text-muted" style={{ margin: '0 0 1rem', fontSize: '0.8rem' }}>Versión: {p.version}</p>
-              <button className="btn btn--primary btn--block" onClick={() => navigate(`/protocolos/${p.id}/ejecutar`)}>
-                ▶ Ejecutar Protocolo
-              </button>
+              <div style={{ display: 'flex', gap: '0.5rem' }}>
+                <button className="btn btn--primary" style={{ flex: 1 }} onClick={() => navigate(`/protocolos/${p.id}/ejecutar`)}>
+                  ▶ Ejecutar
+                </button>
+                <button className="btn btn--ghost" onClick={() => navigate(`/protocolos/${p.id}`)}>
+                  Ver / Editar
+                </button>
+              </div>
             </div>
           ))}
         </div>

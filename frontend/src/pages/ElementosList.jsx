@@ -121,7 +121,7 @@ function ElementoForm({ onSaved, onCancel }) {
   if (showScanner) {
     return (
       <div style={{ position: 'fixed', inset: 0, zIndex: 2000, background: '#000' }}>
-        <QRScanner onScan={handleScan} />
+        <QRScanner onResult={handleScan} />
         <button 
           className="btn btn--secondary" 
           style={{ position: 'absolute', bottom: '2rem', left: '50%', transform: 'translateX(-50%)', zIndex: 2010 }}
