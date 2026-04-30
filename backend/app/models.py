@@ -398,6 +398,7 @@ class LotePreparado(Base):
     volumen_l = Column(Float, nullable=False)
     concentracion_x = Column(Float, default=1.0)
     ph_final = Column(Float, nullable=True)
+    trazabilidad_reactivos = Column(JSONB, nullable=True, default=dict) # Mapa de Reactivo_ID -> Lote_Proveedor
     estado = Column(String(30), default="disponible")
     notas = Column(Text, nullable=True)
 

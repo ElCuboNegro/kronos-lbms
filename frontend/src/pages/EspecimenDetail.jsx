@@ -5,9 +5,9 @@ import EventoForm from '../components/EventoForm'
 import RegistroEvolucionForm from '../components/RegistroEvolucionForm'
 import MapPicker from '../components/MapPicker'
 
-const ESTADO_COLOR = {
-  activo: '#2d7a47', en_experimento: '#b07d1e',
-  archivado: '#4a5568', contaminado: '#c0392b',
+const ESTADO_BADGE = {
+  activo: 'badge--success', en_experimento: 'badge--warning',
+  archivado: 'badge--outline', contaminado: 'badge--danger',
 }
 const ANGULO_LABEL = { arriba: '↑', frente: '●', atras: '○', izquierda: '←', derecha: '→' }
 
@@ -56,41 +56,48 @@ export default function EspecimenDetail() {
     finally { setPrinting(false) }
   }
 
-  if (loading) return <div style={s.page}><p style={s.muted}>Cargando…</p></div>
-  if (!esp) return <div style={s.page}><p style={s.error}>No encontrado</p></div>
+  if (loading) return <div className="page-container text-center"><p className="text-muted" style={{padding:'2rem 0'}}>Cargando…</p></div>
+  if (!esp) return <div className="page-container text-center"><p className="text-danger" style={{padding:'2rem 0'}}>No encontrado</p></div>
 
   const ultimoRegistro = registros[0] || null
 
   return (
-    <div style={s.page}>
+    <div className="page-container" style={{ padding: 0 }}>
       {/* Header */}
-      <div style={s.header}>
-        <div style={s.headerTop}>
+      <div style={{ padding: '1.5rem', background: 'var(--bio-surface)', borderBottom: '1px solid var(--bio-border)' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
           <div>
-            <span style={{ ...s.badge, background: ESTADO_COLOR[esp.estado] || '#555' }}>{esp.estado}</span>
-            <h2 style={s.especie}>{esp.especie}</h2>
+            <span className={`badge ${ESTADO_BADGE[esp.estado] || 'badge--outline'}`} style={{ marginBottom: '0.5rem' }}>{esp.estado.replace('_', ' ')}</span>
+            <h2 className="page-title text-primary" style={{ fontStyle: 'italic', marginBottom: '0.2rem' }}>{esp.especie}</h2>
             {esp.linea_nombre && (
-              <div style={s.jerarquia}>
-                <span style={s.jerarquiaItem}>{esp.linea_nombre}</span>
-                {esp.variegacion_nombre && <><span style={s.jerarquiaSep}>›</span><span style={s.jerarquiaItem}>{esp.variegacion_nombre}</span></>}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginTop: '0.2rem' }}>
+                <span className="text-secondary" style={{ fontSize: '0.9rem' }}>{esp.linea_nombre}</span>
+                {esp.variegacion_nombre && <><span className="text-muted">›</span><span className="text-secondary" style={{ fontSize: '0.9rem' }}>{esp.variegacion_nombre}</span></>}
               </div>
             )}
-            <p style={s.uid}>UID: {esp.uid}</p>
+            <p className="text-muted font-mono" style={{ margin: '0.5rem 0 0', fontSize: '0.85rem' }}>UID: {esp.uid}</p>
           </div>
-          <div style={s.headerActions}>
-            <button style={s.btnIcon} onClick={() => { setEvolutionStep(2); setShowEvolucion(true) }} title="Tomar fotos">📸</button>
-            <button style={s.btnIcon} onClick={imprimir} disabled={printing} title="Reimprimir etiqueta">
+          <div style={{ display: 'flex', gap: '0.5rem' }}>
+            <button className="btn btn--ghost" style={{ padding: '0.5rem' }} onClick={() => { setEvolutionStep(2); setShowEvolucion(true) }} title="Tomar fotos">📸</button>
+            <button className="btn btn--ghost" style={{ padding: '0.5rem' }} onClick={imprimir} disabled={printing} title="Reimprimir etiqueta">
               {printing ? '…' : '🖨'}
             </button>
-            <button style={s.btnIcon} onClick={() => setShowEdit(true)} title="Editar">✏️</button>
+            <button className="btn btn--ghost" style={{ padding: '0.5rem' }} onClick={() => setShowEdit(true)} title="Editar">✏️</button>
           </div>
         </div>
       </div>
 
       {/* Tabs */}
-      <div style={s.tabs}>
+      <div style={{ display: 'flex', borderBottom: '1px solid var(--bio-border)', background: 'var(--bio-surface)' }}>
         {['info', 'evolucion', 'eventos'].map(t => (
-          <button key={t} style={{ ...s.tab, ...(tab === t ? s.tabActive : {}) }} onClick={() => setTab(t)}>
+          <button key={t} 
+            style={{ 
+              flex: 1, background: 'none', border: 'none', cursor: 'pointer', padding: '1rem 0.5rem', fontSize: '0.9rem',
+              color: tab === t ? 'var(--bio-primary)' : 'var(--bio-text-muted)',
+              borderBottom: tab === t ? '2px solid var(--bio-primary)' : '2px solid transparent',
+              fontWeight: tab === t ? 600 : 400
+            }} 
+            onClick={() => setTab(t)}>
             {t === 'info' ? 'Info' : t === 'evolucion' ? `Evolución (${registros.length})` : `Eventos (${esp.eventos.length})`}
           </button>
         ))}
@@ -98,54 +105,51 @@ export default function EspecimenDetail() {
 
       {/* Tab: Info */}
       {tab === 'info' && (
-        <div style={s.tabBody}>
-          <InfoCard label="Ingreso" value={esp.fecha_ingreso} />
-          {esp.origen && <InfoCard label="Origen" value={esp.origen} />}
-          {esp.madre_uid && (
-            <div style={s.infoRow}>
-              <span style={s.infoLabel}>Planta Madre</span>
-              <button onClick={() => navigate(`/especimen/${esp.madre_id}`)} style={s.linkBtn}>{esp.madre_uid} ↗</button>
-            </div>
-          )}
-          {esp.padre_uid && (
-            <div style={s.infoRow}>
-              <span style={s.infoLabel}>Planta Padre</span>
-              <button onClick={() => navigate(`/especimen/${esp.padre_id}`)} style={s.linkBtn}>{esp.padre_uid} ↗</button>
-            </div>
-          )}
-          {esp.coordenadas && (
-            <div style={s.infoRow}>
-              <span style={s.infoLabel}>Ubicación In Situ</span>
-              <a href={`https://www.google.com/maps/search/?api=1&query=${esp.coordenadas.lat},${esp.coordenadas.lng}`} target="_blank" rel="noopener noreferrer" style={s.linkVal}>
-                {esp.coordenadas.lat.toFixed(5)}, {esp.coordenadas.lng.toFixed(5)} 📍
-              </a>
-            </div>
-          )}
-          {esp.notas && <InfoCard label="Notas" value={esp.notas} />}
+        <div style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          <div className="card" style={{ padding: '0.5rem 1rem', margin: 0 }}>
+            <InfoRow label="Ingreso" value={fmtFecha(esp.fecha_ingreso)} />
+            {esp.origen && <InfoRow label="Origen" value={esp.origen} />}
+            {esp.madre_uid && (
+              <InfoRow label="Planta Madre" value={
+                <button onClick={() => navigate(`/especimen/${esp.madre_id}`)} style={{ background: 'none', border: 'none', color: 'var(--bio-primary)', fontSize: '0.9rem', cursor: 'pointer', padding: 0 }}>{esp.madre_uid} ↗</button>
+              } />
+            )}
+            {esp.padre_uid && (
+              <InfoRow label="Planta Padre" value={
+                <button onClick={() => navigate(`/especimen/${esp.padre_id}`)} style={{ background: 'none', border: 'none', color: 'var(--bio-primary)', fontSize: '0.9rem', cursor: 'pointer', padding: 0 }}>{esp.padre_uid} ↗</button>
+              } />
+            )}
+            {esp.coordenadas && (
+              <InfoRow label="Ubicación In Situ" value={
+                <a href={`https://www.google.com/maps/search/?api=1&query=${esp.coordenadas.lat},${esp.coordenadas.lng}`} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--bio-primary)', fontSize: '0.9rem', textDecoration: 'none' }}>
+                  {esp.coordenadas.lat.toFixed(5)}, {esp.coordenadas.lng.toFixed(5)} 📍
+                </a>
+              } />
+            )}
+            {esp.notas && <InfoRow label="Notas" value={esp.notas} isLast />}
+          </div>
 
           {ultimoRegistro && (
-            <>
-              <p style={s.secTitle}>Último registro · {fmtFecha(ultimoRegistro.fecha)}</p>
+            <div className="card" style={{ margin: 0 }}>
+              <p className="text-secondary" style={{ fontSize: '0.8rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1, margin: '0 0 1rem' }}>Último registro · {fmtFecha(ultimoRegistro.fecha)}</p>
               <MedidasGrid r={ultimoRegistro} />
               {tieneCondiciones(ultimoRegistro) && <CondicionesGrid r={ultimoRegistro} />}
               {ultimoRegistro.fotos && Object.keys(ultimoRegistro.fotos).length > 0 && (
-                <FotosRow fotos={ultimoRegistro.fotos} />
+                <div style={{ marginTop: '1rem' }}><FotosRow fotos={ultimoRegistro.fotos} /></div>
               )}
-            </>
+            </div>
           )}
 
-          <button style={s.btnEvolucion} onClick={() => { setShowEvolucion(true) }}>
-            + Nuevo registro de evolución
-          </button>
+          <button className="btn btn--ghost btn--block" onClick={() => setShowEvolucion(true)}>+ Nuevo registro de evolución</button>
         </div>
       )}
 
       {/* Tab: Evolución */}
       {tab === 'evolucion' && (
-        <div style={s.tabBody}>
-          <button style={s.btnEvolucion} onClick={() => setShowEvolucion(true)}>+ Nuevo registro</button>
+        <div style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          <button className="btn btn--ghost btn--block" onClick={() => setShowEvolucion(true)}>+ Nuevo registro</button>
           {registros.length === 0
-            ? <p style={s.muted}>Sin registros aún</p>
+            ? <p className="text-muted text-center" style={{ padding: '2rem 0' }}>Sin registros aún</p>
             : registros.map(r => <RegistroCard key={r.id} r={r} />)
           }
         </div>
@@ -153,16 +157,16 @@ export default function EspecimenDetail() {
 
       {/* Tab: Eventos */}
       {tab === 'eventos' && (
-        <div style={s.tabBody}>
-          <button style={s.btnEvolucion} onClick={() => setShowEvento(true)}>+ Evento</button>
+        <div style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          <button className="btn btn--ghost btn--block" onClick={() => setShowEvento(true)}>+ Registrar Evento</button>
           {esp.eventos.length === 0
-            ? <p style={s.muted}>Sin eventos</p>
+            ? <p className="text-muted text-center" style={{ padding: '2rem 0' }}>Sin eventos</p>
             : esp.eventos.map(ev => <EventoCard key={ev.id} ev={ev} />)
           }
         </div>
       )}
 
-      {/* Modales */}
+      {/* Modals */}
       {showEvolucion && (
         <RegistroEvolucionForm
           especimenId={id}
@@ -206,11 +210,11 @@ function MedidasGrid({ r }) {
 
   if (!items.length) return null
   return (
-    <div style={s.medGrid}>
+    <div className="grid-2" style={{ gap: '0.5rem', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))' }}>
       {items.map(([label, val, unit]) => (
-        <div key={label} style={s.medItem}>
-          <span style={s.medLabel}>{label}</span>
-          <span style={s.medVal}>{val}{unit && ` ${unit}`}</span>
+        <div key={label} style={{ background: 'var(--bio-background)', borderRadius: '8px', padding: '0.6rem 0.8rem', display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
+          <span className="text-muted" style={{ fontSize: '0.7rem' }}>{label}</span>
+          <span className="text-primary" style={{ fontSize: '1rem', fontWeight: 600 }}>{val}{unit && <span style={{ fontSize: '0.8rem', marginLeft: '0.1rem' }}>{unit}</span>}</span>
         </div>
       ))}
     </div>
@@ -229,33 +233,32 @@ function CondicionesGrid({ r }) {
 
   if (!items.length) return null
   return (
-    <>
-      <p style={s.secSubTitle}>Condiciones ambientales</p>
-      <div style={s.medGrid}>
+    <div style={{ marginTop: '1rem' }}>
+      <p className="text-muted" style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: 1, margin: '0 0 0.5rem' }}>Condiciones ambientales</p>
+      <div className="grid-2" style={{ gap: '0.5rem', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))' }}>
         {items.map(([label, val, unit]) => (
-          <div key={label} style={s.medItem}>
-            <span style={s.medLabel}>{label}</span>
-            <span style={s.medVal}>{val}{unit && ` ${unit}`}</span>
-          </div>
+           <div key={label} style={{ background: 'var(--bio-background)', borderRadius: '8px', padding: '0.6rem 0.8rem', display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
+             <span className="text-muted" style={{ fontSize: '0.7rem' }}>{label}</span>
+             <span className="text-primary" style={{ fontSize: '1rem', fontWeight: 600 }}>{val}{unit && <span style={{ fontSize: '0.8rem', marginLeft: '0.1rem' }}>{unit}</span>}</span>
+           </div>
         ))}
       </div>
-    </>
+    </div>
   )
 }
 
 function FotosRow({ fotos }) {
-  const token = localStorage.getItem('token')
   return (
-    <div style={s.fotosRow}>
+    <div style={{ display: 'flex', gap: '0.8rem', overflowX: 'auto', paddingBottom: '0.5rem' }}>
       {Object.entries(fotos).map(([angulo, url]) => (
-        <div key={angulo} style={s.fotoWrap}>
+        <div key={angulo} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.3rem', flexShrink: 0 }}>
           <img
             src={`/api${url}?t=${Date.now()}`}
-            style={s.fotoThumb}
+            style={{ width: 80, height: 80, objectFit: 'cover', borderRadius: '10px', border: '1px solid var(--bio-border)' }}
             alt={angulo}
             onError={e => { e.target.style.display = 'none' }}
           />
-          <span style={s.fotoLabel}>{ANGULO_LABEL[angulo] || angulo}</span>
+          <span className="badge badge--outline" style={{ fontSize: '0.6rem' }}>{ANGULO_LABEL[angulo] || angulo}</span>
         </div>
       ))}
     </div>
@@ -265,19 +268,19 @@ function FotosRow({ fotos }) {
 function RegistroCard({ r }) {
   const [open, setOpen] = useState(false)
   return (
-    <div style={s.regCard}>
-      <button style={s.regHeader} onClick={() => setOpen(o => !o)}>
-        <span style={s.regFecha}>{fmtFecha(r.fecha)}</span>
-        <span style={s.regUser}>por {r.registrado_por_nombre}</span>
-        <span style={{ color: '#4a8c5c' }}>{open ? '▲' : '▼'}</span>
+    <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
+      <button style={{ width: '100%', background: 'none', border: 'none', padding: '1rem', display: 'flex', gap: '0.5rem', alignItems: 'center', cursor: 'pointer' }} onClick={() => setOpen(o => !o)}>
+        <span className="text-primary" style={{ fontSize: '0.9rem', fontWeight: 600 }}>{fmtFecha(r.fecha)}</span>
+        <span className="text-muted" style={{ fontSize: '0.8rem', flex: 1, textAlign: 'right' }}>por {r.registrado_por_nombre}</span>
+        <span className="text-secondary">{open ? '▲' : '▼'}</span>
       </button>
       {open && (
-        <div style={s.regBody}>
-          {r.protocolo_clonacion_nombre && <p style={s.regProto}>Protocolo: {r.protocolo_clonacion_nombre}</p>}
+        <div style={{ padding: '0 1rem 1rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          {r.protocolo_clonacion_nombre && <p className="text-secondary" style={{ fontSize: '0.85rem', margin: 0 }}>Protocolo: {r.protocolo_clonacion_nombre}</p>}
           <MedidasGrid r={r} />
           {tieneCondiciones(r) && <CondicionesGrid r={r} />}
           {r.fotos && Object.keys(r.fotos).length > 0 && <FotosRow fotos={r.fotos} />}
-          {r.notas && <p style={s.regNotas}>{r.notas}</p>}
+          {r.notas && <p className="text-muted" style={{ fontSize: '0.9rem', margin: 0, fontStyle: 'italic', borderLeft: '2px solid var(--bio-border)', paddingLeft: '0.5rem' }}>"{r.notas}"</p>}
         </div>
       )}
     </div>
@@ -287,13 +290,13 @@ function RegistroCard({ r }) {
 function EventoCard({ ev }) {
   const d = new Date(ev.timestamp)
   return (
-    <div style={s.eventoCard}>
-      <div style={s.eventoTop}>
-        <span style={s.eventoTipo}>{ev.tipo}</span>
-        <span style={s.eventoFecha}>{d.toLocaleDateString('es-MX')} {d.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' })}</span>
+    <div className="card" style={{ padding: '1rem' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+        <span className="badge badge--success">{ev.tipo}</span>
+        <span className="text-muted" style={{ fontSize: '0.8rem' }}>{d.toLocaleDateString('es-MX')} {d.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' })}</span>
       </div>
-      <p style={s.eventoDesc}>{ev.descripcion}</p>
-      <p style={s.eventoUser}>
+      <p className="text-primary" style={{ fontSize: '1rem', margin: '0 0 0.5rem' }}>{ev.descripcion}</p>
+      <p className="text-muted" style={{ fontSize: '0.75rem', margin: 0 }}>
         registrado por {ev.usuario_nombre}
         {ev.ejecutado_por_nombre && ` · ejecutado por ${ev.ejecutado_por_nombre}`}
       </p>
@@ -301,11 +304,11 @@ function EventoCard({ ev }) {
   )
 }
 
-function InfoCard({ label, value }) {
+function InfoRow({ label, value, isLast }) {
   return (
-    <div style={s.infoRow}>
-      <span style={s.infoLabel}>{label}</span>
-      <span style={s.infoVal}>{value}</span>
+    <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0.65rem 0', borderBottom: isLast ? 'none' : '1px solid var(--bio-background)' }}>
+      <span className="text-secondary" style={{ fontSize: '0.85rem', fontWeight: 600 }}>{label}</span>
+      <span className="text-primary" style={{ fontSize: '0.9rem', maxWidth: '60%', textAlign: 'right' }}>{value}</span>
     </div>
   )
 }
@@ -376,10 +379,10 @@ function EditEspecimenSheet({ esp, onSaved, onCancel }) {
   }
 
   return (
-    <div style={so.overlay}>
-      <div style={so.sheet}>
-        <h3 style={so.title}>Editar individuo</h3>
-        <form onSubmit={submit} style={so.form}>
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'flex-end', zIndex: 200 }}>
+      <div style={{ background: 'var(--bio-surface)', borderRadius: '24px 24px 0 0', padding: '2rem 1.5rem', width: '100%', maxHeight: '90dvh', overflowY: 'auto' }}>
+        <h3 className="text-primary" style={{ margin: '0 0 1.5rem', fontSize: '1.2rem' }}>Editar individuo</h3>
+        <form onSubmit={submit} style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
           <Sel2 label="Especie" value={form.especie_id} onChange={v => set('especie_id', v)}
             options={[{ value: '', label: '— Sin cambiar —' }, ...especies.map(e => ({ value: e.id, label: e.nombre_cientifico }))]} />
           {lineas.length > 0 && (
@@ -393,26 +396,24 @@ function EditEspecimenSheet({ esp, onSaved, onCancel }) {
           <Sel2 label="Estado" value={form.estado} onChange={v => set('estado', v)}
             options={['activo', 'en_experimento', 'archivado', 'contaminado'].map(e => ({ value: e, label: e }))} />
           
-          <div style={{ display: 'flex', gap: 8 }}>
-            <div style={{ flex: 1 }}>
-              <EspecimenSearch label="Madre" value={form.madre_id} onChange={v => set('madre_id', v)} />
-            </div>
-            <div style={{ flex: 1 }}>
-              <EspecimenSearch label="Padre" value={form.padre_id} onChange={v => set('padre_id', v)} />
-            </div>
+          <div className="grid-2">
+            <EspecimenSearch label="Madre" value={form.madre_id} onChange={v => set('madre_id', v)} />
+            <EspecimenSearch label="Padre" value={form.padre_id} onChange={v => set('padre_id', v)} />
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-            <label style={{ color: '#4a8c5c', fontSize: '0.78rem', fontWeight: 600 }}>Ubicación In Situ</label>
+          <div className="form-group">
+            <label>Ubicación In Situ</label>
             <MapPicker value={form.coordenadas} onChange={v => set('coordenadas', v)} />
           </div>
 
           <Txt2 label="Origen (descripción)" value={form.origen} onChange={v => set('origen', v)} />
           <Txt2 label="Notas" value={form.notas} onChange={v => set('notas', v)} textarea />
-          {error && <p style={{ color: '#f28b82', fontSize: '0.85rem' }}>{error}</p>}
-          <div style={so.actions}>
-            <button type="button" style={so.btnCancel} onClick={onCancel}>Cancelar</button>
-            <button type="submit" style={so.btnSave} disabled={loading}>{loading ? '…' : 'Guardar'}</button>
+          
+          {error && <p className="text-danger" style={{ fontSize: '0.85rem' }}>{error}</p>}
+          
+          <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
+            <button type="button" className="btn btn--ghost" style={{ flex: 1 }} onClick={onCancel}>Cancelar</button>
+            <button type="submit" className="btn btn--primary" style={{ flex: 2 }} disabled={loading}>{loading ? '…' : 'Guardar'}</button>
           </div>
         </form>
       </div>
@@ -422,9 +423,9 @@ function EditEspecimenSheet({ esp, onSaved, onCancel }) {
 
 function Sel2({ label, value, onChange, options }) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-      <label style={{ color: '#4a8c5c', fontSize: '0.78rem', fontWeight: 600 }}>{label}</label>
-      <select style={inputStyle} value={value} onChange={e => onChange(e.target.value)}>
+    <div className="form-group" style={{ marginBottom: '1rem' }}>
+      <label>{label}</label>
+      <select value={value} onChange={e => onChange(e.target.value)}>
         {options.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
       </select>
     </div>
@@ -432,11 +433,11 @@ function Sel2({ label, value, onChange, options }) {
 }
 function Txt2({ label, value, onChange, textarea }) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-      <label style={{ color: '#4a8c5c', fontSize: '0.78rem', fontWeight: 600 }}>{label}</label>
+    <div className="form-group" style={{ marginBottom: '1rem' }}>
+      <label>{label}</label>
       {textarea
-        ? <textarea style={{ ...inputStyle, minHeight: 60, resize: 'vertical' }} value={value} onChange={e => onChange(e.target.value)} />
-        : <input style={inputStyle} value={value} onChange={e => onChange(e.target.value)} />
+        ? <textarea style={{ minHeight: 80, resize: 'vertical' }} value={value} onChange={e => onChange(e.target.value)} />
+        : <input value={value} onChange={e => onChange(e.target.value)} />
       }
     </div>
   )
@@ -469,41 +470,24 @@ function EspecimenSearch({ label, value, onChange }) {
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 4, position: 'relative' }}>
-      <label style={{ color: '#4a8c5c', fontSize: '0.78rem', fontWeight: 600 }}>{label}</label>
-      <input style={inputStyle} value={query} onChange={e => search(e.target.value)} placeholder="Buscar UID..." />
+    <div className="form-group" style={{ position: 'relative', marginBottom: '1rem' }}>
+      <label>{label}</label>
+      <input value={query} onChange={e => search(e.target.value)} placeholder="Buscar UID..." />
       {results.length > 0 && (
-        <div style={ssr.results}>
+        <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, background: 'var(--bio-surface)', border: '1px solid var(--bio-border)', borderRadius: 8, zIndex: 200, marginTop: 4, boxShadow: '0 4px 12px rgba(0,0,0,0.5)' }}>
           {results.map(r => (
-            <div key={r.id} style={ssr.item} onClick={() => select(r)}>
-              <span style={{ fontWeight: 'bold' }}>{r.uid}</span>
-              <span style={{ fontSize: '0.7rem', color: '#4a8c5c', marginLeft: 6 }}>{r.especie}</span>
+            <div key={r.id} style={{ padding: '0.8rem', cursor: 'pointer', borderBottom: '1px solid var(--bio-background)' }} onClick={() => select(r)}>
+              <span className="text-primary" style={{ fontWeight: 'bold' }}>{r.uid}</span>
+              <span className="text-muted" style={{ fontSize: '0.8rem', marginLeft: 8 }}>{r.especie}</span>
             </div>
           ))}
         </div>
       )}
       {selectedUid && query === selectedUid && (
-        <button type="button" style={ssr.clear} onClick={() => { onChange(''); setQuery(''); setSelectedUid(''); }}>✕</button>
+        <button type="button" style={{ position: 'absolute', right: 10, top: 32, background: 'none', border: 'none', color: 'var(--error)', cursor: 'pointer', fontSize: '1.2rem' }} onClick={() => { onChange(''); setQuery(''); setSelectedUid(''); }}>✕</button>
       )}
     </div>
   )
-}
-
-const ssr = {
-  results: { position: 'absolute', top: '100%', left: 0, right: 0, background: '#1a2e1e', border: '1px solid #2d5c3a', borderRadius: 8, zIndex: 200, marginTop: 4, boxShadow: '0 4px 12px rgba(0,0,0,0.5)' },
-  item: { padding: '0.6rem 0.8rem', cursor: 'pointer', borderBottom: '1px solid #0f1f13', fontSize: '0.9rem', color: '#e0f0e5' },
-  clear: { position: 'absolute', right: 8, top: 26, background: 'none', border: 'none', color: '#f28b82', cursor: 'pointer', fontSize: '1.1rem' },
-}
-
-const inputStyle = { background: '#0f1f13', border: '1px solid #2d5c3a', borderRadius: 8, padding: '0.6rem 0.85rem', color: '#e0f0e5', fontSize: '0.9rem', outline: 'none', width: '100%', boxSizing: 'border-box' }
-const so = {
-  overlay: { position: 'fixed', inset: 0, background: '#000c', display: 'flex', alignItems: 'flex-end', zIndex: 150 },
-  sheet: { background: '#1a2e1e', borderRadius: '16px 16px 0 0', padding: '1.5rem', width: '100%', maxHeight: '90dvh', overflowY: 'auto' },
-  title: { color: '#7dca8f', margin: '0 0 1rem', fontSize: '1rem' },
-  form: { display: 'flex', flexDirection: 'column', gap: 10 },
-  actions: { display: 'flex', gap: 8, marginTop: 4 },
-  btnCancel: { flex: 1, background: 'none', border: '1px solid #2d5c3a', borderRadius: 8, color: '#7dca8f', padding: '0.75rem', fontSize: '0.9rem', cursor: 'pointer' },
-  btnSave: { flex: 2, background: '#2d7a47', border: 'none', borderRadius: 8, color: '#fff', padding: '0.75rem', fontSize: '0.9rem', fontWeight: 600, cursor: 'pointer' },
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -513,55 +497,7 @@ function tieneCondiciones(r) {
 }
 
 function fmtFecha(iso) {
+  if (!iso) return ''
   const d = new Date(iso)
   return d.toLocaleDateString('es-MX', { day: '2-digit', month: 'short', year: 'numeric' })
-}
-
-const s = {
-  page: { display: 'flex', flexDirection: 'column', minHeight: '100%' },
-  header: { padding: '1rem 1.25rem 0', background: '#1a2e1e', borderBottom: '1px solid #2d5c3a' },
-  headerTop: { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', paddingBottom: '0.75rem' },
-  badge: { display: 'inline-block', borderRadius: 20, padding: '0.15rem 0.65rem', fontSize: '0.7rem', color: '#fff', fontWeight: 600, textTransform: 'uppercase', marginBottom: 4 },
-  especie: { color: '#7dca8f', margin: 0, fontSize: '1.3rem', fontStyle: 'italic' },
-  jerarquia: { display: 'flex', alignItems: 'center', gap: 4, marginTop: 2 },
-  jerarquiaItem: { color: '#4a8c5c', fontSize: '0.82rem' },
-  jerarquiaSep: { color: '#2d5c3a', fontSize: '0.8rem' },
-  uid: { color: '#4a5568', margin: '2px 0 0', fontFamily: 'monospace', fontSize: '0.82rem' },
-  headerActions: { display: 'flex', gap: 6 },
-  btnIcon: { background: '#0f1f13', border: '1px solid #2d5c3a', borderRadius: 8, padding: '0.4rem 0.6rem', cursor: 'pointer', fontSize: '1rem' },
-  tabs: { display: 'flex', borderBottom: '1px solid #2d5c3a', background: '#1a2e1e' },
-  tab: { flex: 1, background: 'none', border: 'none', borderBottom: '2px solid transparent', color: '#4a5568', padding: '0.65rem 0.5rem', fontSize: '0.82rem', cursor: 'pointer' },
-  tabActive: { color: '#7dca8f', borderBottomColor: '#7dca8f' },
-  tabBody: { padding: '1rem 1.25rem', display: 'flex', flexDirection: 'column', gap: 10 },
-  infoRow: { display: 'flex', justifyContent: 'space-between', padding: '0.45rem 0', borderBottom: '1px solid #1a2e1e' },
-  infoLabel: { color: '#4a8c5c', fontSize: '0.82rem', fontWeight: 600 },
-  infoVal: { color: '#e0f0e5', fontSize: '0.88rem', maxWidth: '60%', textAlign: 'right' },
-  linkVal: { color: '#7dca8f', fontSize: '0.88rem', maxWidth: '60%', textAlign: 'right', textDecoration: 'none' },
-  linkBtn: { background: 'none', border: 'none', color: '#7dca8f', fontSize: '0.88rem', cursor: 'pointer', padding: 0, textAlign: 'right' },
-  secTitle: { color: '#4a8c5c', fontSize: '0.78rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1, margin: '8px 0 0' },
-  secSubTitle: { color: '#4a5568', fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: 1, margin: '6px 0 0' },
-  medGrid: { display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 6 },
-  medItem: { background: '#0f1f13', borderRadius: 8, padding: '0.5rem 0.6rem', display: 'flex', flexDirection: 'column', gap: 2 },
-  medLabel: { color: '#4a5568', fontSize: '0.68rem' },
-  medVal: { color: '#7dca8f', fontSize: '0.92rem', fontWeight: 600 },
-  fotosRow: { display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 4 },
-  fotoWrap: { display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, flexShrink: 0 },
-  fotoThumb: { width: 72, height: 72, objectFit: 'cover', borderRadius: 8, border: '1px solid #2d5c3a' },
-  fotoLabel: { color: '#4a5568', fontSize: '0.65rem' },
-  btnEvolucion: { background: '#1a2e1e', border: '1px solid #2d7a47', borderRadius: 10, color: '#7dca8f', padding: '0.75rem', fontSize: '0.9rem', cursor: 'pointer', textAlign: 'center' },
-  regCard: { background: '#1a2e1e', borderRadius: 10, overflow: 'hidden', border: '1px solid #2d5c3a' },
-  regHeader: { width: '100%', background: 'none', border: 'none', padding: '0.65rem 0.9rem', display: 'flex', gap: 8, alignItems: 'center', cursor: 'pointer' },
-  regFecha: { color: '#7dca8f', fontSize: '0.85rem', fontWeight: 600 },
-  regUser: { color: '#4a5568', fontSize: '0.78rem', flex: 1, textAlign: 'right' },
-  regBody: { padding: '0 0.9rem 0.9rem', display: 'flex', flexDirection: 'column', gap: 8 },
-  regProto: { color: '#4a8c5c', fontSize: '0.8rem', margin: 0 },
-  regNotas: { color: '#6aaa82', fontSize: '0.85rem', margin: 0, fontStyle: 'italic' },
-  eventoCard: { background: '#1a2e1e', borderRadius: 10, padding: '0.75rem 1rem' },
-  eventoTop: { display: 'flex', justifyContent: 'space-between' },
-  eventoTipo: { color: '#7dca8f', fontSize: '0.78rem', fontWeight: 600, textTransform: 'uppercase' },
-  eventoFecha: { color: '#4a5568', fontSize: '0.72rem' },
-  eventoDesc: { color: '#e0f0e5', fontSize: '0.88rem', margin: '4px 0 2px' },
-  eventoUser: { color: '#4a5568', fontSize: '0.72rem', margin: 0 },
-  muted: { color: '#4a5568', fontSize: '0.88rem', textAlign: 'center', padding: '1rem 0' },
-  error: { color: '#f28b82' },
 }

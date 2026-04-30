@@ -305,13 +305,25 @@ class ElementoListItem(BaseModel):
 
 # ── Protocolo ─────────────────────────────────────────────────────────────────
 
+class ProtocoloMaterial(BaseModel):
+    nombre: str
+    cantidad: Optional[float] = None
+    unidad: Optional[str] = None
+    notas: Optional[str] = None
+
+class ProtocoloPaso(BaseModel):
+    orden: int
+    instruccion: str
+    tiempo_minutos: Optional[int] = None
+    notas: Optional[str] = None
+
 class ProtocoloCreate(BaseModel):
     nombre: str
     tipo: str
     version: str = "1.0"
     descripcion: Optional[str] = None
-    pasos: list[dict[str, Any]] = []
-    materiales: Optional[list[dict[str, Any]]] = None
+    pasos: list[ProtocoloPaso] = []
+    materiales: Optional[list[ProtocoloMaterial]] = None
 
 
 class ProtocoloUpdate(BaseModel):
@@ -697,6 +709,7 @@ class LotePreparadoCreate(BaseModel):
     volumen_l: float
     concentracion_x: float = 1.0
     ph_final: Optional[float] = None
+    trazabilidad_reactivos: Optional[dict[str, str]] = None
     notas: Optional[str] = None
 
 class LotePreparadoOut(BaseModel):
@@ -709,6 +722,7 @@ class LotePreparadoOut(BaseModel):
     volumen_l: float
     concentracion_x: float
     ph_final: Optional[float]
+    trazabilidad_reactivos: Optional[dict[str, str]] = None
     estado: str
     notas: Optional[str]
     model_config = {"from_attributes": True}

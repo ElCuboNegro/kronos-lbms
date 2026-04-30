@@ -8,7 +8,8 @@ router = APIRouter(prefix="/eventos", tags=["eventos"])
 TIPOS_VALIDOS = {
     "siembra", "transferencia", "contaminacion", "observacion",
     "cosecha", "entrada", "salida", "sanitizacion",
-    "inicio_experimento", "fin_experimento", "otro"
+    "inicio_experimento", "fin_experimento", "otro",
+    "mantenimiento", "calibracion", "clonacion"
 }
 
 

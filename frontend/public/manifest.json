@@ -1,9 +1,8 @@
 {
-  "name": "LBMS — Kronos Tech Labs",
-  "short_name": "LBMS",
+  "name": "Seymour-OS — Kronos Tech Labs",
+  "short_name": "Seymour-OS",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#0f1f13",
-  "theme_color": "#1a472a",
-  "icons": []
+  "background_color": "#1B1F23",
+  "theme_color": "#023C69"
 }

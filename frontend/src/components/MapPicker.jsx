@@ -51,17 +51,17 @@ export default function MapPicker({ value, onChange }) {
   const center = value ? [value.lat, value.lng] : defaultCenter
 
   return (
-    <div style={s.wrap}>
-      <div style={s.topRow}>
-        <span style={s.coordsDisplay}>
+    <div style={{display:'flex',flexDirection:'column',gap:8}}>
+      <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+        <span style={{color:'var(--bio-text)',fontSize:'0.85rem',fontStyle:'italic'}}>
           {value ? `${value.lat.toFixed(5)}, ${value.lng.toFixed(5)}` : 'Sin ubicar'}
         </span>
-        <button type="button" style={s.btnLocate} onClick={handleGetLocation} disabled={locating}>
+        <button type="button" style={{background:'var(--bio-primary)',border:'none',borderRadius:8,color:'#fff',padding:'0.6rem 1rem',fontSize:'0.9rem',fontWeight:'bold',cursor:'pointer',display:'flex',alignItems:'center',gap:6,boxShadow:'0 2px 4px rgba(0,0,0,0.2)'}} onClick={handleGetLocation} disabled={locating}>
           {locating ? 'Activando GPS...' : '📍 En este lugar'}
         </button>
       </div>
       
-      <div style={s.mapContainer}>
+      <div style={{height:200,width:'100%',borderRadius:8,border:'2px solid var(--bio-primary)',overflow:'hidden',marginTop:4}}>
         <MapContainer 
           center={center} 
           zoom={value ? 16 : 4} 
@@ -74,16 +74,8 @@ export default function MapPicker({ value, onChange }) {
           <LocationMarker position={value} setPosition={onChange} />
         </MapContainer>
       </div>
-      <p style={s.hint}>Toca el mapa para ajustar el pin</p>
+      <p style={{color:'var(--bio-text-muted)',fontSize:'0.75rem',margin:0,textAlign:'center'}}>Toca el mapa para ajustar el pin</p>
     </div>
   )
 }
 
-const s = {
-  wrap: { display: 'flex', flexDirection: 'column', gap: 8 },
-  topRow: { display: 'flex', justifyContent: 'space-between', alignItems: 'center' },
-  coordsDisplay: { color: '#a0c8b0', fontSize: '0.85rem', fontStyle: 'italic' },
-  btnLocate: { background: '#2d7a47', border: 'none', borderRadius: 8, color: '#fff', padding: '0.6rem 1rem', fontSize: '0.9rem', fontWeight: 'bold', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, boxShadow: '0 2px 4px rgba(0,0,0,0.2)' },
-  mapContainer: { height: 200, width: '100%', borderRadius: 8, border: '2px solid #2d7a47', overflow: 'hidden', marginTop: 4 },
-  hint: { color: '#4a5568', fontSize: '0.75rem', margin: 0, textAlign: 'center' },
-}

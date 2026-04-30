@@ -110,6 +110,7 @@ def _map_lote(l):
         volumen_l=l.volumen_l,
         concentracion_x=l.concentracion_x,
         ph_final=l.ph_final,
+        trazabilidad_reactivos=l.trazabilidad_reactivos,
         estado=l.estado,
         notas=l.notas
     )

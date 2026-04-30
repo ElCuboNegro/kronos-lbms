@@ -1,8 +1,14 @@
+import os
+import json
 from uuid import UUID
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
 from sqlalchemy.orm import Session, joinedload
 from app.database import get_db
 from app import models, schemas, auth
+
+# Import Google GenAI (using the new official SDK)
+from google import genai
+from google.genai import types
 
 router = APIRouter(prefix="/protocolos", tags=["protocolos"])
 
@@ -11,6 +17,60 @@ TIPOS_VALIDOS = {
     "subcultivo", "enraizamiento", "aclimatacion", "otro"
 }
 RESULTADOS_VALIDOS = {"exitoso", "fallido", "parcial"}
+
+
+@router.post("/extract", response_model=schemas.ProtocoloCreate)
+async def extraer_de_documento(
+    file: UploadFile = File(...),
+    _=Depends(auth.get_current_user)
+):
+    """
+    Analiza una imagen o documento (PDF) y extrae los pasos y materiales
+    para generar un borrador de protocolo usando Google Gemini 1.5.
+    """
+    api_key = os.environ.get("GEMINI_API_KEY")
+    if not api_key:
+        raise HTTPException(status_code=500, detail="GEMINI_API_KEY no configurada en el servidor.")
+
+    if not file.content_type.startswith("image/") and file.content_type != "application/pdf":
+        raise HTTPException(status_code=415, detail="Solo se soportan imágenes y PDFs.")
+
+    try:
+        client = genai.Client(api_key=api_key)
+        
+        file_bytes = await file.read()
+        document_part = types.Part.from_bytes(data=file_bytes, mime_type=file.content_type)
+        
+        prompt = f"""
+        Eres un asistente experto en laboratorios biológicos.
+        Lee este documento que describe un protocolo de laboratorio.
+        Extrae la información en un formato JSON estricto que cumpla con el siguiente esquema.
+        Asegúrate de inferir el 'tipo' de protocolo lo mejor que puedas usando solo estos valores válidos:
+        {list(TIPOS_VALIDOS)}.
+        
+        Extrae todos los materiales mencionados.
+        Extrae los pasos en orden. Si mencionan tiempos de espera o temporizadores, ponlos en 'tiempo_minutos'.
+        """
+        
+        response = client.models.generate_content(
+            model='gemini-2.5-flash',
+            contents=[document_part, prompt],
+            config=types.GenerateContentConfig(
+                response_mime_type="application/json",
+                response_schema=schemas.ProtocoloCreate,
+                temperature=0.1
+            ),
+        )
+        
+        data = json.loads(response.text)
+        # Asegurar tipo válido
+        if data.get("tipo") not in TIPOS_VALIDOS:
+            data["tipo"] = "otro"
+            
+        return data
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error en la extracción AI: {str(e)}")
 
 
 @router.get("", response_model=list[schemas.ProtocoloListItem])

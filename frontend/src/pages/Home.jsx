@@ -15,17 +15,21 @@ export default function Home() {
   ]
 
   return (
-    <div style={s.page}>
-      <div style={s.greeting}>
-        <p style={s.sub}>Bienvenido,</p>
-        <h2 style={s.name}>{user?.nombre}</h2>
+    <div className="page-container" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+        <p className="text-muted" style={{ margin: 0, fontSize: '0.85rem' }}>Bienvenido,</p>
+        <h2 className="text-primary" style={{ margin: 0, fontSize: '1.5rem' }}>{user?.nombre}</h2>
       </div>
-      <div style={s.grid}>
+      <div className="grid-2">
         {sections.map(sec => (
-          <button key={sec.path} style={s.tile} onClick={() => navigate(sec.path)}>
-            <span style={s.icon}>{sec.icon}</span>
-            <span style={s.tileLabel}>{sec.label}</span>
-            <span style={s.tileDesc}>{sec.desc}</span>
+          <button 
+            key={sec.path} 
+            className="tile"
+            onClick={() => navigate(sec.path)}
+          >
+            <span style={{ fontSize: '1.5rem' }}>{sec.icon}</span>
+            <span className="text-primary" style={{ fontSize: '0.95rem', fontWeight: 600 }}>{sec.label}</span>
+            <span className="text-muted" style={{ fontSize: '0.75rem' }}>{sec.desc}</span>
           </button>
         ))}
       </div>
@@ -33,14 +37,3 @@ export default function Home() {
   )
 }
 
-const s = {
-  page: { padding: '1.25rem', display: 'flex', flexDirection: 'column', gap: '1.5rem' },
-  greeting: { display: 'flex', flexDirection: 'column', gap: 2 },
-  sub: { color: '#4a8c5c', margin: 0, fontSize: '0.85rem' },
-  name: { color: '#7dca8f', margin: 0, fontSize: '1.5rem' },
-  grid: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 },
-  tile: { background: '#1a2e1e', border: '1px solid #2d5c3a', borderRadius: 14, padding: '1.1rem 0.9rem', display: 'flex', flexDirection: 'column', gap: 4, cursor: 'pointer', textAlign: 'left' },
-  icon: { fontSize: '1.5rem' },
-  tileLabel: { color: '#7dca8f', fontSize: '0.95rem', fontWeight: 600 },
-  tileDesc: { color: '#4a8c5c', fontSize: '0.75rem' },
-}

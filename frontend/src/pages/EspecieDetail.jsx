@@ -22,40 +22,53 @@ export default function EspecieDetail() {
 
   useEffect(() => { fetchEspecie() }, [id])
 
-  if (loading) return <div style={s.page}><p style={s.muted}>Cargando…</p></div>
-  if (!especie) return <div style={s.page}><p style={s.error}>No encontrada</p></div>
+  if (loading) return <div className="page-container" style={{display:'flex',flexDirection:'column',gap:'0.75rem'}}><p style={{color:'var(--bio-text-muted)',fontSize:'0.9rem',margin:0}}>Cargando…</p></div>
+  if (!especie) return <div className="page-container" style={{display:'flex',flexDirection:'column',gap:'0.75rem'}}><p style={{color:'var(--error)'}}>No encontrada</p></div>
 
   return (
-    <div style={s.page}>
+    <div className="page-container" style={{display:'flex',flexDirection:'column',gap:'0.75rem'}}>
       {/* Cabecera */}
-      <div style={s.header}>
-        <div style={s.headerTop}>
+      <div className="page-header" style={{display:'flex',flexDirection:'column',gap:4}}>
+        <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start'}}>
           <div>
-            <h2 style={s.cientifico}>{especie.nombre_cientifico}</h2>
+            <h2 style={{color:'var(--bio-primary)',margin:0,fontSize:'1.4rem',fontStyle:'italic'}}>{especie.nombre_cientifico}</h2>
             <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-               <span style={s.categoriaBadge}>{especie.categoria}</span>
-               {especie.nombre_comun && <p style={{...s.comun, margin: 0}}>{especie.nombre_comun}</p>}
+               <span className="badge badge--outline">{especie.categoria}</span>
+               {especie.nombre_comun && <p style={{color:'var(--bio-text)',margin:0,fontSize:'1rem'}}>{especie.nombre_comun}</p>}
             </div>
           </div>
-          <span style={s.codigoBadge}>{especie.codigo}</span>
+          <span className="badge badge--outline font-mono">{especie.codigo}</span>
         </div>
-        <div style={s.tags}>
+        <div style={{display:'flex',gap:6,flexWrap:'wrap',marginTop:4}}>
           {especie.familia && <Tag label={especie.familia} />}
-          {especie.genero && <Tag label={especie.genero} color="#2d5c3a" />}
+          {especie.genero && <Tag label={especie.genero} color="var(--bio-border)" />}
         </div>
       </div>
 
       {/* Tabs */}
-      <div style={s.tabBar}>
-        {['ficha', 'lineas', 'experimentos', 'protocolos', 'sustratos'].map(tab => (
-          <button
-            key={tab}
-            style={{ ...s.tab, ...(activeTab === tab ? s.tabActive : {}) }}
-            onClick={() => setActiveTab(tab)}
-          >
-            {{ ficha: 'Ficha', lineas: `Líneas (${especie.lineas.length})`, experimentos: 'Experimentos', protocolos: 'Protocolos', sustratos: 'Sustratos' }[tab]}
-          </button>
-        ))}
+      <div style={{display:'flex',gap:0,borderBottom:'1px solid var(--bio-border)',marginBottom:4}}>
+        {['ficha', 'lineas', 'experimentos', 'protocolos', 'sustratos'].map(tab => {
+          const isActive = activeTab === tab;
+          return (
+            <button
+              key={tab}
+              style={{ 
+                background:'none',
+                border:'none',
+                borderBottom: isActive ? '2px solid var(--bio-primary)' : '2px solid transparent',
+                padding:'0.5rem 0.85rem',
+                color: isActive ? 'var(--bio-primary)' : 'var(--bio-text-muted)',
+                fontSize:'0.82rem',
+                cursor:'pointer',
+                marginBottom:-1,
+                fontWeight: isActive ? 600 : 400
+              }}
+              onClick={() => setActiveTab(tab)}
+            >
+              {{ ficha: 'Ficha', lineas: `Líneas (${especie.lineas.length})`, experimentos: 'Experimentos', protocolos: 'Protocolos', sustratos: 'Sustratos' }[tab]}
+            </button>
+          )
+        })}
       </div>
 
       {/* Ficha */}
@@ -65,13 +78,13 @@ export default function EspecieDetail() {
 
       {/* Líneas */}
       {activeTab === 'lineas' && (
-        <div style={s.section}>
-          <div style={s.sectionHeader}>
-            <h3 style={s.sectionTitle}>Líneas genéticas</h3>
-            <button style={s.btnAdd} onClick={() => setShowLineaForm(true)}>+ Línea</button>
+        <div style={{display:'flex',flexDirection:'column',gap:8}}>
+          <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+            <h3 style={{color:'var(--bio-primary)',margin:0,fontSize:'1rem'}}>Líneas genéticas</h3>
+            <button className="btn btn--primary" onClick={() => setShowLineaForm(true)}>+ Línea</button>
           </div>
           {especie.lineas.length === 0
-            ? <p style={s.muted}>Sin líneas registradas</p>
+            ? <p style={{color:'var(--bio-text-muted)',fontSize:'0.9rem',margin:0}}>Sin líneas registradas</p>
             : especie.lineas.map(linea => (
                 <LineaCard
                   key={linea.id}
@@ -83,14 +96,14 @@ export default function EspecieDetail() {
                 />
               ))
           }
-          <div style={s.bottomActions}>
-            <button style={s.btnVerIndividuos} onClick={() => navigate(`/especimenes?especie=${id}`)}>
+          <div style={{display:'flex',gap:8,marginTop:8}}>
+            <button className="btn btn--ghost" onClick={() => navigate(`/especimenes?especie=${id}`)}>
               Ver todos los individuos ({especie.total_individuos})
             </button>
-            <button style={s.btnNuevoIndividuo} onClick={() => navigate(`/nuevo-individuo?especie=${id}`)}>
+            <button className="btn btn--primary" onClick={() => navigate(`/nuevo-individuo?especie=${id}`)}>
               + Individuo
             </button>
-            <button style={s.btnMulti} onClick={() => navigate(`/nuevo-lote?especie=${id}`)}>
+            <button className="btn btn--secondary" onClick={() => navigate(`/nuevo-lote?especie=${id}`)}>
               + Lotes
             </button>
           </div>
@@ -229,11 +242,10 @@ function FichaPanel({ especie, especieId, onSaved }) {
   const req = form.requerimientos
 
   return (
-    <div style={s.fichaWrapper}>
+    <div style={{display:'flex',flexDirection:'column',gap:12}}>
       {/* Acciones ficha */}
-      <div style={s.fichaActions}>
-        <button
-          style={s.btnWiki}
+      <div style={{display:'flex',gap:8,alignItems:'center',flexWrap:'wrap'}}>
+        <button className="btn btn--ghost"
           onClick={fetchWiki}
           disabled={fetchingWiki}
           title="Buscar descripción en Wikipedia usando el nombre científico"
@@ -241,24 +253,24 @@ function FichaPanel({ especie, especieId, onSaved }) {
           {fetchingWiki ? 'Buscando…' : 'Wikipedia →'}
         </button>
         {ficha.wiki_url && (
-          <a href={ficha.wiki_url} target="_blank" rel="noreferrer" style={s.wikiLink}>
+          <a href={ficha.wiki_url} target="_blank" rel="noreferrer" style={{color:'var(--bio-secondary)',fontSize:'0.8rem',textDecoration:'underline'}}>
             Ver en Wikipedia
           </a>
         )}
         {!editing
           ? (
             <div style={{ display: 'flex', gap: 6 }}>
-              <button style={s.btnEdit} onClick={() => setEditing(true)}>Editar</button>
-              <button style={s.btnEdit} onClick={() => setShowConfigForm(true)}>Valores Estándar</button>
+              <button className="btn btn--ghost" onClick={() => setEditing(true)}>Editar</button>
+              <button className="btn btn--ghost" onClick={() => setShowConfigForm(true)}>Valores Estándar</button>
             </div>
           )
           : <>
-              <button style={s.btnSaveInline} onClick={save} disabled={saving}>{saving ? 'Guardando…' : 'Guardar'}</button>
-              <button style={s.btnCancelInline} onClick={cancel}>Cancelar</button>
+              <button className="btn btn--primary" onClick={save} disabled={saving}>{saving ? 'Guardando…' : 'Guardar'}</button>
+              <button className="btn btn--ghost" onClick={cancel}>Cancelar</button>
             </>
         }
       </div>
-      {wikiError && <p style={s.wikiError}>{wikiError}</p>}
+      {wikiError && <p style={{color:'var(--error)',fontSize:'0.82rem',margin:0}}>{wikiError}</p>}
 
       {showConfigForm && (
         <ConfigEstandarForm 
@@ -278,8 +290,8 @@ function FichaPanel({ especie, especieId, onSaved }) {
                    <Txt label="Nombre Científico" value={form.nombre_cientifico} onChange={v => set('nombre_cientifico', v)} italic={form.categoria === 'especie'} />
                 </div>
                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 4 }}>
-                  <label style={s.condKey}>Categoría</label>
-                  <select style={s.condInput} value={form.categoria} onChange={e => set('categoria', e.target.value)}>
+                  <label style={{color:'var(--bio-secondary)',fontSize:'0.82rem',fontWeight:600,minWidth:110}}>Categoría</label>
+                  <select  value={form.categoria} onChange={e => set('categoria', e.target.value)}>
                     <option value="especie">Especie</option>
                     <option value="subespecie">Subespecie</option>
                     <option value="cultivar">Cultivar</option>
@@ -293,19 +305,19 @@ function FichaPanel({ especie, especieId, onSaved }) {
                 <Txt label="Familia" value={form.familia} onChange={v => set('familia', v)} />
                 <Txt label="Género" value={form.genero} onChange={v => set('genero', v)} />
               </div>
-              <textarea style={s.textarea} value={form.descripcion} onChange={e => set('descripcion', e.target.value)} rows={5} placeholder="Descripción general de la especie…" />
+              <textarea  value={form.descripcion} onChange={e => set('descripcion', e.target.value)} rows={5} placeholder="Descripción general de la especie…" />
             </div>
           )
           : form.descripcion
-            ? <p style={s.fichaText}>{form.descripcion}</p>
-            : <p style={s.muted}>Sin descripción. Usa el botón Wikipedia para obtener una.</p>
+            ? <p style={{color:'var(--bio-text)',fontSize:'0.88rem',margin:0,lineHeight:1.6,whiteSpace:'pre-wrap'}}>{form.descripcion}</p>
+            : <p style={{color:'var(--bio-text-muted)',fontSize:'0.9rem',margin:0}}>Sin descripción. Usa el botón Wikipedia para obtener una.</p>
         }
       </FichaSection>
 
       {/* Condiciones óptimas */}
       <FichaSection title="Condiciones óptimas de desarrollo">
         {editing ? (
-          <div style={s.condGrid}>
+          <div className="grid-2">
             <CondField label="Temperatura (°C)" value={req.temperatura || ''} onChange={v => setReq('temperatura', v)} />
             <CondField label="Humedad relativa (%)" value={req.humedad || ''} onChange={v => setReq('humedad', v)} />
             <CondField label="Luz (lux / descripción)" value={req.luz || ''} onChange={v => setReq('luz', v)} />
@@ -319,37 +331,37 @@ function FichaPanel({ especie, especieId, onSaved }) {
         ) : (
           Object.keys(req).length
             ? <CondTable data={req} />
-            : <p style={s.muted}>Sin condiciones registradas.</p>
+            : <p style={{color:'var(--bio-text-muted)',fontSize:'0.9rem',margin:0}}>Sin condiciones registradas.</p>
         )}
       </FichaSection>
 
       {/* Ciclo de vida */}
       <FichaSection title="Ciclo de vida">
         {editing
-          ? <textarea style={s.textarea} value={ficha.ciclo_vida || ''} onChange={e => setFicha('ciclo_vida', e.target.value)} rows={4} placeholder="Describe el ciclo de vida: germinación, crecimiento vegetativo, floración, fructificación…" />
+          ? <textarea  value={ficha.ciclo_vida || ''} onChange={e => setFicha('ciclo_vida', e.target.value)} rows={4} placeholder="Describe el ciclo de vida: germinación, crecimiento vegetativo, floración, fructificación…" />
           : ficha.ciclo_vida
-            ? <p style={s.fichaText}>{ficha.ciclo_vida}</p>
-            : <p style={s.muted}>Sin información de ciclo de vida.</p>
+            ? <p style={{color:'var(--bio-text)',fontSize:'0.88rem',margin:0,lineHeight:1.6,whiteSpace:'pre-wrap'}}>{ficha.ciclo_vida}</p>
+            : <p style={{color:'var(--bio-text-muted)',fontSize:'0.9rem',margin:0}}>Sin información de ciclo de vida.</p>
         }
       </FichaSection>
 
       {/* Maduración */}
       <FichaSection title="Maduración">
         {editing
-          ? <textarea style={s.textarea} value={ficha.maduracion || ''} onChange={e => setFicha('maduracion', e.target.value)} rows={3} placeholder="Tiempo y condiciones de maduración, indicadores de madurez…" />
+          ? <textarea  value={ficha.maduracion || ''} onChange={e => setFicha('maduracion', e.target.value)} rows={3} placeholder="Tiempo y condiciones de maduración, indicadores de madurez…" />
           : ficha.maduracion
-            ? <p style={s.fichaText}>{ficha.maduracion}</p>
-            : <p style={s.muted}>Sin información de maduración.</p>
+            ? <p style={{color:'var(--bio-text)',fontSize:'0.88rem',margin:0,lineHeight:1.6,whiteSpace:'pre-wrap'}}>{ficha.maduracion}</p>
+            : <p style={{color:'var(--bio-text-muted)',fontSize:'0.9rem',margin:0}}>Sin información de maduración.</p>
         }
       </FichaSection>
 
       {/* Notas de cultivo */}
       <FichaSection title="Notas de cultivo">
         {editing
-          ? <textarea style={s.textarea} value={ficha.notas_cultivo || ''} onChange={e => setFicha('notas_cultivo', e.target.value)} rows={3} placeholder="Tips, observaciones propias, recomendaciones de manejo…" />
+          ? <textarea  value={ficha.notas_cultivo || ''} onChange={e => setFicha('notas_cultivo', e.target.value)} rows={3} placeholder="Tips, observaciones propias, recomendaciones de manejo…" />
           : ficha.notas_cultivo
-            ? <p style={s.fichaText}>{ficha.notas_cultivo}</p>
-            : <p style={s.muted}>Sin notas de cultivo.</p>
+            ? <p style={{color:'var(--bio-text)',fontSize:'0.88rem',margin:0,lineHeight:1.6,whiteSpace:'pre-wrap'}}>{ficha.notas_cultivo}</p>
+            : <p style={{color:'var(--bio-text-muted)',fontSize:'0.9rem',margin:0}}>Sin notas de cultivo.</p>
         }
       </FichaSection>
     </div>
@@ -358,8 +370,8 @@ function FichaPanel({ especie, especieId, onSaved }) {
 
 function FichaSection({ title, children }) {
   return (
-    <div style={s.fichaSection}>
-      <h4 style={s.fichaSectionTitle}>{title}</h4>
+    <div className="card">
+      <h4 style={{color:'var(--bio-secondary)',margin:'0 0 0.5rem',fontSize:'0.78rem',fontWeight:700,textTransform:'uppercase',letterSpacing:0.5}}>{title}</h4>
       {children}
     </div>
   )
@@ -367,9 +379,9 @@ function FichaSection({ title, children }) {
 
 function CondField({ label, value, onChange }) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-      <label style={s.condLabel}>{label}</label>
-      <input style={s.condInput} value={value} onChange={e => onChange(e.target.value)} placeholder="—" />
+    <div className="form-group">
+      <label>{label}</label>
+      <input value={value} onChange={e => onChange(e.target.value)} placeholder="—" />
     </div>
   )
 }
@@ -382,11 +394,11 @@ function CondTable({ data }) {
   const entries = Object.entries(data).filter(([, v]) => v)
   if (!entries.length) return null
   return (
-    <div style={s.condTable}>
+    <div style={{display:'flex',flexDirection:'column',gap:4}}>
       {entries.map(([k, v]) => (
-        <div key={k} style={s.condRow}>
-          <span style={s.condKey}>{LABELS[k] || k}</span>
-          <span style={s.condVal}>{v}</span>
+        <div key={k} style={{display:'flex',gap:8}}>
+          <span style={{color:'var(--bio-secondary)',fontSize:'0.82rem',fontWeight:600,minWidth:110}}>{LABELS[k] || k}</span>
+          <span style={{color:'var(--bio-text)',fontSize:'0.82rem'}}>{v}</span>
         </div>
       ))}
     </div>
@@ -406,24 +418,24 @@ function ExperimentosPanel({ especieId, navigate }) {
       .finally(() => setLoading(false))
   }, [especieId])
 
-  if (loading) return <p style={s.muted}>Cargando…</p>
+  if (loading) return <p style={{color:'var(--bio-text-muted)',fontSize:'0.9rem',margin:0}}>Cargando…</p>
 
-  const ESTADO_COLOR = { activo: '#2d7a47', planificado: '#4a8c5c', pausado: '#c6a230', completado: '#1a472a', cancelado: '#553333' }
+  const ESTADO_COLOR = { activo: 'var(--bio-primary)', planificado: 'var(--bio-secondary)', pausado: '#c6a230', completado: 'var(--bio-border)', cancelado: '#553333' }
 
   return (
-    <div style={s.section}>
-      <h3 style={s.sectionTitle}>Experimentos con esta especie</h3>
+    <div style={{display:'flex',flexDirection:'column',gap:8}}>
+      <h3 style={{color:'var(--bio-primary)',margin:0,fontSize:'1rem'}}>Experimentos con esta especie</h3>
       {!data || data.length === 0
-        ? <p style={s.muted}>No hay experimentos registrados con especímenes de esta especie.</p>
+        ? <p style={{color:'var(--bio-text-muted)',fontSize:'0.9rem',margin:0}}>No hay experimentos registrados con especímenes de esta especie.</p>
         : data.map(exp => (
-            <div key={exp.id} style={s.relCard} onClick={() => navigate(`/experimentos/${exp.id}`)}>
+            <div key={exp.id} className="tile" onClick={() => navigate(`/experimentos/${exp.id}`)}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                <span style={s.relNombre}>{exp.nombre}</span>
-                <span style={{ ...s.estadoBadge, background: ESTADO_COLOR[exp.estado] || '#2d5c3a' }}>
+                <span style={{color:'var(--bio-primary)',fontWeight:600,fontSize:'0.92rem'}}>{exp.nombre}</span>
+                <span className={`badge ${exp.estado === "activo" ? "badge--success" : exp.estado === "pausado" ? "badge--warning" : exp.estado === "cancelado" ? "badge--danger" : "badge--outline"}`}>
                   {exp.estado}
                 </span>
               </div>
-              <div style={s.relMeta}>
+              <div style={{display:'flex',gap:12,marginTop:4,color:'var(--bio-text-muted)',fontSize:'0.78rem',flexWrap:'wrap'}}>
                 {exp.director_nombre && <span>Dir: {exp.director_nombre}</span>}
                 <span>{exp.num_especimenes} especímenes de esta especie</span>
                 <span>{exp.fecha_inicio}</span>
@@ -448,29 +460,29 @@ function ProtocolosPanel({ especieId, navigate }) {
       .finally(() => setLoading(false))
   }, [especieId])
 
-  if (loading) return <p style={s.muted}>Cargando…</p>
+  if (loading) return <p style={{color:'var(--bio-text-muted)',fontSize:'0.9rem',margin:0}}>Cargando…</p>
 
   const TIPO_LABEL = {
     extraccion_meristema: 'Extracción meristema', propagacion_in_vitro: 'Propagación in vitro',
     desinfeccion: 'Desinfección', subcultivo: 'Subcultivo', enraizamiento: 'Enraizamiento',
     aclimatacion: 'Aclimatación', otro: 'Otro',
   }
-  const VALIDACION_COLOR = { validado: '#2d7a47', borrador: '#4a5568', obsoleto: '#553333' }
+  const VALIDACION_COLOR = { validado: 'var(--bio-primary)', borrador: 'var(--bio-text-muted)', obsoleto: '#553333' }
 
   return (
-    <div style={s.section}>
-      <h3 style={s.sectionTitle}>Protocolos aplicados a esta especie</h3>
+    <div style={{display:'flex',flexDirection:'column',gap:8}}>
+      <h3 style={{color:'var(--bio-primary)',margin:0,fontSize:'1rem'}}>Protocolos aplicados a esta especie</h3>
       {!data || data.length === 0
-        ? <p style={s.muted}>No hay protocolos vinculados a experimentos o registros de evolución de esta especie.</p>
+        ? <p style={{color:'var(--bio-text-muted)',fontSize:'0.9rem',margin:0}}>No hay protocolos vinculados a experimentos o registros de evolución de esta especie.</p>
         : data.map(p => (
-            <div key={p.id} style={s.relCard} onClick={() => navigate(`/protocolos/${p.id}`)}>
+            <div key={p.id} className="tile" onClick={() => navigate(`/protocolos/${p.id}`)}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                <span style={s.relNombre}>{p.nombre}</span>
-                <span style={{ ...s.estadoBadge, background: VALIDACION_COLOR[p.estado_validacion] || '#2d5c3a' }}>
+                <span style={{color:'var(--bio-primary)',fontWeight:600,fontSize:'0.92rem'}}>{p.nombre}</span>
+                <span className={`badge ${p.estado_validacion === "validado" ? "badge--success" : p.estado_validacion === "obsoleto" ? "badge--danger" : "badge--outline"}`}>
                   {p.estado_validacion}
                 </span>
               </div>
-              <div style={s.relMeta}>
+              <div style={{display:'flex',gap:12,marginTop:4,color:'var(--bio-text-muted)',fontSize:'0.78rem',flexWrap:'wrap'}}>
                 <span>{TIPO_LABEL[p.tipo] || p.tipo}</span>
                 <span>v{p.version}</span>
               </div>
@@ -501,14 +513,14 @@ function ConfigEstandarForm({ especie, onSaved, onCancel }) {
   }
 
   return (
-    <div style={so.overlay}>
-      <div style={so.sheet}>
-        <h3 style={so.title}>Valores Estándar ({especie.codigo})</h3>
-        <p style={{ color: '#4a8c5c', fontSize: '0.8rem', marginBottom: '1rem' }}>
+    <div style={{position:"fixed",inset:0,background:"#0009",display:"flex",alignItems:"flex-end",zIndex:100}}>
+      <div style={{background:"var(--bio-surface)",borderRadius:"16px 16px 0 0",padding:"1.5rem",width:"100%",maxHeight:"88dvh",overflowY:"auto"}}>
+        <h3 style={{color:"var(--bio-primary)",margin:"0 0 1rem",fontSize:"1rem"}}>Valores Estándar ({especie.codigo})</h3>
+        <p style={{ color: 'var(--bio-secondary)', fontSize: '0.8rem', marginBottom: '1rem' }}>
           Estos valores se auto-completarán en nuevos registros de evolución si se dejan vacíos.
         </p>
-        <form onSubmit={submit} style={so.form}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+        <form onSubmit={submit} style={{display:"flex",flexDirection:"column",gap:10}}>
+          <div className="grid-2">
             <ConfigNum label="Temperatura (°C)" value={form.temperatura_c} onChange={v => set('temperatura_c', v)} />
             <ConfigNum label="Humedad Rel. (%)" value={form.humedad_relativa_pct} onChange={v => set('humedad_relativa_pct', v)} />
             <ConfigNum label="PH Sustrato" value={form.ph_sustrato} onChange={v => set('ph_sustrato', v)} />
@@ -519,11 +531,11 @@ function ConfigEstandarForm({ especie, onSaved, onCancel }) {
           <ConfigField label="Sustrato por defecto" value={form.sustrato} onChange={v => set('sustrato', v)} />
           <ConfigField label="Contenedor por defecto" value={form.tipo_contenedor} onChange={v => set('tipo_contenedor', v)} />
           
-          {error && <p style={{ color: '#f28b82', fontSize: '0.85rem' }}>{error}</p>}
+          {error && <p style={{ color: 'var(--error)', fontSize: '0.85rem' }}>{error}</p>}
           
-          <div style={so.actions}>
-            <button type="button" style={so.btnCancel} onClick={onCancel}>Cancelar</button>
-            <button type="submit" style={so.btnSave} disabled={loading}>{loading ? '…' : 'Guardar'}</button>
+          <div style={{display:"flex",gap:8,marginTop:4}}>
+            <button type="button" className="btn btn--ghost" onClick={onCancel}>Cancelar</button>
+            <button type="submit" className="btn btn--primary" disabled={loading}>{loading ? '…' : 'Guardar'}</button>
           </div>
         </form>
       </div>
@@ -549,14 +561,14 @@ function LineaConfigForm({ linea, onSaved, onCancel }) {
   }
 
   return (
-    <div style={so.overlay}>
-      <div style={so.sheet}>
-        <h3 style={so.title}>Valores Estándar Línea: {linea.nombre}</h3>
-        <p style={{ color: '#4a8c5c', fontSize: '0.8rem', marginBottom: '1rem' }}>
+    <div style={{position:"fixed",inset:0,background:"#0009",display:"flex",alignItems:"flex-end",zIndex:100}}>
+      <div style={{background:"var(--bio-surface)",borderRadius:"16px 16px 0 0",padding:"1.5rem",width:"100%",maxHeight:"88dvh",overflowY:"auto"}}>
+        <h3 style={{color:"var(--bio-primary)",margin:"0 0 1rem",fontSize:"1rem"}}>Valores Estándar Línea: {linea.nombre}</h3>
+        <p style={{ color: 'var(--bio-secondary)', fontSize: '0.8rem', marginBottom: '1rem' }}>
           Estos valores tienen prioridad sobre los de la especie.
         </p>
-        <form onSubmit={submit} style={so.form}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+        <form onSubmit={submit} style={{display:"flex",flexDirection:"column",gap:10}}>
+          <div className="grid-2">
             <ConfigNum label="Temperatura (°C)" value={form.temperatura_c} onChange={v => set('temperatura_c', v)} />
             <ConfigNum label="Humedad Rel. (%)" value={form.humedad_relativa_pct} onChange={v => set('humedad_relativa_pct', v)} />
             <ConfigNum label="PH Sustrato" value={form.ph_sustrato} onChange={v => set('ph_sustrato', v)} />
@@ -567,11 +579,11 @@ function LineaConfigForm({ linea, onSaved, onCancel }) {
           <ConfigField label="Sustrato por defecto" value={form.sustrato} onChange={v => set('sustrato', v)} />
           <ConfigField label="Contenedor por defecto" value={form.tipo_contenedor} onChange={v => set('tipo_contenedor', v)} />
           
-          {error && <p style={{ color: '#f28b82', fontSize: '0.85rem' }}>{error}</p>}
+          {error && <p style={{ color: 'var(--error)', fontSize: '0.85rem' }}>{error}</p>}
           
-          <div style={so.actions}>
-            <button type="button" style={so.btnCancel} onClick={onCancel}>Cancelar</button>
-            <button type="submit" style={so.btnSave} disabled={loading}>{loading ? '…' : 'Guardar'}</button>
+          <div style={{display:"flex",gap:8,marginTop:4}}>
+            <button type="button" className="btn btn--ghost" onClick={onCancel}>Cancelar</button>
+            <button type="submit" className="btn btn--primary" disabled={loading}>{loading ? '…' : 'Guardar'}</button>
           </div>
         </form>
       </div>
@@ -597,14 +609,14 @@ function VariegacionConfigForm({ variegacion, onSaved, onCancel }) {
   }
 
   return (
-    <div style={so.overlay}>
-      <div style={so.sheet}>
-        <h3 style={so.title}>Valores Estándar Variegación: {variegacion.nombre}</h3>
-        <p style={{ color: '#4a8c5c', fontSize: '0.8rem', marginBottom: '1rem' }}>
+    <div style={{position:"fixed",inset:0,background:"#0009",display:"flex",alignItems:"flex-end",zIndex:100}}>
+      <div style={{background:"var(--bio-surface)",borderRadius:"16px 16px 0 0",padding:"1.5rem",width:"100%",maxHeight:"88dvh",overflowY:"auto"}}>
+        <h3 style={{color:"var(--bio-primary)",margin:"0 0 1rem",fontSize:"1rem"}}>Valores Estándar Variegación: {variegacion.nombre}</h3>
+        <p style={{ color: 'var(--bio-secondary)', fontSize: '0.8rem', marginBottom: '1rem' }}>
           Estos valores tienen prioridad sobre la línea y la especie.
         </p>
-        <form onSubmit={submit} style={so.form}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+        <form onSubmit={submit} style={{display:"flex",flexDirection:"column",gap:10}}>
+          <div className="grid-2">
             <ConfigNum label="Temperatura (°C)" value={form.temperatura_c} onChange={v => set('temperatura_c', v)} />
             <ConfigNum label="Humedad Rel. (%)" value={form.humedad_relativa_pct} onChange={v => set('humedad_relativa_pct', v)} />
             <ConfigNum label="PH Sustrato" value={form.ph_sustrato} onChange={v => set('ph_sustrato', v)} />
@@ -612,9 +624,9 @@ function VariegacionConfigForm({ variegacion, onSaved, onCancel }) {
             <ConfigField label="NPK" value={form.npk} onChange={v => set('npk', v)} placeholder="20-20-20" />
             <ConfigNum label="Nutrición (PPM)" value={form.ppm} onChange={v => set('ppm', v)} />
           </div>
-          <div style={so.actions}>
-            <button type="button" style={so.btnCancel} onClick={onCancel}>Cancelar</button>
-            <button type="submit" style={so.btnSave} disabled={loading}>{loading ? '…' : 'Guardar'}</button>
+          <div style={{display:"flex",gap:8,marginTop:4}}>
+            <button type="button" className="btn btn--ghost" onClick={onCancel}>Cancelar</button>
+            <button type="submit" className="btn btn--primary" disabled={loading}>{loading ? '…' : 'Guardar'}</button>
           </div>
         </form>
       </div>
@@ -624,18 +636,31 @@ function VariegacionConfigForm({ variegacion, onSaved, onCancel }) {
 
 function ConfigField({ label, value, onChange, placeholder }) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-      <label style={{ color: '#4a8c5c', fontSize: '0.78rem', fontWeight: 600 }}>{label}</label>
-      <input style={s.condInput} value={value || ''} onChange={e => onChange(e.target.value)} placeholder={placeholder || '—'} />
+    <div className="form-group">
+      <label>{label}</label>
+      <input value={value || ''} onChange={e => onChange(e.target.value)} placeholder={placeholder || '—'} />
+    </div>
+  )
+}
+
+function Txt({ label, value, onChange, italic }) {
+  return (
+    <div className="form-group">
+      <label>{label}</label>
+      <input 
+        value={value || ''} 
+        onChange={e => onChange(e.target.value)} 
+        style={italic ? { fontStyle: 'italic' } : {}}
+      />
     </div>
   )
 }
 
 function ConfigNum({ label, value, onChange }) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-      <label style={{ color: '#4a8c5c', fontSize: '0.78rem', fontWeight: 600 }}>{label}</label>
-      <input type="number" step="0.1" style={s.condInput} value={value ?? ''} onChange={e => onChange(e.target.value)} placeholder="—" />
+    <div className="form-group">
+      <label>{label}</label>
+      <input type="number" step="0.1" value={value ?? ''} onChange={e => onChange(e.target.value)} placeholder="—" />
     </div>
   )
 }
@@ -648,23 +673,23 @@ function SustratosPanel({ navigate }) {
     api.get('/sustratos').then(setSustratos).finally(() => setLoading(false))
   }, [])
 
-  if (loading) return <p style={s.muted}>Cargando…</p>
+  if (loading) return <p style={{color:'var(--bio-text-muted)',fontSize:'0.9rem',margin:0}}>Cargando…</p>
 
   return (
-    <div style={s.section}>
-      <div style={s.sectionHeader}>
-        <h3 style={s.sectionTitle}>Formulaciones de Sustrato</h3>
-        <button style={s.btnSec} onClick={() => navigate('/medios')}>Gestionar 🧪</button>
+    <div style={{display:'flex',flexDirection:'column',gap:8}}>
+      <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+        <h3 style={{color:'var(--bio-primary)',margin:0,fontSize:'1rem'}}>Formulaciones de Sustrato</h3>
+        <button className="btn btn--secondary" onClick={() => navigate('/medios')}>Gestionar 🧪</button>
       </div>
-      {sustratos.length === 0 ? <p style={s.muted}>Sin sustratos registrados</p> : (
+      {sustratos.length === 0 ? <p style={{color:'var(--bio-text-muted)',fontSize:'0.9rem',margin:0}}>Sin sustratos registrados</p> : (
         sustratos.map(su => (
-          <div key={su.id} style={s.relCard}>
+          <div key={su.id} className="tile">
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <span style={s.relNombre}>{su.nombre}</span>
-              <span style={s.codigoBadge}>{su.codigo_formulacion}</span>
+              <span style={{color:'var(--bio-primary)',fontWeight:600,fontSize:'0.92rem'}}>{su.nombre}</span>
+              <span className="badge badge--outline font-mono">{su.codigo_formulacion}</span>
             </div>
-            {su.descripcion && <p style={{ color: '#6aaa82', fontSize: '0.8rem', margin: '4px 0' }}>{su.descripcion}</p>}
-            <div style={s.relMeta}>
+            {su.descripcion && <p style={{ color: 'var(--bio-text-muted)', fontSize: '0.8rem', margin: '4px 0' }}>{su.descripcion}</p>}
+            <div style={{display:'flex',gap:12,marginTop:4,color:'var(--bio-text-muted)',fontSize:'0.78rem',flexWrap:'wrap'}}>
               {su.ph_teorico && <span>pH: {su.ph_teorico}</span>}
               {su.conductividad_teorica && <span>EC: {su.conductividad_teorica}</span>}
             </div>
@@ -675,8 +700,8 @@ function SustratosPanel({ navigate }) {
   )
 }
 
-function Tag({ label, color = '#1a472a' }) {
-  return <span style={{ ...s.tag, background: color }}>{label}</span>
+function Tag({ label, color = 'var(--bio-border)' }) {
+  return <span style={{ borderRadius:20,padding:'0.2rem 0.65rem',fontSize:'0.75rem',color:'var(--bio-primary)',fontStyle:'italic', background: color }}>{label}</span>
 }
 
 function LineaCard({ linea, onAddVar, onVerIndividuos, onEditConfig, onEditVarConfig }) {
@@ -689,33 +714,33 @@ function LineaCard({ linea, onAddVar, onVerIndividuos, onEditConfig, onEditVarCo
   }
 
   return (
-    <div style={s.lineaCard}>
-      <button style={s.lineaHeader} onClick={() => setExpanded(e => !e)}>
+    <div className="card" style={{ padding: 0, overflow: "hidden" }}>
+      <button style={{width:'100%',background:'none',border:'none',padding:'0.75rem 1rem',display:'flex',justifyContent:'space-between',alignItems:'center',cursor:'pointer',textAlign:'left'}} onClick={() => setExpanded(e => !e)}>
         <div style={{ display: 'flex', flexDirection: 'column' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            <span style={s.lineaNombre}>{linea.nombre}</span>
+            <span style={{color:'var(--bio-primary)',fontWeight:600,fontSize:'0.95rem'}}>{linea.nombre}</span>
             {linea.metodo_propagacion !== 'desconocido' && (
-              <span style={s.metodoBadge}>{METODO_LABEL[linea.metodo_propagacion]}</span>
+              <span className="badge badge--outline">{METODO_LABEL[linea.metodo_propagacion]}</span>
             )}
           </div>
-          <span style={s.lineaStats}>{linea.variegaciones.length} var. · {linea.total_individuos} ind.</span>
+          <span style={{color:'var(--bio-text-muted)',fontSize:'0.8rem'}}>{linea.variegaciones.length} var. · {linea.total_individuos} ind.</span>
         </div>
-        <span style={{ color: '#4a8c5c', fontSize: '0.85rem' }}>{expanded ? '▲' : '▼'}</span>
+        <span style={{ color: 'var(--bio-secondary)', fontSize: '0.85rem' }}>{expanded ? '▲' : '▼'}</span>
       </button>
 
       {expanded && (
-        <div style={s.lineaBody}>
-          {linea.descripcion && <p style={s.lineaDesc}>{linea.descripcion}</p>}
-          <div style={s.varGrid}>
+        <div style={{padding:'0 1rem 0.75rem',display:'flex',flexDirection:'column',gap:8}}>
+          {linea.descripcion && <p style={{color:'var(--bio-text-muted)',fontSize:'0.85rem',margin:0}}>{linea.descripcion}</p>}
+          <div style={{display:'flex',flexWrap:'wrap',gap:6}}>
             {linea.variegaciones.map(v => <VarChip key={v.id} v={v} onEditConfig={onEditVarConfig} />)}
-            <button style={s.varAdd} onClick={onAddVar}>+ variegación</button>
+            <button style={{background:'none',border:'1px dashed var(--bio-border)',borderRadius:20,color:'var(--bio-secondary)',padding:'0.3rem 0.75rem',fontSize:'0.82rem',cursor:'pointer'}} onClick={onAddVar}>+ variegación</button>
           </div>
-          <div style={s.lineaActions}>
+          <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginTop:4}}>
             <div style={{ display: 'flex', gap: 10 }}>
-              <button style={s.btnVerLinea} onClick={onVerIndividuos}>Ver individuos →</button>
-              <button style={s.btnVerLinea} onClick={onEditConfig}>⚙️ Config</button>
+              <button style={{background:'none',border:'none',color:'var(--bio-secondary)',fontSize:'0.8rem',cursor:'pointer',textAlign:'left',padding:0}} onClick={onVerIndividuos}>Ver individuos →</button>
+              <button style={{background:'none',border:'none',color:'var(--bio-secondary)',fontSize:'0.8rem',cursor:'pointer',textAlign:'left',padding:0}} onClick={onEditConfig}>⚙️ Config</button>
             </div>
-            <button style={s.btnNuevoLineaIndividuo}
+            <button className="btn btn--ghost"
               onClick={() => navigate(`/nuevo-individuo?especie=${linea.especie_id}&linea=${linea.id}`)}>
               + Nuevo
             </button>
@@ -728,10 +753,10 @@ function LineaCard({ linea, onAddVar, onVerIndividuos, onEditConfig, onEditVarCo
 
 function VarChip({ v, onEditConfig }) {
   return (
-    <div style={s.varChip}>
-      <span style={s.varNombre}>{v.nombre}</span>
-      <span style={s.varInds}>({v.total_individuos})</span>
-      <button onClick={() => onEditConfig(v)} style={s.btnVarConfig} title="Configurar cuidados de esta variegación">⚙️</button>
+    <div style={{background:'var(--bio-background)',border:'1px solid var(--bio-border)',borderRadius:20,padding:'0.3rem 0.75rem',display:'flex',gap:6,alignItems:'center'}}>
+      <span style={{color:'var(--bio-text)',fontSize:'0.82rem'}}>{v.nombre}</span>
+      <span style={{color:'var(--bio-text-muted)',fontSize:'0.72rem'}}>({v.total_individuos})</span>
+      <button onClick={() => onEditConfig(v)} style={{background:'none',border:'none',color:'var(--bio-secondary)',cursor:'pointer',fontSize:'0.85rem',padding:0,marginLeft:4}} title="Configurar cuidados de esta variegación">⚙️</button>
     </div>
   )
 }
@@ -756,9 +781,9 @@ function LineaForm({ especieId, onSaved, onCancel }) {
   return (
     <SheetForm title="Nueva línea genética" onCancel={onCancel} onSubmit={submit} loading={loading} error={error}>
       <Field label="Nombre de la línea *" value={form.nombre} onChange={v => set('nombre', v)} required />
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-        <label style={s.label}>Origen / Método de Propagación</label>
-        <select style={s.input} value={form.metodo_propagacion} onChange={e => set('metodo_propagacion', e.target.value)}>
+      <div className="form-group">
+        <label style={{color:'var(--bio-secondary)',fontSize:'0.78rem',fontWeight:600}}>Origen / Método de Propagación</label>
+        <select  value={form.metodo_propagacion} onChange={e => set('metodo_propagacion', e.target.value)}>
           <option value="desconocido">Desconocido</option>
           <option value="semilla">Semilla (Selección/Consanguinidad)</option>
           <option value="clonacion">Clonación / Propagación Vegetativa</option>
@@ -798,15 +823,15 @@ function VariegacionForm({ lineaId, lineaNombre, onSaved, onCancel }) {
 
 function SheetForm({ title, onCancel, onSubmit, loading, error, children }) {
   return (
-    <div style={s.overlay}>
-      <div style={s.sheet}>
-        <h3 style={s.sheetTitle}>{title}</h3>
-        <form onSubmit={onSubmit} style={s.form}>
+    <div style={{position:'fixed',inset:0,background:'#0009',display:'flex',alignItems:'flex-end',zIndex:100}}>
+      <div style={{background:'var(--bio-surface)',borderRadius:'16px 16px 0 0',padding:'1.5rem',width:'100%',maxHeight:'88dvh',overflowY:'auto'}}>
+        <h3 style={{color:'var(--bio-primary)',margin:'0 0 1rem',fontSize:'1rem'}}>{title}</h3>
+        <form onSubmit={onSubmit} style={{display:'flex',flexDirection:'column',gap:10}}>
           {children}
-          {error && <p style={s.errorMsg}>{error}</p>}
-          <div style={s.actions}>
-            <button type="button" style={s.btnCancel} onClick={onCancel}>Cancelar</button>
-            <button type="submit" style={s.btnSave} disabled={loading}>{loading ? 'Guardando…' : 'Guardar'}</button>
+          {error && <p style={{color:'var(--error)',fontSize:'0.85rem',margin:0}}>{error}</p>}
+          <div style={{display:'flex',gap:8,marginTop:4}}>
+            <button type="button" className="btn btn--ghost" onClick={onCancel}>Cancelar</button>
+            <button type="submit" className="btn btn--primary" disabled={loading}>{loading ? 'Guardando…' : 'Guardar'}</button>
           </div>
         </form>
       </div>
@@ -816,11 +841,11 @@ function SheetForm({ title, onCancel, onSubmit, loading, error, children }) {
 
 function Field({ label, value, onChange, textarea, required }) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-      <label style={s.label}>{label}</label>
+    <div className="form-group">
+      <label style={{color:'var(--bio-secondary)',fontSize:'0.78rem',fontWeight:600}}>{label}</label>
       {textarea
-        ? <textarea style={{ ...s.input, minHeight: 60, resize: 'vertical' }} value={value} onChange={e => onChange(e.target.value)} />
-        : <input style={s.input} value={value} onChange={e => onChange(e.target.value)} required={required} />
+        ? <textarea  value={value} onChange={e => onChange(e.target.value)} />
+        : <input  value={value} onChange={e => onChange(e.target.value)} required={required} />
       }
     </div>
   )
@@ -828,85 +853,3 @@ function Field({ label, value, onChange, textarea, required }) {
 
 // ── Styles ─────────────────────────────────────────────────────────────────────
 
-const s = {
-  page: { padding: '1.25rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' },
-  header: { display: 'flex', flexDirection: 'column', gap: 4 },
-  headerTop: { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' },
-  cientifico: { color: '#7dca8f', margin: 0, fontSize: '1.4rem', fontStyle: 'italic' },
-  comun: { color: '#a0c8b0', margin: 0, fontSize: '1rem' },
-  codigoBadge: { background: '#1a2e1e', border: '1px solid #2d5c3a', borderRadius: 6, color: '#4a8c5c', padding: '0.2rem 0.5rem', fontSize: '0.75rem', fontWeight: 700, letterSpacing: 1, whiteSpace: 'nowrap' },
-  categoriaBadge: { background: '#1a472a', color: '#7dca8f', fontSize: '0.65rem', padding: '1px 5px', borderRadius: 4, textTransform: 'uppercase', fontWeight: 'bold', border: '1px solid #2d5c3a', marginLeft: 0 },
-  tags: { display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 4 },
-  tag: { borderRadius: 20, padding: '0.2rem 0.65rem', fontSize: '0.75rem', color: '#7dca8f', fontStyle: 'italic' },
-
-  // Tabs
-  tabBar: { display: 'flex', gap: 0, borderBottom: '1px solid #2d5c3a', marginBottom: 4 },
-  tab: { background: 'none', border: 'none', borderBottom: '2px solid transparent', padding: '0.5rem 0.85rem', color: '#4a5568', fontSize: '0.82rem', cursor: 'pointer', marginBottom: -1 },
-  tabActive: { color: '#7dca8f', borderBottomColor: '#7dca8f', fontWeight: 600 },
-
-  // Ficha
-  fichaWrapper: { display: 'flex', flexDirection: 'column', gap: 12 },
-  fichaActions: { display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' },
-  btnWiki: { background: '#1a2e1e', border: '1px solid #2d5c3a', borderRadius: 8, color: '#a0c8b0', padding: '0.4rem 0.85rem', fontSize: '0.82rem', cursor: 'pointer' },
-  wikiLink: { color: '#4a8c5c', fontSize: '0.8rem', textDecoration: 'underline' },
-  wikiError: { color: '#f28b82', fontSize: '0.82rem', margin: 0 },
-  btnEdit: { marginLeft: 'auto', background: 'none', border: '1px solid #2d5c3a', borderRadius: 8, color: '#7dca8f', padding: '0.35rem 0.75rem', fontSize: '0.8rem', cursor: 'pointer' },
-  btnSaveInline: { marginLeft: 'auto', background: '#2d7a47', border: 'none', borderRadius: 8, color: '#fff', padding: '0.35rem 0.85rem', fontSize: '0.8rem', cursor: 'pointer', fontWeight: 600 },
-  btnCancelInline: { background: 'none', border: '1px solid #2d5c3a', borderRadius: 8, color: '#7dca8f', padding: '0.35rem 0.75rem', fontSize: '0.8rem', cursor: 'pointer' },
-  fichaSection: { background: '#1a2e1e', border: '1px solid #2d5c3a', borderRadius: 10, padding: '0.85rem' },
-  fichaSectionTitle: { color: '#4a8c5c', margin: '0 0 0.5rem', fontSize: '0.78rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.5 },
-  fichaText: { color: '#c0ddc8', fontSize: '0.88rem', margin: 0, lineHeight: 1.6, whiteSpace: 'pre-wrap' },
-  textarea: { background: '#0f1f13', border: '1px solid #2d5c3a', borderRadius: 8, padding: '0.65rem', color: '#e0f0e5', fontSize: '0.9rem', resize: 'vertical', width: '100%', boxSizing: 'border-box', fontFamily: 'inherit' },
-  condGrid: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 },
-  condLabel: { color: '#4a8c5c', fontSize: '0.72rem', fontWeight: 600 },
-  condInput: { background: '#0f1f13', border: '1px solid #2d5c3a', borderRadius: 6, padding: '0.5rem 0.75rem', color: '#e0f0e5', fontSize: '0.85rem', width: '100%', boxSizing: 'border-box' },
-  condTable: { display: 'flex', flexDirection: 'column', gap: 4 },
-  condRow: { display: 'flex', gap: 8 },
-  condKey: { color: '#4a8c5c', fontSize: '0.82rem', fontWeight: 600, minWidth: 110 },
-  condVal: { color: '#c0ddc8', fontSize: '0.82rem' },
-
-  // Cards relacionadas
-  relCard: { background: '#1a2e1e', border: '1px solid #2d5c3a', borderRadius: 10, padding: '0.75rem', cursor: 'pointer', marginBottom: 6 },
-  relNombre: { color: '#7dca8f', fontWeight: 600, fontSize: '0.92rem' },
-  relMeta: { display: 'flex', gap: 12, marginTop: 4, color: '#4a5568', fontSize: '0.78rem', flexWrap: 'wrap' },
-  estadoBadge: { borderRadius: 4, padding: '0.1rem 0.45rem', fontSize: '0.68rem', color: '#fff', fontWeight: 700, textTransform: 'uppercase' },
-
-  // Secciones
-  section: { display: 'flex', flexDirection: 'column', gap: 8 },
-  sectionHeader: { display: 'flex', justifyContent: 'space-between', alignItems: 'center' },
-  sectionTitle: { color: '#7dca8f', margin: 0, fontSize: '1rem' },
-  btnAdd: { background: '#2d7a47', border: 'none', borderRadius: 20, color: '#fff', padding: '0.3rem 0.9rem', fontSize: '0.85rem', cursor: 'pointer' },
-  lineaCard: { background: '#1a2e1e', border: '1px solid #2d5c3a', borderRadius: 12, overflow: 'hidden' },
-  lineaHeader: { width: '100%', background: 'none', border: 'none', padding: '0.75rem 1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer', textAlign: 'left' },
-  lineaNombre: { color: '#7dca8f', fontWeight: 600, fontSize: '0.95rem' },
-  metodoBadge: { background: '#2d5c3a', color: '#7dca8f', padding: '0.1rem 0.4rem', borderRadius: 4, fontSize: '0.65rem', textTransform: 'uppercase', fontWeight: 'bold' },
-  lineaStats: { color: '#4a5568', fontSize: '0.8rem' },
-  lineaBody: { padding: '0 1rem 0.75rem', display: 'flex', flexDirection: 'column', gap: 8 },
-  lineaDesc: { color: '#6aaa82', fontSize: '0.85rem', margin: 0 },
-  varGrid: { display: 'flex', flexWrap: 'wrap', gap: 6 },
-  varChip: { background: '#0f1f13', border: '1px solid #2d5c3a', borderRadius: 20, padding: '0.3rem 0.75rem', display: 'flex', gap: 6, alignItems: 'center' },
-  btnVarConfig: { background: 'none', border: 'none', color: '#4a8c5c', cursor: 'pointer', fontSize: '0.85rem', padding: 0, marginLeft: 4 },
-  varNombre: { color: '#a0c8b0', fontSize: '0.82rem' },
-  varInds: { color: '#4a5568', fontSize: '0.72rem' },
-  varAdd: { background: 'none', border: '1px dashed #2d5c3a', borderRadius: 20, color: '#4a8c5c', padding: '0.3rem 0.75rem', fontSize: '0.82rem', cursor: 'pointer' },
-  btnVerLinea: { background: 'none', border: 'none', color: '#4a8c5c', fontSize: '0.8rem', cursor: 'pointer', textAlign: 'left', padding: 0 },
-  lineaActions: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 4 },
-  btnNuevoLineaIndividuo: { background: 'none', border: '1px solid #2d7a47', borderRadius: 8, color: '#7dca8f', padding: '0.3rem 0.6rem', fontSize: '0.75rem', cursor: 'pointer' },
-  bottomActions: { display: 'flex', gap: 8, marginTop: 8 },
-  btnVerIndividuos: { flex: 2, background: '#1a2e1e', border: '1px solid #2d5c3a', borderRadius: 10, color: '#7dca8f', padding: '0.7rem 0.5rem', fontSize: '0.85rem', cursor: 'pointer', textAlign: 'center' },
-  btnNuevoIndividuo: { flex: 1, background: '#2d7a47', border: 'none', borderRadius: 10, color: '#fff', padding: '0.7rem 0.5rem', fontSize: '0.85rem', cursor: 'pointer', textAlign: 'center', fontWeight: 'bold' },
-  btnMulti: { flex: 1, background: '#4a8c5c', border: 'none', borderRadius: 10, color: '#fff', padding: '0.7rem 0.5rem', fontSize: '0.85rem', cursor: 'pointer', textAlign: 'center', fontWeight: 'bold' },
-
-  muted: { color: '#4a5568', fontSize: '0.9rem', margin: 0 },
-  error: { color: '#f28b82' },
-  overlay: { position: 'fixed', inset: 0, background: '#0009', display: 'flex', alignItems: 'flex-end', zIndex: 100 },
-  sheet: { background: '#1a2e1e', borderRadius: '16px 16px 0 0', padding: '1.5rem', width: '100%', maxHeight: '88dvh', overflowY: 'auto' },
-  sheetTitle: { color: '#7dca8f', margin: '0 0 1rem', fontSize: '1rem' },
-  form: { display: 'flex', flexDirection: 'column', gap: 10 },
-  label: { color: '#4a8c5c', fontSize: '0.78rem', fontWeight: 600 },
-  input: { background: '#0f1f13', border: '1px solid #2d5c3a', borderRadius: 8, padding: '0.65rem 0.9rem', color: '#e0f0e5', fontSize: '0.95rem', outline: 'none' },
-  errorMsg: { color: '#f28b82', fontSize: '0.85rem', margin: 0 },
-  actions: { display: 'flex', gap: 8, marginTop: 4 },
-  btnCancel: { flex: 1, background: 'none', border: '1px solid #2d5c3a', borderRadius: 8, color: '#7dca8f', padding: '0.75rem', fontSize: '0.9rem', cursor: 'pointer' },
-  btnSave: { flex: 2, background: '#2d7a47', border: 'none', borderRadius: 8, color: '#fff', padding: '0.75rem', fontSize: '0.9rem', fontWeight: 600, cursor: 'pointer' },
-}

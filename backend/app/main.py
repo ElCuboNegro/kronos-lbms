@@ -7,11 +7,12 @@ from app.routers import auth, especimenes, elementos, eventos, scan, especies, p
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    Base.metadata.create_all(bind=engine)
+    # Base.metadata.create_all is now managed via Alembic migrations.
+    # Run `alembic upgrade head` to apply schema changes.
     yield
 
 
-app = FastAPI(title="LBMS API", version="0.2.0", lifespan=lifespan)
+app = FastAPI(title="Seymour-OS API", version="0.2.0", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,

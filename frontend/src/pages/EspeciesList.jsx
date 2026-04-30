@@ -25,22 +25,22 @@ export default function EspeciesList() {
   )
 
   return (
-    <div style={s.page}>
-      <div style={s.topBar}>
+    <div className="page-container" style={{display:'flex',flexDirection:'column',gap:10}}>
+      <div style={{display:'flex',gap:8}}>
         <input
-          style={s.search}
+          style={{flex:1,background:'var(--bio-surface)',border:'1px solid var(--bio-border)',borderRadius:10,padding:'0.6rem 0.9rem',color:'var(--bio-text)',fontSize:'0.95rem',outline:'none'}}
           placeholder="Buscar especie…"
           value={busqueda}
           onChange={e => setBusqueda(e.target.value)}
         />
-        <button style={s.btnSustratos} onClick={() => navigate('/medios')} title="Medios">🧪</button>
-        <button style={s.btnAdd} onClick={() => setShowForm(true)}>+</button>
+        <button style={{background:'var(--bio-background)',border:'1px solid var(--bio-border)',borderRadius:10,color:'var(--bio-primary)',fontSize:'1.1rem',width:44,cursor:'pointer'}} onClick={() => navigate('/medios')} title="Medios">🧪</button>
+        <button style={{background:'var(--bio-primary)',border:'none',borderRadius:10,color:'#fff',fontSize:'1.4rem',width:44,cursor:'pointer'}} onClick={() => setShowForm(true)}>+</button>
       </div>
 
       {loading
-        ? <p style={s.muted}>Cargando…</p>
+        ? <p style={{color:'var(--bio-text-muted)',textAlign:'center',padding:'2rem 0'}}>Cargando…</p>
         : filtradas.length === 0
-          ? <p style={s.muted}>{busqueda ? 'Sin resultados' : 'No hay especies registradas'}</p>
+          ? <p style={{color:'var(--bio-text-muted)',textAlign:'center',padding:'2rem 0'}}>{busqueda ? 'Sin resultados' : 'No hay especies registradas'}</p>
           : filtradas.map(e => (
               <EspecieCard key={e.id} e={e} onClick={() => navigate(`/especies/${e.id}`)} />
             ))
@@ -62,17 +62,17 @@ export default function EspeciesList() {
 
 function EspecieCard({ e, onClick }) {
   return (
-    <button style={s.card} onClick={onClick}>
-      <div style={s.cardTop}>
-        <span style={s.cientifico}>{e.nombre_cientifico}</span>
-        <span style={s.familia}>{e.familia || 'Sin familia'}</span>
+    <button className="card" style={{textAlign:'left',cursor:'pointer',width:'100%'}} onClick={onClick}>
+      <div style={{display:'flex',justifyContent:'space-between',alignItems:'baseline',gap:8}}>
+        <span style={{color:'var(--bio-primary)',fontSize:'1rem',fontWeight:600,fontStyle:'italic'}}>{e.nombre_cientifico}</span>
+        <span style={{color:'var(--bio-text-muted)',fontSize:'0.75rem',flexShrink:0}}>{e.familia || 'Sin familia'}</span>
       </div>
       <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
-        <span style={s.categoriaBadge}>{e.categoria}</span>
-        {e.nombre_comun && <p style={{...s.comun, margin: 0}}>{e.nombre_comun}</p>}
+        <span style={{background:'var(--bio-border)',color:'var(--bio-primary)',fontSize:'0.65rem',padding:'1px 5px',borderRadius:4,textTransform:'uppercase',fontWeight:'bold',border:'1px solid var(--bio-border)'}}>{e.categoria}</span>
+        {e.nombre_comun && <p style={{color:'var(--bio-text)',fontSize:'0.85rem',margin: 0}}>{e.nombre_comun}</p>}
       </div>
 
-      <div style={s.stats}>
+      <div style={{display:'flex',gap:16}}>
         <Stat label="Líneas" val={e.total_lineas} />
         <Stat label="Individuos" val={e.total_individuos} />
       </div>
@@ -82,28 +82,10 @@ function EspecieCard({ e, onClick }) {
 
 function Stat({ label, val }) {
   return (
-    <span style={s.stat}>
-      <span style={s.statVal}>{val}</span>
-      <span style={s.statLabel}> {label}</span>
+    <span style={{color:'var(--bio-secondary)',fontSize:'0.8rem'}}>
+      <span style={{color:'var(--bio-primary)',fontWeight:700}}>{val}</span>
+      <span > {label}</span>
     </span>
   )
 }
 
-const s = {
-  page: { padding: '1rem', display: 'flex', flexDirection: 'column', gap: 10 },
-  topBar: { display: 'flex', gap: 8 },
-  search: { flex: 1, background: '#1a2e1e', border: '1px solid #2d5c3a', borderRadius: 10, padding: '0.6rem 0.9rem', color: '#e0f0e5', fontSize: '0.95rem', outline: 'none' },
-  btnSustratos: { background: '#0f1f13', border: '1px solid #2d5c3a', borderRadius: 10, color: '#7dca8f', fontSize: '1.1rem', width: 44, cursor: 'pointer' },
-  btnAdd: { background: '#2d7a47', border: 'none', borderRadius: 10, color: '#fff', fontSize: '1.4rem', width: 44, cursor: 'pointer' },
-  card: { background: '#1a2e1e', border: '1px solid #2d5c3a', borderRadius: 12, padding: '0.9rem 1rem', textAlign: 'left', cursor: 'pointer', width: '100%' },
-  cardTop: { display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 8 },
-  cientifico: { color: '#7dca8f', fontSize: '1rem', fontWeight: 600, fontStyle: 'italic' },
-  familia: { color: '#4a5568', fontSize: '0.75rem', flexShrink: 0 },
-  comun: { color: '#a0c8b0', fontSize: '0.85rem', margin: '2px 0 6px' },
-  categoriaBadge: { background: '#1a472a', color: '#7dca8f', fontSize: '0.65rem', padding: '1px 5px', borderRadius: 4, textTransform: 'uppercase', fontWeight: 'bold', border: '1px solid #2d5c3a' },
-  stats: { display: 'flex', gap: 16 },
-  stat: { color: '#4a8c5c', fontSize: '0.8rem' },
-  statVal: { color: '#7dca8f', fontWeight: 700 },
-  statLabel: {},
-  muted: { color: '#4a5568', textAlign: 'center', padding: '2rem 0' },
-}

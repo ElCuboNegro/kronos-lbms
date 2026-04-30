@@ -81,20 +81,13 @@ export default function QRScanner({ onResult, onError }) {
   }, [])
 
   return (
-    <div style={s.wrap}>
-      <div style={s.container}>
-        <div id={divId} style={{ ...s.reader, borderColor: flash ? '#4ade80' : '#2d7a47' }} />
-        {flash && <div style={s.flashOverlay}></div>}
+    <div style={{display:'flex',flexDirection:'column',alignItems:'center',gap:12}}>
+      <div style={{position:'relative',width:'100%',maxWidth:320}}>
+        <div id={divId} style={{ width:'100%',borderRadius:12,overflow:'hidden',border:'3px solid var(--bio-primary)',transition:'border-color 0.2s', borderColor: flash ? '#4ade80' : 'var(--bio-primary)' }} />
+        {flash && <div style={{position:'absolute',top:0,left:0,right:0,bottom:0,backgroundColor:'rgba(74, 222, 128, 0.4)',borderRadius:12,zIndex:10,pointerEvents:'none'}}></div>}
       </div>
-      <p style={s.hint}>{flash ? '¡Código detectado!' : 'Apunta al código QR de la etiqueta'}</p>
+      <p style={{color:'var(--bio-secondary)',fontSize:'0.95rem',margin:0,fontWeight:600,minHeight:'1.2rem'}}>{flash ? '¡Código detectado!' : 'Apunta al código QR de la etiqueta'}</p>
     </div>
   )
 }
 
-const s = {
-  wrap: { display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 },
-  container: { position: 'relative', width: '100%', maxWidth: 320 },
-  reader: { width: '100%', borderRadius: 12, overflow: 'hidden', border: '3px solid #2d7a47', transition: 'border-color 0.2s' },
-  flashOverlay: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(74, 222, 128, 0.4)', borderRadius: 12, zIndex: 10, pointerEvents: 'none' },
-  hint: { color: '#4a8c5c', fontSize: '0.95rem', margin: 0, fontWeight: 600, minHeight: '1.2rem' },
-}

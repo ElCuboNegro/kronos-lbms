@@ -110,15 +110,15 @@ export default function RegistroEvolucionForm({ especimenId, protocolos = [], on
   }
 
   return (
-    <div style={s.overlay}>
-      <div style={s.sheet}>
-        <div style={s.header}>
-          <h3 style={s.title}>Nuevo registro de evolución</h3>
-          <button style={s.btnClose} onClick={onCancel}>✕</button>
+    <div style={{position:'fixed',inset:0,background:'#000c',display:'flex',alignItems:'flex-end',zIndex:100}}>
+      <div style={{background:'var(--bio-surface)',borderRadius:'16px 16px 0 0',padding:'1.5rem',width:'100%',maxHeight:'90dvh',overflowY:'auto',display:'flex',flexDirection:'column'}}>
+        <div className="page-header" style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'1.25rem'}}>
+          <h3 className="page-title" style={{color:'var(--bio-primary)',margin:0,fontSize:'1.1rem'}}>Nuevo registro de evolución</h3>
+          <button style={{background:'none',border:'none',color:'var(--bio-secondary)',fontSize:'1.2rem',cursor:'pointer'}} onClick={onCancel}>✕</button>
         </div>
 
         {step === 0 && (
-          <div style={s.body}>
+          <div style={{display:'flex',flexDirection:'column',gap:'1.25rem'}}>
             <Section title="Morfología y Variegación">
               <Row2>
                 <Num label="Altura (cm)" value={form.altura_cm} onChange={v => set('altura_cm', v)} />
@@ -141,9 +141,9 @@ export default function RegistroEvolucionForm({ especimenId, protocolos = [], on
             </Section>
 
             <Section title="Contenedor y Protocolo">
-              <div style={s.field}>
-                <label style={s.label}>Formulación de Sustrato</label>
-                <select style={s.input} value={form.sustrato_id} onChange={e => set('sustrato_id', e.target.value)}>
+              <div style={{display:'flex',flexDirection:'column',gap:4,flex:1}}>
+                <label style={{color:'var(--bio-secondary)',fontSize:'0.75rem',fontWeight:600}}>Formulación de Sustrato</label>
+                <select style={{background:'var(--bio-background)',border:'1px solid var(--bio-border)',borderRadius:8,padding:'0.65rem 0.8rem',color:'var(--bio-text)',fontSize:'0.95rem',outline:'none',width:'100%',boxSizing:'border-box'}} value={form.sustrato_id} onChange={e => set('sustrato_id', e.target.value)}>
                   <option value="">— Seleccionar formulación —</option>
                   {sustratos.map(su => <option key={su.id} value={su.id}>{su.codigo_formulacion} - {su.nombre}</option>)}
                 </select>
@@ -152,23 +152,23 @@ export default function RegistroEvolucionForm({ especimenId, protocolos = [], on
                 <Sel label="Tipo Sustrato" value={form.sustrato} onChange={v => set('sustrato', v)} options={SUSTRATOS_BASE} />
                 <Sel label="Contenedor" value={form.tipo_contenedor} onChange={v => set('tipo_contenedor', v)} options={CONTENEDORES} />
               </Row2>
-              <div style={s.field}>
-                <label style={s.label}>Protocolo aplicado</label>
-                <select style={s.input} value={form.protocolo_clonacion_id} onChange={e => set('protocolo_clonacion_id', e.target.value)}>
+              <div style={{display:'flex',flexDirection:'column',gap:4,flex:1}}>
+                <label style={{color:'var(--bio-secondary)',fontSize:'0.75rem',fontWeight:600}}>Protocolo aplicado</label>
+                <select style={{background:'var(--bio-background)',border:'1px solid var(--bio-border)',borderRadius:8,padding:'0.65rem 0.8rem',color:'var(--bio-text)',fontSize:'0.95rem',outline:'none',width:'100%',boxSizing:'border-box'}} value={form.protocolo_clonacion_id} onChange={e => set('protocolo_clonacion_id', e.target.value)}>
                   <option value="">Ninguno / Observación</option>
                   {protocolos.map(p => <option key={p.id} value={p.id}>{p.nombre} (v{p.version})</option>)}
                 </select>
               </div>
             </Section>
 
-            <div style={s.navRow}>
-              <button type="button" style={s.btnNext} onClick={() => setStep(1)}>Siguiente: Ambiente →</button>
+            <div style={{display:'flex',gap:10,marginTop:10}}>
+              <button type="button" style={{flex:2,background:'var(--bio-primary)',border:'none',borderRadius:10,color:'#fff',padding:'0.8rem',fontSize:'0.95rem',fontWeight:600,cursor:'pointer'}} onClick={() => setStep(1)}>Siguiente: Ambiente →</button>
             </div>
           </div>
         )}
 
         {step === 1 && (
-          <div style={s.body}>
+          <div style={{display:'flex',flexDirection:'column',gap:'1.25rem'}}>
             <Section title="Condiciones Ambientales">
               <Row2>
                 <Num label="Temp (°C)" value={form.temperatura_c} onChange={v => set('temperatura_c', v)} />
@@ -186,17 +186,17 @@ export default function RegistroEvolucionForm({ especimenId, protocolos = [], on
                 <Txt label="NPK" value={form.npk} onChange={v => set('npk', v)} placeholder="20-20-20" />
                 <Num label="Nutrición (PPM)" value={form.ppm} onChange={v => set('ppm', v)} />
               </Row2>
-              <div style={s.field}>
-                <label style={s.label}>Notas y observaciones</label>
-                <textarea style={{...s.input, minHeight: 80}} value={form.notas} onChange={e => set('notas', e.target.value)} />
+              <div style={{display:'flex',flexDirection:'column',gap:4,flex:1}}>
+                <label style={{color:'var(--bio-secondary)',fontSize:'0.75rem',fontWeight:600}}>Notas y observaciones</label>
+                <textarea style={{background:'var(--bio-background)',border:'1px solid var(--bio-border)',borderRadius:8,padding:'0.65rem 0.8rem',color:'var(--bio-text)',fontSize:'0.95rem',outline:'none',width:'100%',boxSizing:'border-box', minHeight: 80}} value={form.notas} onChange={e => set('notas', e.target.value)} />
               </div>
             </Section>
 
-            {error && <p style={s.errorMsg}>{error}</p>}
+            {error && <p style={{color:'var(--error)',fontSize:'0.85rem',margin:0}}>{error}</p>}
 
-            <div style={s.navRow}>
-              <button type="button" style={s.btnCancel} onClick={() => setStep(0)}>← Atrás</button>
-              <button type="button" style={s.btnNext} onClick={guardarMedidas} disabled={loading}>
+            <div style={{display:'flex',gap:10,marginTop:10}}>
+              <button type="button" style={{flex:1,background:'none',border:'1px solid var(--bio-border)',borderRadius:10,color:'var(--bio-primary)',padding:'0.8rem',fontSize:'0.95rem',cursor:'pointer'}} onClick={() => setStep(0)}>← Atrás</button>
+              <button type="button" style={{flex:2,background:'var(--bio-primary)',border:'none',borderRadius:10,color:'#fff',padding:'0.8rem',fontSize:'0.95rem',fontWeight:600,cursor:'pointer'}} onClick={guardarMedidas} disabled={loading}>
                 {loading ? 'Guardando…' : 'Guardar y fotografiar →'}
               </button>
             </div>
@@ -204,28 +204,28 @@ export default function RegistroEvolucionForm({ especimenId, protocolos = [], on
         )}
 
         {step === 2 && (
-          <div style={s.body}>
+          <div style={{display:'flex',flexDirection:'column',gap:'1.25rem'}}>
             <Section title="Fotografías">
-              <div style={s.fotoGrid}>
+              <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10}}>
                 {ANGULOS.map(ang => (
-                  <div key={ang} style={s.fotoCard} onClick={() => !uploadingAngulo && triggerCamera(ang)}>
+                  <div key={ang} style={{aspectRatio:'1',background:'var(--bio-background)',borderRadius:12,border:'1px dashed var(--bio-border)',overflow:'hidden',cursor:'pointer'}} onClick={() => !uploadingAngulo && triggerCamera(ang)}>
                     <input type="file" accept="image/*" capture="environment" style={{display:'none'}}
                       ref={el => fileRefs.current[ang] = el}
                       onChange={e => e.target.files[0] && capturarFoto(ang, e.target.files[0])}
                     />
                     {fotos[ang] ? (
-                      <img src={fotos[ang].preview} style={s.fotoImg} />
+                      <img src={fotos[ang].preview} style={{width:'100%',height:'100%',objectFit:'cover'}} />
                     ) : (
-                      <div style={s.fotoPlaceholder}>
-                        {uploadingAngulo === ang ? '⌛' : <><span style={s.angIcon}>📷</span><span style={s.angLabel}>{ANGULO_LABEL[ang]}</span></>}
+                      <div style={{height:'100%',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:6}}>
+                        {uploadingAngulo === ang ? '⌛' : <><span style={{fontSize:'1.5rem'}}>📷</span><span style={{color:'var(--bio-primary)',fontSize:'0.75rem'}}>{ANGULO_LABEL[ang]}</span></>}
                       </div>
                     )}
                   </div>
                 ))}
               </div>
             </Section>
-            <div style={s.navRow}>
-              <button type="button" style={s.btnSaveFinal} onClick={onSaved}>Finalizar Registro</button>
+            <div style={{display:'flex',gap:10,marginTop:10}}>
+              <button type="button" style={{width:'100%',background:'var(--bio-primary)',border:'none',borderRadius:10,color:'#fff',padding:'1rem',fontSize:'1rem',fontWeight:700,cursor:'pointer'}} onClick={onSaved}>Finalizar Registro</button>
             </div>
           </div>
         )}
@@ -236,68 +236,42 @@ export default function RegistroEvolucionForm({ especimenId, protocolos = [], on
 
 function Section({ title, children }) {
   return (
-    <div style={s.section}>
-      <h4 style={s.sectionTitle}>{title}</h4>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem', marginBottom: '0.5rem' }}>
+      <h4 className="text-secondary" style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1, margin: 0 }}>{title}</h4>
       {children}
     </div>
   )
 }
 
-function Row2({ children }) { return <div style={s.row2}>{children}</div> }
-function Row3({ children }) { return <div style={s.row3}>{children}</div> }
+function Row2({ children }) { return <div className="grid-2">{children}</div> }
+function Row3({ children }) { return <div className="grid-2" style={{ gridTemplateColumns: '1fr 1fr 1fr' }}>{children}</div> }
 
 function Num({ label, value, onChange }) {
   return (
-    <div style={s.field}>
-      <label style={s.label}>{label}</label>
-      <input type="number" step="0.1" style={s.input} value={value} onChange={e => onChange(e.target.value)} placeholder="—" />
+    <div className="form-group" style={{ marginBottom: 0 }}>
+      <label>{label}</label>
+      <input type="number" step="0.1" value={value} onChange={e => onChange(e.target.value)} placeholder="—" />
     </div>
   )
 }
 
 function Txt({ label, value, onChange, placeholder }) {
   return (
-    <div style={s.field}>
-      <label style={s.label}>{label}</label>
-      <input type="text" style={s.input} value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder || "—"} />
+    <div className="form-group" style={{ marginBottom: 0 }}>
+      <label>{label}</label>
+      <input type="text" value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder || "—"} />
     </div>
   )
 }
 
 function Sel({ label, value, onChange, options }) {
   return (
-    <div style={s.field}>
-      <label style={s.label}>{label}</label>
-      <select style={s.input} value={value} onChange={e => onChange(e.target.value)}>
+    <div className="form-group" style={{ marginBottom: 0 }}>
+      <label>{label}</label>
+      <select value={value} onChange={e => onChange(e.target.value)}>
         {options.map(o => <option key={o} value={o}>{o}</option>)}
       </select>
     </div>
   )
 }
 
-const s = {
-  overlay: { position: 'fixed', inset: 0, background: '#000c', display: 'flex', alignItems: 'flex-end', zIndex: 100 },
-  sheet: { background: '#1a2e1e', borderRadius: '16px 16px 0 0', padding: '1.5rem', width: '100%', maxHeight: '90dvh', overflowY: 'auto', display: 'flex', flexDirection: 'column' },
-  header: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' },
-  title: { color: '#7dca8f', margin: 0, fontSize: '1.1rem' },
-  btnClose: { background: 'none', border: 'none', color: '#4a8c5c', fontSize: '1.2rem', cursor: 'pointer' },
-  body: { display: 'flex', flexDirection: 'column', gap: '1.25rem' },
-  section: { display: 'flex', flexDirection: 'column', gap: 10 },
-  sectionTitle: { color: '#4a8c5c', fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1, margin: 0 },
-  field: { display: 'flex', flexDirection: 'column', gap: 4, flex: 1 },
-  label: { color: '#4a8c5c', fontSize: '0.75rem', fontWeight: 600 },
-  input: { background: '#0f1f13', border: '1px solid #2d5c3a', borderRadius: 8, padding: '0.65rem 0.8rem', color: '#e0f0e5', fontSize: '0.95rem', outline: 'none', width: '100%', boxSizing: 'border-box' },
-  row2: { display: 'flex', gap: 10 },
-  row3: { display: 'flex', gap: 8 },
-  navRow: { display: 'flex', gap: 10, marginTop: 10 },
-  btnCancel: { flex: 1, background: 'none', border: '1px solid #2d5c3a', borderRadius: 10, color: '#7dca8f', padding: '0.8rem', fontSize: '0.95rem', cursor: 'pointer' },
-  btnNext: { flex: 2, background: '#2d7a47', border: 'none', borderRadius: 10, color: '#fff', padding: '0.8rem', fontSize: '0.95rem', fontWeight: 600, cursor: 'pointer' },
-  btnSaveFinal: { width: '100%', background: '#2d7a47', border: 'none', borderRadius: 10, color: '#fff', padding: '1rem', fontSize: '1rem', fontWeight: 700, cursor: 'pointer' },
-  errorMsg: { color: '#f28b82', fontSize: '0.85rem', margin: 0 },
-  fotoGrid: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 },
-  fotoCard: { aspectRatio: '1', background: '#0f1f13', borderRadius: 12, border: '1px dashed #2d5c3a', overflow: 'hidden', cursor: 'pointer' },
-  fotoImg: { width: '100%', height: '100%', objectFit: 'cover' },
-  fotoPlaceholder: { height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 6 },
-  angIcon: { fontSize: '1.5rem' },
-  angLabel: { color: '#7dca8f', fontSize: '0.75rem' },
-}
