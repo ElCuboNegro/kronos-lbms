@@ -41,11 +41,11 @@ export const api = {
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body: form,
     })
-    
+
     if (res.status === 502) {
       throw new Error('Servidor fuera de línea o reiniciándose (502 Bad Gateway)')
     }
-    
+
     const data = await res.json()
     if (!res.ok) throw new Error(data?.detail || 'Credenciales incorrectas')
     return data

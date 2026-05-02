@@ -20,10 +20,10 @@ class TestPatchExcludeUnsetRegresion:
 
         # 2. Patch enviando el campo explícitamente a null
         res = auth_client.patch(f"/especies/{test_id}", json={"codigo": None})
-        
+
         assert res.status_code == 200, res.text
         data = res.json()
-        
+
         # 3. El campo debe haber sido actualizado a null en la respuesta
         assert data["codigo"] is None, "El código debería ser null, pero el parche fue ignorado"
 

@@ -26,8 +26,8 @@ class TestRaceConditionRegresion:
 
         # 2. Hacer 3 peticiones en paralelo (12 especímenes en total) usando threads
         def make_request():
-            # In a test environment with shared db sessions, concurrent writes 
-            # might cause sqlalchemy InvalidRequestError on the fixture. 
+            # In a test environment with shared db sessions, concurrent writes
+            # might cause sqlalchemy InvalidRequestError on the fixture.
             # We are verifying if it catches unique constraints or locks properly.
             return auth_client.post("/especimenes/bulk", json=payload)
 

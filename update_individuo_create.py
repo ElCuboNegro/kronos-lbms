@@ -187,4 +187,3 @@ content = re.sub(r'function EspecimenSearch.*?return.*?\).*?\}', especimen_searc
 
 with open('frontend/src/pages/IndividuoCreate.jsx', 'w') as f:
     f.write(content)
-

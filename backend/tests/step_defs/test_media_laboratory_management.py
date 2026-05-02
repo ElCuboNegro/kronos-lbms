@@ -28,16 +28,16 @@ def formulation_with_phytohormone(db, form_name, temp_lab_data):
     db.add(reactivo)
     db.commit()
     db.refresh(reactivo)
-    
+
     form = models.Formulacion(nombre=form_name, volumen_base_l=1.0)
     db.add(form)
     db.flush()
-    
+
     comp = models.FormulacionComponente(formulacion_id=form.id, reactivo_id=reactivo.id, cantidad_base=2.0)
     db.add(comp)
     db.commit()
     db.refresh(form)
-    
+
     temp_lab_data["form_id_phyto"] = str(form.id)
     temp_lab_data["reactivo_id"] = str(reactivo.id)
 
@@ -79,7 +79,7 @@ def add_reagents_to_form(auth_client, request, temp_lab_data, db):
         db.commit()
         db.refresh(r)
         temp_lab_data["created_reagent_id"] = str(r.id)
-        
+
     payload = {
         "nombre": temp_lab_data["new_form_name"],
         "volumen_base_l": temp_lab_data.get("vol_base", 1.0),
@@ -107,7 +107,7 @@ def prepare_batch(form_name, temp_lab_data):
 def specify_target_volume(auth_client, request, vol, conc, temp_lab_data):
     temp_lab_data["lote_payload"]["volumen_l"] = float(vol)
     temp_lab_data["lote_payload"]["concentracion_x"] = float(conc)
-    
+
     # We will submit it here unless another step needs to add more to the payload
     # Let's check if the next step is about the lot number
     pass

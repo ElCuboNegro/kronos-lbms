@@ -37,21 +37,21 @@ async def extraer_de_documento(
 
     try:
         client = genai.Client(api_key=api_key)
-        
+
         file_bytes = await file.read()
         document_part = types.Part.from_bytes(data=file_bytes, mime_type=file.content_type)
-        
+
         prompt = f"""
         Eres un asistente experto en laboratorios biológicos.
         Lee este documento que describe un protocolo de laboratorio.
         Extrae la información en un formato JSON estricto que cumpla con el siguiente esquema.
         Asegúrate de inferir el 'tipo' de protocolo lo mejor que puedas usando solo estos valores válidos:
         {list(TIPOS_VALIDOS)}.
-        
+
         Extrae todos los materiales mencionados.
         Extrae los pasos en orden. Si mencionan tiempos de espera o temporizadores, ponlos en 'tiempo_minutos'.
         """
-        
+
         response = client.models.generate_content(
             model='gemini-2.5-flash',
             contents=[document_part, prompt],
@@ -61,12 +61,12 @@ async def extraer_de_documento(
                 temperature=0.1
             ),
         )
-        
+
         data = json.loads(response.text)
         # Asegurar tipo válido
         if data.get("tipo") not in TIPOS_VALIDOS:
             data["tipo"] = "otro"
-            
+
         return data
 
     except Exception as e:

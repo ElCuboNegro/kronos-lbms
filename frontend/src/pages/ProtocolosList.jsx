@@ -31,7 +31,7 @@ export default function ProtocolosList() {
     try {
       const formData = new FormData()
       formData.append('file', file)
-      
+
       const token = localStorage.getItem('token')
       const res = await fetch('/api/protocolos/extract', {
         method: 'POST',
@@ -40,12 +40,12 @@ export default function ProtocolosList() {
         },
         body: formData
       })
-      
+
       const json = await res.json()
       if (!res.ok) throw new Error(json.detail || 'Error en la extracción AI')
 
       navigate('/protocolos/nuevo', { state: { draft: json } })
-      
+
     } catch (err) {
       setError(err.message)
     } finally {
@@ -60,7 +60,7 @@ export default function ProtocolosList() {
         <h2 className="page-title text-primary" style={{ margin: 0 }}>Protocolos</h2>
         <button className="btn btn--primary" onClick={() => navigate('/protocolos/nuevo')}>+ Nuevo Manualmente</button>
       </div>
-      
+
       <p className="text-muted" style={{ margin: 0, fontSize: '0.9rem' }}>
         Procedimientos, metodologías y validaciones estandarizadas del laboratorio.
       </p>
@@ -71,20 +71,20 @@ export default function ProtocolosList() {
         <p className="text-muted" style={{ margin: 0, fontSize: '0.85rem' }}>
           Sube una foto o un PDF de un protocolo impreso. Nuestra IA extraerá los materiales y pasos, y abrirá el editor para que puedas validarlos y usar formato Wikilinks.
         </p>
-        
+
         {error && <p className="text-danger" style={{ fontSize: '0.85rem', margin: 0 }}>{error}</p>}
-        
+
         <div>
-          <input 
-            type="file" 
-            id="protocolo-upload" 
-            accept="image/*,.pdf" 
-            style={{ display: 'none' }} 
-            onChange={handleFileUpload} 
+          <input
+            type="file"
+            id="protocolo-upload"
+            accept="image/*,.pdf"
+            style={{ display: 'none' }}
+            onChange={handleFileUpload}
           />
-          <label 
-            htmlFor="protocolo-upload" 
-            className="btn btn--secondary" 
+          <label
+            htmlFor="protocolo-upload"
+            className="btn btn--secondary"
             style={{ display: 'inline-block', width: '100%', textAlign: 'center', cursor: 'pointer' }}
           >
             {uploading ? 'Extrayendo datos...' : 'Subir Documento / Imagen'}

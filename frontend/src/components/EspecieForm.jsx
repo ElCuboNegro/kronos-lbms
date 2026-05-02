@@ -2,14 +2,14 @@ import { useState } from 'react'
 import { api } from '../api/client'
 
 export default function EspecieForm({ onSaved, onCancel }) {
-  const [form, setForm] = useState({ 
-    codigo: '', 
-    nombre_cientifico: '', 
+  const [form, setForm] = useState({
+    codigo: '',
+    nombre_cientifico: '',
     categoria: 'especie',
-    nombre_comun: '', 
-    familia: '', 
-    genero: '', 
-    descripcion: '' 
+    nombre_comun: '',
+    familia: '',
+    genero: '',
+    descripcion: ''
   })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -76,4 +76,3 @@ function Field({ label, value, onChange, italic, textarea, required }) {
     </div>
   )
 }
-

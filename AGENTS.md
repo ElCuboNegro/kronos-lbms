@@ -77,6 +77,16 @@ Para un solo archivo:
 # reemplazar tests/ por tests/test_experimentos_regresion.py
 ```
 
+### Verificación Pre-Commit (Regla Absoluta)
+Todo agente o desarrollador DEBE ejecutar la suite de pruebas completa exitosamente antes de registrar un commit. No se permite realizar `git commit` a ciegas.
+
+El proyecto utiliza `pre-commit`. Asegúrate de tenerlo instalado y configurado:
+```bash
+pre-commit install
+```
+
+Los hooks incluyen `import-linter` para verificar la arquitectura de capas en el backend.
+
 ### Estado actual del coverage (baseline)
 
 | Router | % | Prioridad para mejorar |
@@ -95,7 +105,30 @@ Para un solo archivo:
 
 ---
 
+## Coordinación Multi-Agente
+
+Para acelerar el desarrollo, se permite la ejecución de múltiples agentes en paralelo bajo las siguientes reglas:
+
+1. **Independencia de Tareas:** Cada agente debe trabajar en un issue diferente que no afecte a los mismos archivos simultáneamente.
+2. **Delegación Estratégica:** El agente principal utilizará sub-agentes (`generalist`, `codebase_investigator`) para tareas de investigación o refactorización masiva, manteniendo el control de la integración.
+3. **Gestión de Colisiones:**
+   - No ejecutar dos agentes que modifiquen `models.py` o `schemas.py` al mismo tiempo (riesgo en migraciones de base de datos).
+   - Las migraciones de Alembic deben generarse de forma secuencial para evitar conflictos en el historial de revisiones.
+4. **Validación Cruzada:** Cada agente es responsable de correr los tests globales antes de dar por finalizada su tarea para asegurar que no hay regresiones causadas por la interacción de cambios paralelos.
+
+---
+
 ## Convenciones de código Python
+
+### Arquitectura y Capas (Import Linter)
+El backend sigue una arquitectura de capas estricta definida en `backend/.importlinter`:
+1. `app.routers`: Capa de entrada (API). Depende de todo lo de abajo.
+2. `app.auth`: Seguridad. Depende de schemas, modelos y DB.
+3. `app.schemas`: DTOs (Pydantic). Depende de modelos (opcionalmente) y DB.
+4. `app.models`: Entidades (SQLAlchemy). Depende de la DB.
+5. `app.database`: Configuración de conexión.
+
+**Regla:** Ninguna capa inferior puede importar de una superior (ej. `models` no puede importar de `routers`).
 
 ### ORM: nombres de atributos en `Especimen`
 
@@ -200,8 +233,8 @@ Orden de implementación acordado:
 | # | Tipo | Título corto | Estado |
 |---|------|--------------|--------|
 | [#5](https://github.com/ElCuboNegro/kronos-lbms/issues/5) | bug:crash | `_exp_out` atributos ORM incorrectos | ✅ PR #24 en develop |
-| [#25](https://github.com/ElCuboNegro/kronos-lbms/issues/25) | bug:crash | Orden de rutas en `reactivos.py` | 🔄 pendiente |
-| [#6](https://github.com/ElCuboNegro/kronos-lbms/issues/6) | bug:crash | `EspecieListItem.codigo` no Optional | 🔄 pendiente |
+| [#25](https://github.com/ElCuboNegro/kronos-lbms/issues/25) | bug:crash | Orden de rutas en `reactivos.py` | ✅ resuelto |
+| [#6](https://github.com/ElCuboNegro/kronos-lbms/issues/6) | bug:crash | `EspecieListItem.codigo` no Optional | ✅ resuelto |
 | [#7](https://github.com/ElCuboNegro/kronos-lbms/issues/7) | bug:data | PATCH `exclude_none` no nullea campos | 🔄 pendiente |
 | [#13](https://github.com/ElCuboNegro/kronos-lbms/issues/13) | ux | CSS `--bio-*` vs `--theme-*` | 🔄 pendiente |
 | [#12](https://github.com/ElCuboNegro/kronos-lbms/issues/12) | ux | `navigate(-1)` roto en deep links | 🔄 pendiente |
@@ -224,9 +257,10 @@ Orden de implementación acordado:
 
 ## Checklist antes de abrir un PR
 
+- [ ] La validación pre-commit (tests globales + hooks) fue ejecutada exitosamente justo antes de este PR.
+- [ ] La arquitectura ha sido verificada con `import-linter`.
 - [ ] La rama sale de `develop`, no de `master`
 - [ ] El título del PR referencia el issue: `fix(#N): ...` o `feat(#N): ...`
 - [ ] Todo código Python modificado tiene tests que pasan
-- [ ] `docker compose run ... pytest tests/ -v` pasa sin nuevos fallos
 - [ ] No se incluyen cambios no relacionados con el issue
 - [ ] Si hay cambio de schema DB: migración Alembic incluida en el PR

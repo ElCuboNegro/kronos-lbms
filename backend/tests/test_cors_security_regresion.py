@@ -10,7 +10,7 @@ class TestCorsSecurityRegresion:
             "Access-Control-Request-Method": "GET"
         }
         res = client.options("/health", headers=headers)
-        
+
         # Debe fallar silenciosamente omitiendo los headers de CORS, o devolver 400
         # En Starlette, si el origen no está permitido, no incluye Access-Control-Allow-Origin
         assert "access-control-allow-origin" not in res.headers, "Se permitió un Origin no confiable"
@@ -22,7 +22,7 @@ class TestCorsSecurityRegresion:
             "Access-Control-Request-Method": "GET"
         }
         res = client.options("/health", headers=headers)
-        
+
         # Debe incluir los headers de CORS para el origen confiable
         assert res.headers.get("access-control-allow-origin") == "http://localhost"
         assert res.headers.get("access-control-allow-credentials") == "true"

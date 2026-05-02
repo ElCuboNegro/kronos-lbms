@@ -9,7 +9,7 @@ export default function ProtocoloEditor() {
   const navigate = useNavigate()
   const location = useLocation()
   const { id } = useParams()
-  
+
   const draft = location.state?.draft || null
 
   const [form, setForm] = useState({
@@ -112,7 +112,7 @@ export default function ProtocoloEditor() {
     }
   }
 
-  const wikiOptions = { 
+  const wikiOptions = {
     pageResolver: (name) => [name.replace(/ /g, '_').toLowerCase()],
     hrefTemplate: (permalink) => `/#/wiki/${permalink}` // Simplificación para demo
   }
@@ -135,7 +135,7 @@ export default function ProtocoloEditor() {
             <span className="badge badge--outline">{form.tipo.replace('_', ' ')}</span>
             <span className="badge badge--outline font-mono">v{form.version}</span>
           </div>
-          
+
           <div className="markdown-body">
             <ReactMarkdown remarkPlugins={[remarkGfm, [wikiLinkPlugin, wikiOptions]]}>
               {form.descripcion || '*Sin descripción*'}
@@ -146,7 +146,7 @@ export default function ProtocoloEditor() {
           <ul>
             {form.materiales.map((m, i) => (
               <li key={i}>
-                <strong>{m.nombre}</strong> {m.cantidad && m.unidad ? `(${m.cantidad} ${m.unidad})` : ''} - 
+                <strong>{m.nombre}</strong> {m.cantidad && m.unidad ? `(${m.cantidad} ${m.unidad})` : ''} -
                 <span className="text-muted"> {m.notas}</span>
               </li>
             ))}
@@ -195,10 +195,10 @@ export default function ProtocoloEditor() {
             </div>
             <div className="form-group" style={{ marginBottom: 0 }}>
               <label>Descripción (Markdown soportado, imágenes ![]() y Wikilinks [[]] )</label>
-              <textarea 
-                value={form.descripcion} 
-                onChange={e => set('descripcion', e.target.value)} 
-                rows={6} 
+              <textarea
+                value={form.descripcion}
+                onChange={e => set('descripcion', e.target.value)}
+                rows={6}
                 placeholder="Descripción, justificación, u observaciones generales. Puedes usar Markdown..."
                 style={{ fontFamily: 'var(--font-mono)' }}
               />
@@ -210,7 +210,7 @@ export default function ProtocoloEditor() {
               <h3 className="text-secondary" style={{ margin: 0 }}>Materiales</h3>
               <button type="button" className="btn btn--ghost" onClick={addMaterial} style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem' }}>+ Agregar</button>
             </div>
-            
+
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
               {form.materiales.map((m, i) => (
                 <div key={i} style={{ display: 'flex', gap: '0.5rem', alignItems: 'flex-start' }}>
@@ -255,7 +255,7 @@ export default function ProtocoloEditor() {
           </div>
 
           {error && <p className="text-danger" style={{ margin: 0 }}>{error}</p>}
-          
+
           <div style={{ display: 'flex', gap: '1rem' }}>
             <button type="button" className="btn btn--ghost" style={{ flex: 1 }} onClick={() => {
               if (window.history.state && window.history.state.idx > 0) navigate(-1)

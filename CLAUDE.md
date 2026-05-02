@@ -53,6 +53,24 @@ Base URL: `/api` (proxied to backend:8001)
 All styles are inline JS objects in a `const s = { ... }` at bottom of each file.
 Color palette: dark green background (#0f1f13, #1a2e1e), accent greens (#7dca8f, #4a8c5c, #2d7a47).
 
+## Pre-commit Testing & Verification (MANDATORIO)
+Antes de realizar cualquier `git commit`, es obligatorio verificar que toda la suite de tests pasa sin errores.
+
+El proyecto utiliza `pre-commit` para automatizar validaciones (linting de arquitectura con `import-linter`, limpieza de espacios, etc.).
+- Instalar hooks: `pre-commit install`
+- Ejecutar manualmente: `pre-commit run --all-files`
+
+### Ejecución de tests de backend:
+Ejecuta la validación completa con:
+```bash
+docker compose run --rm -v "$(pwd):/workspace" --workdir /workspace/backend --entrypoint "" backend sh -c "pip install -q pytest pytest-bdd httpx pytest-cov && DATABASE_URL=postgresql://\${POSTGRES_USER}:\${POSTGRES_PASSWORD}@db:5432/\${POSTGRES_DB} python -m pytest tests/ -v"
+```
+
+## Architecture Verification
+El backend utiliza `import-linter` para asegurar que no haya violaciones de arquitectura (capas).
+- Configuración: `backend/.importlinter`
+- Comando: `cd backend && PYTHONPATH=. import-linter lint` (automatizado en pre-commit)
+
 ## Docker
 ```
 docker compose up -d        # start all services

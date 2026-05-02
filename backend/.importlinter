@@ -1,0 +1,12 @@
+[importlinter]
+root_package = app
+
+[importlinter:contract:layers]
+name = Layered architecture
+type = layers
+layers =
+    app.routers
+    app.auth
+    app.schemas
+    app.models
+    app.database

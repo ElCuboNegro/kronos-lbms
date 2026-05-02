@@ -55,12 +55,12 @@ function Layout({ children }) {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100dvh' }}>
-      <header className="page-header" style={{ 
-        padding: '0.75rem 1rem', 
-        background: 'var(--theme-surface)', 
-        borderBottom: '1px solid var(--theme-border)', 
-        position: 'sticky', 
-        top: 0, 
+      <header className="page-header" style={{
+        padding: '0.75rem 1rem',
+        background: 'var(--theme-surface)',
+        borderBottom: '1px solid var(--theme-border)',
+        position: 'sticky',
+        top: 0,
         zIndex: 50,
         margin: 0
       }}>
@@ -77,15 +77,15 @@ function Layout({ children }) {
         </div>
       </header>
       <main style={{ flex: 1, overflowY: 'auto', paddingBottom: '90px' }}>{children}</main>
-      <nav style={{ 
-        position: 'fixed', 
-        bottom: 0, 
-        left: 0, 
-        right: 0, 
-        background: 'var(--theme-surface)', 
-        borderTop: '1px solid var(--theme-border)', 
-        display: 'flex', 
-        justifyContent: 'space-around', 
+      <nav style={{
+        position: 'fixed',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        background: 'var(--theme-surface)',
+        borderTop: '1px solid var(--theme-border)',
+        display: 'flex',
+        justifyContent: 'space-around',
         padding: '0.5rem 0 calc(0.5rem + env(safe-area-inset-bottom))',
         zIndex: 100
       }}>
@@ -105,18 +105,18 @@ function Layout({ children }) {
 function NavBtn({ icon, label, path, exact, current, onClick }) {
   const active = exact ? current === path : (current === path || current.startsWith(path + '/'))
   return (
-    <button 
-      style={{ 
-        background: 'none', 
-        border: 'none', 
-        color: active ? 'var(--theme-primary)' : 'var(--theme-text-muted)', 
-        display: 'flex', 
-        flexDirection: 'column', 
-        alignItems: 'center', 
-        gap: 2, 
-        cursor: 'pointer', 
-        padding: '0.25rem 1rem' 
-      }} 
+    <button
+      style={{
+        background: 'none',
+        border: 'none',
+        color: active ? 'var(--theme-primary)' : 'var(--theme-text-muted)',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        gap: 2,
+        cursor: 'pointer',
+        padding: '0.25rem 1rem'
+      }}
       onClick={onClick}
     >
       {icon}
@@ -177,4 +177,3 @@ function ComingSoon() {
     </div>
   )
 }
-

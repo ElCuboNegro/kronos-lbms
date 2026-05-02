@@ -52,9 +52,9 @@ export default function ElementosList() {
       )}
 
       {showForm && (
-        <ElementoForm 
-          onSaved={() => { setShowForm(false); fetchElementos(); }} 
-          onCancel={() => setShowForm(false)} 
+        <ElementoForm
+          onSaved={() => { setShowForm(false); fetchElementos(); }}
+          onCancel={() => setShowForm(false)}
         />
       )}
     </div>
@@ -83,7 +83,7 @@ function ElementoForm({ onSaved, onCancel }) {
     setShowScanner(false)
     const code = scannedCode.replace('ID:', '') // Limpiar prefijo si existe
     set('element_id', code)
-    
+
     // Verificar si ya existe en la base de datos
     try {
       setLoading(true)
@@ -122,8 +122,8 @@ function ElementoForm({ onSaved, onCancel }) {
     return (
       <div style={{ position: 'fixed', inset: 0, zIndex: 2000, background: '#000' }}>
         <QRScanner onResult={handleScan} />
-        <button 
-          className="btn btn--secondary" 
+        <button
+          className="btn btn--secondary"
           style={{ position: 'absolute', bottom: '2rem', left: '50%', transform: 'translateX(-50%)', zIndex: 2010 }}
           onClick={() => setShowScanner(false)}
         >
@@ -137,21 +137,21 @@ function ElementoForm({ onSaved, onCancel }) {
     <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.8)', zIndex: 1000, display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}>
       <div style={{ background: 'var(--theme-surface)', borderRadius: '24px 24px 0 0', width: '100%', maxWidth: '500px', padding: '1.5rem', paddingBottom: 'calc(1.5rem + env(safe-area-inset-bottom))', maxHeight: '90dvh', overflowY: 'auto' }}>
         <h3 className="text-primary" style={{ margin: '0 0 1rem', fontSize: '1.2rem' }}>Registrar Nuevo Elemento</h3>
-        
+
         {existingElement ? (
           <div className="card" style={{ background: 'rgba(125, 202, 143, 0.1)', border: '1px solid var(--theme-primary)', textAlign: 'center', display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
             <p className="text-primary" style={{ margin: 0, fontWeight: 'bold' }}>¡Este elemento ya existe en el sistema!</p>
             <p className="text-muted" style={{ margin: 0, fontSize: '0.9rem' }}>
               El código <strong>{existingElement.element_id}</strong> corresponde a <strong>{existingElement.descripcion}</strong>.
             </p>
-            <button 
-              className="btn btn--primary btn--block" 
+            <button
+              className="btn btn--primary btn--block"
               onClick={() => navigate(`/elemento/${existingElement.id}`)}
             >
               Ir a su Ficha para actualizar stock
             </button>
-            <button 
-              className="btn btn--ghost btn--block" 
+            <button
+              className="btn btn--ghost btn--block"
               onClick={() => { setExistingElement(null); set('element_id', '') }}
             >
               Escanear / Ingresar otro código
@@ -159,7 +159,7 @@ function ElementoForm({ onSaved, onCancel }) {
           </div>
         ) : (
           <form onSubmit={submit} style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-            
+
             <div className="form-group" style={{ marginBottom: 0 }}>
               <label>Identificador (ID / Código / EAN)</label>
               <div style={{ display: 'flex', gap: '0.5rem' }}>
@@ -214,7 +214,7 @@ function ElementoForm({ onSaved, onCancel }) {
             </div>
 
             {error && <p className="text-danger" style={{ fontSize: '0.85rem', margin: 0 }}>{error}</p>}
-            
+
             <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
               <button type="button" className="btn btn--ghost" style={{ flex: 1 }} onClick={onCancel}>Cancelar</button>
               <button type="submit" className="btn btn--primary" style={{ flex: 2 }} disabled={loading}>{loading ? 'Guardando…' : 'Registrar'}</button>

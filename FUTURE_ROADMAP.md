@@ -5,7 +5,7 @@ This document tracks formal feature requests and architectural gaps identified f
 ## 📍 [FR-001] Spatial & Location Management
 **Priority:** High (Once inventory exceeds 1,000 units)
 *   **Description:** Implement a hierarchical location model (Building -> Room -> Rack -> Shelf -> Tray).
-*   **Goal:** Allow technicians to pinpoint the exact physical location of a `UID`. 
+*   **Goal:** Allow technicians to pinpoint the exact physical location of a `UID`.
 *   **Workflow:** Scan a "Shelf QR" to see all associated specimens; move batches between locations via a single scan.
 
 ## 📅 [FR-002] Proactive Task & Alert Engine

@@ -32,7 +32,7 @@ export default function RegistroEvolucionForm({ especimenId, protocolos = [], on
 
   useEffect(() => {
     api.get('/sustratos').then(setSustratos).catch(() => {})
-    
+
     // Si empezamos en paso de fotos, crear el registro base inmediatamente
     if (initialStep === 2 && !registroId) {
       guardarMedidas()
@@ -274,4 +274,3 @@ function Sel({ label, value, onChange, options }) {
     </div>
   )
 }
-

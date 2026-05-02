@@ -6,7 +6,7 @@ class TestValidationRegresion:
 
     def test_rango_ph_falla_con_fuera_de_limite(self, auth_client, db):
         import uuid
-        
+
         # 1. Crear Espécimen
         test_esp_id = uuid.uuid4()
         esp = models.Especimen(
@@ -23,7 +23,7 @@ class TestValidationRegresion:
             "ph_sustrato": -5.0
         }
         res = auth_client.post(f"/especimenes/{test_esp_id}/evolucion", json=payload)
-        
+
         assert res.status_code == 422
         assert "ph_sustrato" in res.text
 
@@ -39,6 +39,6 @@ class TestValidationRegresion:
             "humedad_relativa_pct": 150.0
         }
         res = auth_client.post(f"/especimenes/{test_esp_id}/evolucion", json=payload)
-        
+
         assert res.status_code == 422
         assert "humedad_relativa_pct" in res.text

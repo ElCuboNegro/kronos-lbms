@@ -12,16 +12,16 @@ def test_data(db):
     esp = models.Especie(nombre_cientifico="Monstera deliciosa", codigo="MOND")
     db.add(esp)
     db.commit()
-    
+
     # Create Specimen
     specimen = models.Especimen(uid="12345", especie="Monstera deliciosa", especie_id=esp.id, estado="activo")
     db.add(specimen)
-    
+
     # Create Elemento
     elemento = models.Elemento(element_id="REACT-001", tipo="reactivo", descripcion="Agar-Agar", estado="activo")
     db.add(elemento)
     db.commit()
-    
+
     return {"specimen": specimen, "elemento": elemento}
 
 

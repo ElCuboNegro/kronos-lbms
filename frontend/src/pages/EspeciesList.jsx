@@ -47,13 +47,13 @@ export default function EspeciesList() {
       }
 
       {showForm && (
-        <EspecieForm 
-          onSaved={(nueva) => { 
-            setShowForm(false); 
+        <EspecieForm
+          onSaved={(nueva) => {
+            setShowForm(false);
             fetchEspecies();
             if (nueva) navigate(`/especies/${nueva.id}`);
-          }} 
-          onCancel={() => setShowForm(false)} 
+          }}
+          onCancel={() => setShowForm(false)}
         />
       )}
     </div>
@@ -88,4 +88,3 @@ function Stat({ label, val }) {
     </span>
   )
 }
-

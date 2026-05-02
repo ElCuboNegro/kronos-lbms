@@ -60,11 +60,11 @@ export default function MapPicker({ value, onChange }) {
           {locating ? 'Activando GPS...' : '📍 En este lugar'}
         </button>
       </div>
-      
+
       <div style={{height:200,width:'100%',borderRadius:8,border:'2px solid var(--theme-primary)',overflow:'hidden',marginTop:4}}>
-        <MapContainer 
-          center={center} 
-          zoom={value ? 16 : 4} 
+        <MapContainer
+          center={center}
+          zoom={value ? 16 : 4}
           style={{ height: '100%', width: '100%', borderRadius: 8, zIndex: 1 }}
         >
           <TileLayer
@@ -78,4 +78,3 @@ export default function MapPicker({ value, onChange }) {
     </div>
   )
 }
-

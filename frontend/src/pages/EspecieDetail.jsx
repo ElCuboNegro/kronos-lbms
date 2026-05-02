@@ -52,7 +52,7 @@ export default function EspecieDetail() {
           return (
             <button
               key={tab}
-              style={{ 
+              style={{
                 background:'none',
                 border:'none',
                 borderBottom: isActive ? '2px solid var(--theme-primary)' : '2px solid transparent',
@@ -142,7 +142,7 @@ export default function EspecieDetail() {
       )}
 
       {activeLineaConfig && (
-        <LineaConfigForm 
+        <LineaConfigForm
           linea={activeLineaConfig}
           onSaved={() => { setActiveLineaConfig(null); fetchEspecie() }}
           onCancel={() => setActiveLineaConfig(null)}
@@ -150,7 +150,7 @@ export default function EspecieDetail() {
       )}
 
       {activeVarConfig && (
-        <VariegacionConfigForm 
+        <VariegacionConfigForm
           variegacion={activeVarConfig}
           onSaved={() => { setActiveVarConfig(null); fetchEspecie() }}
           onCancel={() => setActiveVarConfig(null)}
@@ -273,7 +273,7 @@ function FichaPanel({ especie, especieId, onSaved }) {
       {wikiError && <p style={{color:'var(--error)',fontSize:'0.82rem',margin:0}}>{wikiError}</p>}
 
       {showConfigForm && (
-        <ConfigEstandarForm 
+        <ConfigEstandarForm
           especie={especie}
           onSaved={() => { setShowConfigForm(false); onSaved() }}
           onCancel={() => setShowConfigForm(false)}
@@ -530,9 +530,9 @@ function ConfigEstandarForm({ especie, onSaved, onCancel }) {
           </div>
           <ConfigField label="Sustrato por defecto" value={form.sustrato} onChange={v => set('sustrato', v)} />
           <ConfigField label="Contenedor por defecto" value={form.tipo_contenedor} onChange={v => set('tipo_contenedor', v)} />
-          
+
           {error && <p style={{ color: 'var(--error)', fontSize: '0.85rem' }}>{error}</p>}
-          
+
           <div style={{display:"flex",gap:8,marginTop:4}}>
             <button type="button" className="btn btn--ghost" onClick={onCancel}>Cancelar</button>
             <button type="submit" className="btn btn--primary" disabled={loading}>{loading ? '…' : 'Guardar'}</button>
@@ -578,9 +578,9 @@ function LineaConfigForm({ linea, onSaved, onCancel }) {
           </div>
           <ConfigField label="Sustrato por defecto" value={form.sustrato} onChange={v => set('sustrato', v)} />
           <ConfigField label="Contenedor por defecto" value={form.tipo_contenedor} onChange={v => set('tipo_contenedor', v)} />
-          
+
           {error && <p style={{ color: 'var(--error)', fontSize: '0.85rem' }}>{error}</p>}
-          
+
           <div style={{display:"flex",gap:8,marginTop:4}}>
             <button type="button" className="btn btn--ghost" onClick={onCancel}>Cancelar</button>
             <button type="submit" className="btn btn--primary" disabled={loading}>{loading ? '…' : 'Guardar'}</button>
@@ -647,9 +647,9 @@ function Txt({ label, value, onChange, italic }) {
   return (
     <div className="form-group">
       <label>{label}</label>
-      <input 
-        value={value || ''} 
-        onChange={e => onChange(e.target.value)} 
+      <input
+        value={value || ''}
+        onChange={e => onChange(e.target.value)}
         style={italic ? { fontStyle: 'italic' } : {}}
       />
     </div>
@@ -852,4 +852,3 @@ function Field({ label, value, onChange, textarea, required }) {
 }
 
 // ── Styles ─────────────────────────────────────────────────────────────────────
-

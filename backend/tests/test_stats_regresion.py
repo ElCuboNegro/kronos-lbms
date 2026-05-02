@@ -12,7 +12,7 @@ class TestStatsEndpointRegresion:
 
         base_res = auth_client.get("/stats")
         base_data = base_res.json()
-        
+
         esp_count = base_data["especies"]
         ind_count = base_data["individuos"]
         exp_count = base_data["experimentos_activos"]
@@ -30,7 +30,7 @@ class TestStatsEndpointRegresion:
         # 2. Consultar de nuevo
         res = auth_client.get("/stats")
         assert res.status_code == 200
-        
+
         data = res.json()
         assert data["experimentos_activos"] == exp_count + 1
         assert "especies" in data

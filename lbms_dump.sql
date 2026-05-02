@@ -982,4 +982,3 @@ ALTER TABLE ONLY public.variegaciones
 --
 
 \unrestrict vhKdZeo46rgSLcWIJPyd9gp87P2G26chEF4ImCYAXF3CzBNYLSHKy9tHulF3Ih9
-

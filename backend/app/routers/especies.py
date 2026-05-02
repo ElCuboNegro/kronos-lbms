@@ -114,7 +114,7 @@ def crear(payload: schemas.EspecieCreate, db: Session = Depends(get_db),
         models.Especie.nombre_cientifico == payload.nombre_cientifico
     ).first():
         raise HTTPException(status_code=409, detail="Especie ya registrada")
-    
+
     if db.query(models.Especie).filter(models.Especie.codigo == payload.codigo).first():
         raise HTTPException(status_code=409, detail="Código de especie ya en uso")
 

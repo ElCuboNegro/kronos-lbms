@@ -50,7 +50,7 @@ export default function ProtocolExecution() {
           <PasoCard key={idx} paso={paso} protocoloId={protocol.id} />
         ))}
       </div>
-      
+
       <div style={{ marginTop: '2rem' }}>
         <button className="btn btn--secondary btn--block" onClick={() => {
           if (window.history.state && window.history.state.idx > 0) navigate(-1)
@@ -122,7 +122,7 @@ function PasoCard({ paso, protocoloId }) {
         <div style={{ flex: 1 }}>
           <p className="text-text" style={{ fontSize: '1.05rem', margin: '0 0 0.5rem', lineHeight: 1.4 }}>{paso.instruccion}</p>
           {paso.notas && <p className="text-muted" style={{ fontSize: '0.85rem', fontStyle: 'italic', margin: '0 0 1rem' }}>{paso.notas}</p>}
-          
+
           {paso.tiempo_minutos > 0 && (
             <div style={{ background: 'var(--theme-background)', borderRadius: 'var(--radius-base)', padding: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', border: isRunning ? '1px solid var(--theme-primary)' : isFinished ? '1px solid transparent' : '1px solid var(--theme-border)' }}>
               <div style={{ fontSize: '3rem', fontFamily: 'var(--font-mono)', fontWeight: 'bold', color: isFinished ? 'var(--theme-secondary)' : isRunning ? 'var(--theme-text)' : 'var(--theme-text-muted)' }}>

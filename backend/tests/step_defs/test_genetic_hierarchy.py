@@ -11,12 +11,12 @@ def gen_data(db):
     db.add(esp)
     db.commit()
     db.refresh(esp)
-    
+
     linea = models.Linea(nombre="Monstera Albo-Borsigiana", especie_id=esp.id)
     db.add(linea)
     db.commit()
     db.refresh(linea)
-    
+
     return {"especie_id": str(esp.id), "linea_id": str(linea.id)}
 
 
@@ -67,7 +67,7 @@ def var_exists_in_specific_line(db, vname, lname, gen_data):
     db.add(v)
     db.commit()
     gen_data["linea_a_id"] = str(la.id)
-    
+
 @given(parsers.parse('a variegation named "{vname}" exists'))
 def var_exists_alone(db, vname, gen_data):
     v = models.Variegacion(nombre=vname, linea_id=gen_data["linea_id"])

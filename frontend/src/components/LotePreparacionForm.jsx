@@ -48,7 +48,7 @@ export default function LotePreparacionForm({ formulacion, onSaved, onCancel }) 
     <div style={{position:'fixed',inset:0,background:'rgba(0,0,0,0.8)',display:'flex',alignItems:'flex-end',zIndex:200}}>
       <div style={{background:'var(--theme-surface)',borderRadius:'24px 24px 0 0',padding:'1.5rem',width:'100%',maxHeight:'90dvh',overflowY:'auto'}}>
         <h3 className="page-title text-primary" style={{margin:'0 0 1.5rem'}}>Preparar: {formulacion.nombre}</h3>
-        
+
         <div className="grid-2" style={{marginBottom:'1.5rem'}}>
           <div className="form-group" style={{ marginBottom: 0 }}>
             <label>Volumen a preparar (L)</label>
@@ -68,7 +68,7 @@ export default function LotePreparacionForm({ formulacion, onSaved, onCancel }) 
               const itemNombre = esReactivo ? c.reactivo.nombre : c.formulacion_ingrediente.nombre;
               const itemUnidad = esReactivo ? c.reactivo.unidad_medida : c.formulacion_ingrediente.unidad_medida;
               const itemId = esReactivo ? c.reactivo.id : c.formulacion_ingrediente.id;
-              
+
               return (
                 <div key={c.id} style={{ display: 'flex', flexDirection: 'column', gap: 4, paddingBottom: '0.8rem', borderBottom: '1px solid var(--theme-background)' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -78,8 +78,8 @@ export default function LotePreparacionForm({ formulacion, onSaved, onCancel }) 
                     </span>
                   </div>
                   <div className="form-group" style={{ margin: 0 }}>
-                    <input 
-                      type="text" 
+                    <input
+                      type="text"
                       placeholder={esReactivo ? "Escanear Lote Proveedor (Ej. Sigma-123)" : "Escanear Lote Interno (Ej. REAC-240501-001)"}
                       value={trazabilidad[itemId] || ''}
                       onChange={e => setTrazabilidad(prev => ({ ...prev, [itemId]: e.target.value }))}
@@ -93,9 +93,9 @@ export default function LotePreparacionForm({ formulacion, onSaved, onCancel }) 
         </div>
 
         <p className="text-muted" style={{fontSize:'0.8rem',marginTop:16,textAlign:'center',fontStyle:'italic'}}>Asegúrate de ajustar el pH tras disolver todos los componentes.</p>
-        
+
         {error && <p className="text-danger" style={{fontSize:'0.85rem',marginTop:10}}>{error}</p>}
-        
+
         <div style={{display:'flex',gap:'1rem',marginTop:20}}>
           <button className="btn btn--ghost" style={{flex:1}} onClick={onCancel}>Cancelar</button>
           <button className="btn btn--primary" style={{flex:2}} onClick={preparar} disabled={loading}>
@@ -106,4 +106,3 @@ export default function LotePreparacionForm({ formulacion, onSaved, onCancel }) 
     </div>
   )
 }
-

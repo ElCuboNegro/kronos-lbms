@@ -1,7 +1,7 @@
 """Initial schema sync
 
 Revision ID: 6ab2e936b665
-Revises: 
+Revises:
 Create Date: 2026-04-30 08:10:11.428102
 
 """

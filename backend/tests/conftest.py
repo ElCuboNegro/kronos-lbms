@@ -33,9 +33,9 @@ def db(db_engine):
     connection = db_engine.connect()
     transaction = connection.begin()
     session = TestingSessionLocal(bind=connection)
-    
+
     yield session
-    
+
     session.close()
     transaction.rollback()
     connection.close()
@@ -50,7 +50,7 @@ def client(db):
             yield db
         finally:
             pass
-            
+
     app.dependency_overrides[get_db] = override_get_db
     yield TestClient(app)
     del app.dependency_overrides[get_db]
@@ -73,10 +73,10 @@ def auth_client(client, db):
         )
         db.add(user)
         db.flush()
-    
+
     def override_get_current_user():
         return user
-        
+
     app.dependency_overrides[get_current_user] = override_get_current_user
     yield client
     del app.dependency_overrides[get_current_user]
@@ -97,10 +97,10 @@ def admin_client(client, db):
         )
         db.add(admin)
         db.flush()
-    
+
     def override_get_current_user():
         return admin
-        
+
     app.dependency_overrides[get_current_user] = override_get_current_user
     yield client
     del app.dependency_overrides[get_current_user]
@@ -108,7 +108,7 @@ def admin_client(client, db):
 @pytest.fixture(autouse=True)
 def inject_test_user(db):
     """
-    A global fixture to ensure that tests that don't explicitly use auth_client 
+    A global fixture to ensure that tests that don't explicitly use auth_client
     still have access to a valid user in the DB if they manually create records.
     """
     user = db.query(models.Usuario).filter(models.Usuario.email == "global@lab.com").first()

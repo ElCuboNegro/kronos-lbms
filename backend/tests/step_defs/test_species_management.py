@@ -57,7 +57,7 @@ def genetic_line_exists(db, line_name, temp_species_data):
     db.add(esp)
     db.commit()
     db.refresh(esp)
-    
+
     line = models.Linea(especie_id=esp.id, nombre=line_name)
     db.add(line)
     db.commit()

@@ -90,7 +90,7 @@ async def imprimir_reactivo(
     _=Depends(auth.get_current_user),
 ):
     reactivo = db.query(models.Reactivo).filter(models.Reactivo.id == reactivo_id).first()
-    
+
     if not reactivo:
         raise HTTPException(status_code=404, detail="Reactivo no encontrado")
 
@@ -127,7 +127,7 @@ async def imprimir_sustrato(
     _=Depends(auth.get_current_user),
 ):
     sustrato = db.query(models.Sustrato).filter(models.Sustrato.id == sustrato_id).first()
-    
+
     if not sustrato:
         raise HTTPException(status_code=404, detail="Sustrato no encontrado")
 
@@ -160,7 +160,7 @@ async def imprimir_contenedor(
     _=Depends(auth.get_current_user),
 ):
     especimenes = db.query(models.Especimen).filter(models.Especimen.contenedor_uid == contenedor_uid).all()
-    
+
     if not especimenes:
         raise HTTPException(status_code=404, detail="No hay especímenes asociados a este contenedor")
 
@@ -202,13 +202,13 @@ async def imprimir_lote(
         joinedload(models.LotePreparado.formulacion).joinedload(models.Formulacion.componentes).joinedload(models.FormulacionComponente.formulacion_ingrediente),
         joinedload(models.LotePreparado.preparado_por)
     ).filter(models.LotePreparado.id == lote_id).first()
-    
+
     if not lote:
         raise HTTPException(status_code=404, detail="Lote no encontrado")
 
     # Calcular ratio para componentes
     ratio = (lote.volumen_l / lote.formulacion.volumen_base_l) * lote.concentracion_x
-    
+
     # Construir lista de componentes para la etiqueta
     comps = []
     peligros = set()
@@ -217,7 +217,7 @@ async def imprimir_lote(
         es_reactivo = c.reactivo is not None
         nombre = c.reactivo.nombre if es_reactivo else c.formulacion_ingrediente.nombre
         unit = c.reactivo.unidad_medida if es_reactivo else 'ml'
-        
+
         comps.append(f"{nombre}: {cant:.2f}{unit}")
         if es_reactivo and c.reactivo.peligrosidad:
             peligros.update(c.reactivo.peligrosidad)
@@ -257,14 +257,14 @@ def generar_uid(especie_id: UUID, db: Session = Depends(get_db), _=Depends(auth.
     now = datetime.now() # Usamos hora local para que coincida con el reloj del técnico
     date_part = now.strftime("%y%m%d")
     time_part = now.strftime("%H%M%S")
-    
+
     prefix = f"{code}-{date_part}-{time_part}-"
-    
+
     # Buscar el último espécimen con este prefijo (mismo segundo)
     ultimo = db.query(models.Especimen).filter(
         models.Especimen.uid.like(f"{prefix}%")
     ).order_by(models.Especimen.uid.desc()).first()
-    
+
     if ultimo:
         try:
             parts = ultimo.uid.split("-")
@@ -273,6 +273,6 @@ def generar_uid(especie_id: UUID, db: Session = Depends(get_db), _=Depends(auth.
             idx = 1
     else:
         idx = 1
-    
+
     uid = f"{prefix}{idx:02d}"
     return {"uid": uid}

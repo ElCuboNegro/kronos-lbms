@@ -56,14 +56,14 @@ export default function FormulacionesList() {
       )}
 
       {showForm && (
-        <FormulacionForm 
+        <FormulacionForm
           onSaved={() => { setShowForm(false); fetchItems() }}
           onCancel={() => setShowForm(false)}
         />
       )}
 
       {activeFormulacion && (
-        <LotePreparacionForm 
+        <LotePreparacionForm
           formulacion={activeFormulacion}
           onSaved={() => setActiveFormulacion(null)}
           onCancel={() => setActiveFormulacion(null)}
@@ -76,14 +76,14 @@ export default function FormulacionesList() {
 function FormulacionForm({ onSaved, onCancel }) {
   const [reactivos, setReactivos] = useState([])
   const [formulaciones, setFormulaciones] = useState([])
-  const [form, setForm] = useState({ 
-    nombre: '', 
-    codigo_referencia: '', 
-    descripcion: '', 
-    procedimiento: '', 
-    volumen_base_l: 1.0, 
+  const [form, setForm] = useState({
+    nombre: '',
+    codigo_referencia: '',
+    descripcion: '',
+    procedimiento: '',
+    volumen_base_l: 1.0,
     caducidad_dias: 30,
-    componentes: [] 
+    componentes: []
   })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -155,9 +155,9 @@ function FormulacionForm({ onSaved, onCancel }) {
   if (showReactivoModalForComp) {
     return (
       <div style={{ zIndex: 1100, position: 'relative' }}>
-        <ReactivoForm 
-          onSaved={handleNewReactivoSaved} 
-          onCancel={() => setShowReactivoModalForComp(null)} 
+        <ReactivoForm
+          onSaved={handleNewReactivoSaved}
+          onCancel={() => setShowReactivoModalForComp(null)}
         />
       </div>
     )
@@ -166,9 +166,9 @@ function FormulacionForm({ onSaved, onCancel }) {
   if (showFormulacionModalForComp) {
     return (
       <div style={{ zIndex: 1100, position: 'relative' }}>
-        <FormulacionForm 
-          onSaved={handleNewFormulacionSaved} 
-          onCancel={() => setShowFormulacionModalForComp(null)} 
+        <FormulacionForm
+          onSaved={handleNewFormulacionSaved}
+          onCancel={() => setShowFormulacionModalForComp(null)}
         />
       </div>
     )
@@ -178,7 +178,7 @@ function FormulacionForm({ onSaved, onCancel }) {
     <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'flex-end', zIndex: 1000 }}>
       <div style={{ background: 'var(--theme-surface)', borderRadius: '24px 24px 0 0', width: '100%', maxWidth: 500, padding: '1.5rem', maxHeight: '90dvh', overflowY: 'auto' }}>
         <h3 className="page-title text-primary" style={{ margin: '0 0 1rem' }}>Nueva Formulación</h3>
-        
+
         <form onSubmit={submit} style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
           <Field label="Nombre del Medio / Receta *" value={form.nombre} onChange={v => set('nombre', v)} required />
           <div className="grid-2">
@@ -220,7 +220,7 @@ function FormulacionForm({ onSaved, onCancel }) {
 
           <Field label="Caducidad estimada (días)" type="number" value={form.caducidad_dias} onChange={v => set('caducidad_dias', v)} />
           <Field label="Descripción / Uso" value={form.descripcion} onChange={v => set('descripcion', v)} textarea />
-          
+
           {error && <p className="badge badge--danger" style={{ width: '100%', textAlign: 'center' }}>{error}</p>}
           <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem' }}>
             <button type="button" className="btn btn--ghost btn--block" onClick={onCancel}>Cancelar</button>
@@ -243,4 +243,3 @@ function Field({ label, value, onChange, textarea, type="text", step, required }
     </div>
   )
 }
-

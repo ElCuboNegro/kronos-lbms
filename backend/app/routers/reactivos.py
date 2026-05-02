@@ -89,19 +89,19 @@ def listar_lotes(db: Session = Depends(get_db), _=Depends(auth.get_current_user)
         joinedload(models.LotePreparado.formulacion).joinedload(models.Formulacion.componentes).joinedload(models.FormulacionComponente.reactivo),
         joinedload(models.LotePreparado.preparado_por)
     ).order_by(models.LotePreparado.fecha_preparacion.desc()).all()
-    
+
     return [_map_lote(l) for l in lotes]
 
 @router.post("/lotes", response_model=schemas.LotePreparadoOut, status_code=201)
 def preparar_lote(payload: schemas.LotePreparadoCreate, db: Session = Depends(get_db), user=Depends(auth.get_current_user)):
     f = db.query(models.Formulacion).filter(models.Formulacion.id == payload.formulacion_id).first()
     if not f: raise HTTPException(status_code=404, detail="Formulación no encontrada")
-    
+
     # Generar UID: REAC-YYMMDD-XXX
     now = datetime.now()
     prefix = f"REAC-{now.strftime('%y%m%d')}-"
     lotes_del_dia = db.query(models.LotePreparado).filter(models.LotePreparado.uid.like(f"{prefix}%")).all()
-    
+
     max_idx = 0
     for l in lotes_del_dia:
         try:
@@ -110,13 +110,13 @@ def preparar_lote(payload: schemas.LotePreparadoCreate, db: Session = Depends(ge
                 max_idx = val
         except:
             pass
-            
+
     idx = max_idx + 1
     uid = f"{prefix}{idx:03d}"
-    
+
     # Calcular expiración
     exp = now + timedelta(days=f.caducidad_dias)
-    
+
     lote = models.LotePreparado(
         uid=uid,
         preparado_por_id=user.id,
@@ -126,13 +126,13 @@ def preparar_lote(payload: schemas.LotePreparadoCreate, db: Session = Depends(ge
     db.add(lote)
     db.commit()
     db.refresh(lote)
-    
+
     # Re-cargar con relaciones para el return
     full_lote = db.query(models.LotePreparado).options(
         joinedload(models.LotePreparado.formulacion).joinedload(models.Formulacion.componentes).joinedload(models.FormulacionComponente.reactivo),
         joinedload(models.LotePreparado.preparado_por)
     ).filter(models.LotePreparado.id == lote.id).first()
-    
+
     return _map_lote(full_lote)
 
 # ── Dynamic Routes (Must be at the end) ───────────────────────────────────
@@ -149,10 +149,10 @@ def actualizar_reactivo(id: UUID, payload: schemas.ReactivoUpdate, db: Session =
     r = db.query(models.Reactivo).filter(models.Reactivo.id == id).first()
     if not r:
         raise HTTPException(status_code=404, detail="Reactivo no encontrado")
-    
+
     for k, v in payload.model_dump(exclude_unset=True).items():
         setattr(r, k, v)
-        
+
     db.commit()
     db.refresh(r)
     return r

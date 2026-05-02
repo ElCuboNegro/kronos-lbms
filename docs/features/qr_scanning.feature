@@ -26,7 +26,7 @@ Feature: QR and UID Label Scanning
     And the specimen does not exist in the system
     Then I should see an error message "QR no reconocido por el sistema" or "no encontrado"
     And I should see a prominent button "Registrar este espécimen"
-    
+
   Scenario: Quick register from an unknown scan
     Given I have scanned an unknown specimen with UID "UID:NEW-999"
     When I click "Registrar este espécimen"

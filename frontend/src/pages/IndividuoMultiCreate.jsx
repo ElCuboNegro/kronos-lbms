@@ -14,7 +14,7 @@ export default function IndividuoMultiCreate() {
   const [lineas, setLineas] = useState([])
   const [variegaciones, setVariegaciones] = useState([])
   const [protocolos, setProtocolos] = useState([])
-  
+
   const [showEspecieForm, setShowEspecieForm] = useState(false)
 
   const [form, setForm] = useState({
@@ -80,7 +80,7 @@ export default function IndividuoMultiCreate() {
   async function handleSubmit(e) {
     e.preventDefault()
     if (!form.especie_id) { setError('Selecciona una especie'); return }
-    
+
     // Check amounts
     const validItems = form.items.filter(i => i.cantidad > 0)
     if (validItems.length === 0) { setError('Debe crear al menos 1 individuo'); return }
@@ -111,7 +111,7 @@ export default function IndividuoMultiCreate() {
           notas: it.notas || undefined
         }))
       }
-      
+
       const creados = await api.post('/especimenes/bulk', payload)
 
       // Subir foto a todos los creados si existe
@@ -147,8 +147,8 @@ export default function IndividuoMultiCreate() {
 
       alert(agruparContenedor ? `Se creó 1 etiqueta agrupada (Contenedor) para ${creados.length} individuos.` : `Se crearon ${creados.length} etiquetas individuales correctamente.`)
       navigate(`/especies/${form.especie_id}`)
-    } catch (err) { 
-      setError(err.message) 
+    } catch (err) {
+      setError(err.message)
     }
     finally { setLoading(false) }
   }
@@ -185,7 +185,7 @@ export default function IndividuoMultiCreate() {
           </div>
 
           {showEspecieForm && (
-            <EspecieForm 
+            <EspecieForm
               onSaved={(nueva) => {
                 setShowEspecieForm(false)
                 const listItem = { ...nueva, total_lineas: nueva.lineas?.length || 0, total_individuos: 0 }
@@ -222,7 +222,7 @@ export default function IndividuoMultiCreate() {
             </div>
           </div>
           <Field label="Fecha de clonación / ingreso" type="date" value={form.fecha_ingreso} onChange={v => set('fecha_ingreso', v)} />
-          
+
           <div className="form-group">
             <label>Fotografía del Lote (opcional)</label>
             <div style={{ width: '120px', height: '120px', position: 'relative', marginTop: '4px' }}>
@@ -270,7 +270,7 @@ export default function IndividuoMultiCreate() {
               <Field label="Notas de este lote" value={it.notas} onChange={v => updateItem(it.id, 'notas', v)} placeholder="Observaciones específicas..." noMargin />
             </div>
           ))}
-          
+
           <button type="button" onClick={addItem} className="btn btn--ghost" style={{ marginTop: '0.5rem' }}>+ Añadir otro grupo/lote</button>
         </Section>
 
@@ -278,7 +278,7 @@ export default function IndividuoMultiCreate() {
           <input type="checkbox" checked={printAfter} onChange={e => setPrintAfter(e.target.checked)} style={{ width: 'auto', marginTop: 0 }} />
           <span className="text-primary" style={{ fontSize: '0.9rem', textTransform: 'none', letterSpacing: 'normal' }}>Imprimir etiqueta(s) automáticamente</span>
         </label>
-        
+
         {printAfter && (
           <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', marginBottom: '1.5rem', background: 'var(--theme-background)', padding: '0.8rem', borderRadius: '8px' }}>
             <input type="checkbox" checked={agruparContenedor} onChange={e => setAgruparContenedor(e.target.checked)} style={{ width: 'auto', marginTop: 0 }} />

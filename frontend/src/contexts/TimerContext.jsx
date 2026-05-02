@@ -64,15 +64,15 @@ export function TimerProvider({ children }) {
 
       osc.type = 'sine';
       osc.frequency.setValueAtTime(880, ctx.currentTime); // A5
-      
+
       // Beep pattern
       gainNode.gain.setValueAtTime(0, ctx.currentTime);
       gainNode.gain.linearRampToValueAtTime(1, ctx.currentTime + 0.01);
       gainNode.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.3);
-      
+
       osc.connect(gainNode);
       gainNode.connect(ctx.destination);
-      
+
       osc.start(ctx.currentTime);
       osc.stop(ctx.currentTime + 0.4);
 

@@ -17,10 +17,10 @@ function PrintLoteBtn({ id }) {
   }
 
   return (
-    <button 
-      className="btn btn--ghost" 
-      style={{ padding: '0.2rem 0.5rem', fontSize: '0.9rem' }} 
-      onClick={handlePrint} 
+    <button
+      className="btn btn--ghost"
+      style={{ padding: '0.2rem 0.5rem', fontSize: '0.9rem' }}
+      onClick={handlePrint}
       disabled={printing}
       title="Imprimir Etiqueta"
     >
@@ -81,4 +81,3 @@ export default function LotesPreparadosList() {
     </div>
   )
 }
-

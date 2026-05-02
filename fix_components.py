@@ -212,44 +212,44 @@ def process_file(filename):
     # Shared inline style replacements for the main body
     content = content.replace('<div className="page-container" style={{display:\'flex\',flexDirection:\'column\',gap:\'1rem\'}}>', '<div className="page-container">')
     content = content.replace('<h2 className="page-title" style={{color:\'var(--bio-primary)\',margin:0,fontSize:\'1.2rem\'}}>', '<h2 className="page-title text-primary" style={{marginBottom: "1.5rem"}}>')
-    
+
     content = content.replace('style={{display:\'flex\',alignItems:\'center\',gap:4,flexWrap:\'wrap\',background:\'var(--bio-surface)\',borderRadius:8,padding:\'0.5rem 0.75rem\'}}', 'className="card" style={{display:\'flex\',alignItems:\'center\',gap:4,flexWrap:\'wrap\',padding:\'0.5rem 0.75rem\',marginBottom:\'1rem\'}}')
     content = content.replace('color:\'var(--bio-primary)\'', 'color:\'var(--theme-primary)\'')
     content = content.replace('color:\'var(--bio-border)\'', 'color:\'var(--theme-border)\'')
-    
+
     content = content.replace('<form onSubmit={handleSubmit} style={{display:\'flex\',flexDirection:\'column\',gap:\'1rem\'}}>', '<form onSubmit={handleSubmit}>')
-    
+
     # Especie form button
     content = content.replace('style={{background:\'var(--bio-primary)\',border:\'none\',borderRadius:8,color:\'#fff\',width:42,height:42,fontSize:\'1.4rem\',cursor:\'pointer\',display:\'flex\',alignItems:\'center\',justifyContent:\'center\',flexShrink:0}}', 'className="btn btn--primary" style={{width:44,height:44,padding:0,fontSize:\'1.4rem\',flexShrink:0}}')
-    
+
     # Generar UID button
     content = content.replace('style={form.especie_id ? s.btnGenerar : s.btnGenerarDisabled}', 'className={`btn ${form.especie_id ? "btn--primary" : "btn--ghost"}`} style={{minHeight: "44px"}}')
-    
+
     # Missing form-group wrapper around standard inline UID label/input
     content = content.replace('<label style={{color:\'var(--bio-secondary)\',fontSize:\'0.78rem\',fontWeight:600}}>UID *</label>', '<label>UID *</label>')
     content = content.replace('<input style={{background:\'var(--bio-background)\',border:\'1px solid var(--bio-border)\',borderRadius:8,padding:\'0.65rem 0.9rem\',color:\'var(--bio-text)\',fontSize:\'0.95rem\',outline:\'none\',width:\'100%\',boxSizing:\'border-box\'}}', '<input')
     content = content.replace('<div style={{ flex: 1 }}>\n              <label>UID *</label>', '<div className="form-group" style={{ flex: 1, marginBottom: 0 }}>\n              <label>UID *</label>')
-    
+
     # MapPicker and Fotos wrappers
     content = content.replace('<div style={{display:\'flex\',flexDirection:\'column\',gap:4}}>', '<div className="form-group">')
     content = content.replace('<label style={{color:\'var(--bio-secondary)\',fontSize:\'0.78rem\',fontWeight:600}}>Ubicación In Situ</label>', '<label>Ubicación In Situ</label>')
     content = content.replace('<label style={{color:\'var(--bio-secondary)\',fontSize:\'0.78rem\',fontWeight:600}}>Fotografías iniciales</label>', '<label>Fotografías iniciales</label>')
     content = content.replace('<label style={{color:\'var(--bio-secondary)\',fontSize:\'0.78rem\',fontWeight:600}}>Fotografía del Lote (opcional)</label>', '<label>Fotografía del Lote (opcional)</label>')
-    
+
     # Photos Labels
     content = content.replace('style={fotos[ang] ? s.fotoLabelActive : s.fotoLabelEmpty}', 'style={{display: "flex", alignItems: "center", justifyContent: "center", width: "100%", height: "100%", borderRadius: "var(--radius-base)", border: fotos[ang] ? "none" : "2px dashed var(--theme-border)", background: fotos[ang] ? "transparent" : "var(--theme-surface)", color: "var(--theme-text-muted)", cursor: "pointer", overflow: "hidden", textAlign: "center"}}')
     content = content.replace('style={fotoLote ? s.fotoLabelActive : s.fotoLabelEmpty}', 'style={{display: "flex", alignItems: "center", justifyContent: "center", width: "100%", height: "100%", borderRadius: "var(--radius-base)", border: fotoLote ? "none" : "2px dashed var(--theme-border)", background: fotoLote ? "transparent" : "var(--theme-surface)", color: "var(--theme-text-muted)", cursor: "pointer", overflow: "hidden", textAlign: "center"}}')
-    
+
     # Print Checkbox
     content = content.replace('<label style={{display:\'flex\',alignItems:\'center\',gap:8,cursor:\'pointer\'}}>', '<label style={{display:\'flex\',alignItems:\'center\',gap:8,cursor:\'pointer\',marginBottom:\'1.5rem\'}}>')
     content = content.replace('<span style={{color:\'var(--bio-primary)\',fontSize:\'0.9rem\'}}>Imprimir etiqueta al guardar</span>', '<span className="text-primary" style={{fontSize:\'0.9rem\', textTransform:\'none\', letterSpacing:\'normal\'}}>Imprimir etiqueta al guardar</span>')
     content = content.replace('<span style={{color:\'var(--bio-primary)\',fontSize:\'0.9rem\'}}>Imprimir todas las etiquetas generadas automáticamente</span>', '<span className="text-primary" style={{fontSize:\'0.9rem\', textTransform:\'none\', letterSpacing:\'normal\'}}>Imprimir todas las etiquetas generadas automáticamente</span>')
     content = content.replace('type="checkbox" checked={printAfter} onChange={e => setPrintAfter(e.target.checked)} />', 'type="checkbox" checked={printAfter} onChange={e => setPrintAfter(e.target.checked)} style={{width: "auto", marginTop: 0}} />')
-    
+
     # Submit Button
     content = content.replace('<button type="submit" style={{background:\'var(--bio-primary)\',border:\'none\',borderRadius:10,color:\'#fff\',padding:\'0.9rem\',fontSize:\'1rem\',fontWeight:700,cursor:\'pointer\'}} disabled={loading}>', '<button type="submit" className="btn btn--primary btn--block" disabled={loading}>')
     content = content.replace('<button type="submit" style={{background:\'var(--bio-primary)\',border:\'none\',borderRadius:10,color:\'#fff\',padding:\'0.9rem\',fontSize:\'1rem\',fontWeight:700,cursor:\'pointer\'}} disabled={loading || !form.especie_id}>', '<button type="submit" className="btn btn--primary btn--block" disabled={loading || !form.especie_id}>')
-    
+
     # Error Message
     content = content.replace('<p style={{color:\'var(--error)\',fontSize:\'0.85rem\',margin:0}}>{error}</p>', '<p className="text-center" style={{color:\'var(--error)\',fontSize:\'0.85rem\',marginBottom:\'1rem\'}}>{error}</p>')
 

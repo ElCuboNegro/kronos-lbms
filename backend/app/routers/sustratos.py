@@ -22,7 +22,7 @@ def listar_sustratos(db: Session = Depends(get_db), _=Depends(auth.get_current_u
 def crear_sustrato(payload: schemas.SustratoCreate, db: Session = Depends(get_db), _=Depends(auth.get_current_user)):
     if db.query(models.Sustrato).filter(models.Sustrato.codigo_formulacion == payload.codigo_formulacion).first():
         raise HTTPException(status_code=409, detail="Código de formulación ya existe")
-    
+
     data = payload.model_dump()
     # No procesamos componentes por ahora si se guardan como JSONB directo
     s = models.Sustrato(**data)

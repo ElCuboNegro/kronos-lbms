@@ -13,7 +13,7 @@ export default function ExperimentoDetail() {
 
   const fetchExp = async () => {
     setLoading(true)
-    try { 
+    try {
       const e = await api.get(`/experimentos/${id}`)
       setExp(e)
       const res = await api.get(`/experimentos/${id}/resultados`)
@@ -44,16 +44,16 @@ export default function ExperimentoDetail() {
       </div>
 
       {showConfig && (
-        <ExpConfigForm 
-          exp={exp} 
+        <ExpConfigForm
+          exp={exp}
           onSaved={() => { setShowConfig(false); fetchExp() }}
           onCancel={() => setShowConfig(false)}
         />
       )}
 
       {showResForm && (
-        <ResultadoForm 
-          expId={id} 
+        <ResultadoForm
+          expId={id}
           onSaved={() => { setShowResForm(false); fetchExp() }}
           onCancel={() => setShowResForm(false)}
         />
@@ -143,10 +143,10 @@ function ExpConfigForm({ exp, onSaved, onCancel }) {
   const [especies, setEspecies] = useState([])
   const [lineas, setLineas] = useState([])
   const [variegaciones, setVariegaciones] = useState([])
-  
+
   // Lista explícita de campos que manejamos en este formulario
   const CONFIG_KEYS = ['temperatura_c', 'humedad_relativa_pct', 'ph_sustrato', 'luz_lux', 'npk', 'ppm']
-  
+
   // Extraer valores conocidos del config, o dejar undefined
   const initialConfig = {}
   if (exp.config_estandar) {
@@ -190,11 +190,11 @@ function ExpConfigForm({ exp, onSaved, onCancel }) {
     setLoading(true)
     try {
       const { especie_id, linea_id, variegacion_id } = form
-      
+
       // Construir config estandar preservando lo que ya tenía el objeto original en DB
       // y sobreescribiendo/añadiendo solo los campos manejados por este formulario.
       const newConfig = { ...(exp.config_estandar || {}) }
-      
+
       for (const key of CONFIG_KEYS) {
         if (form[key] !== undefined && form[key] !== '') {
           // Si el input es de tipo number, lo parseamos si aplica. NPK es string.
@@ -208,7 +208,7 @@ function ExpConfigForm({ exp, onSaved, onCancel }) {
         }
       }
 
-      await api.patch(`/experimentos/${exp.id}`, { 
+      await api.patch(`/experimentos/${exp.id}`, {
         especie_id: especie_id || null,
         linea_id: linea_id || null,
         variegacion_id: variegacion_id || null,
@@ -222,11 +222,11 @@ function ExpConfigForm({ exp, onSaved, onCancel }) {
     <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.6)', zIndex: 1000, display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}>
       <div style={{ background: 'var(--theme-surface)', borderTopLeftRadius: '20px', borderTopRightRadius: '20px', width: '100%', maxWidth: '500px', padding: '1.5rem', paddingBottom: 'calc(1.5rem + env(safe-area-inset-bottom))', animation: 'slideUp 0.3s ease-out', maxHeight: '88dvh', overflowY: 'auto' }}>
         <h3 style={{ color: 'var(--theme-primary)', margin: '0 0 1rem', fontSize: '1rem' }}>Configuración del Experimento</h3>
-        
+
         <form onSubmit={submit} style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
            <Section title="Alcance / Categorías de Interés">
              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                <Sel label="Especie Objetivo" value={form.especie_id} onChange={v => set('especie_id', v)} 
+                <Sel label="Especie Objetivo" value={form.especie_id} onChange={v => set('especie_id', v)}
                     options={especies.map(e => ({ value: e.id, label: e.nombre_cientifico }))} />
                 {lineas.length > 0 && (
                   <Sel label="Línea Objetivo" value={form.linea_id} onChange={v => set('linea_id', v)}
@@ -296,4 +296,3 @@ function Field({ label, value, onChange, type="text", textarea=false, required=f
     </div>
   )
 }
-

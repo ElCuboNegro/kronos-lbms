@@ -43,7 +43,7 @@ export default function Scanner() {
   return (
     <div className="page-container" style={{display:'flex',flexDirection:'column',gap:'1.25rem',alignItems:'center',minHeight:'80dvh',justifyContent:'center'}}>
       <h2 className="page-title" style={{color:'var(--theme-primary)',margin:0,fontSize:'1.3rem',position:'absolute',top:'1.5rem',left:'1.5rem'}}>Escanear etiqueta</h2>
-      
+
       {scanning && !loading && !error && (
         <QRScanner
           onResult={handleResult}
@@ -73,15 +73,15 @@ export default function Scanner() {
           </h3>
           <p className="font-mono" style={{ color: 'var(--theme-primary)', margin: '0 0 1.5rem', fontSize: '0.9rem' }}>
             UID: {
-              scanResult.tipo === 'especimen' ? scanResult.especimen.uid : 
+              scanResult.tipo === 'especimen' ? scanResult.especimen.uid :
               scanResult.tipo === 'elemento' ? scanResult.elemento.element_id :
-              scanResult.tipo === 'lote' ? scanResult.lote.uid : 
+              scanResult.tipo === 'lote' ? scanResult.lote.uid :
               scanResult.tipo === 'reactivo' ? `STOCK-${scanResult.reactivo.id.substring(0,8)}` :
               scanResult.tipo === 'sustrato' ? `SUST-${scanResult.sustrato.codigo_formulacion}` :
               scanResult.contenedor.contenedor_uid
             }
           </p>
-          
+
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10, width: '100%', marginBottom: '1rem' }}>
             <button className="btn btn--primary btn--block" onClick={() => {
               if (scanResult.tipo === 'especimen') navigate(`/especimen/${scanResult.especimen.id}`)
@@ -99,7 +99,7 @@ export default function Scanner() {
               </button>
             )}
           </div>
-          
+
           <button className="btn btn--ghost btn--block" onClick={reset}>Escanear otro</button>
         </div>
       )}
@@ -107,9 +107,9 @@ export default function Scanner() {
       {error && (
         <div style={{display:'flex',flexDirection:'column',alignItems:'center',gap:12}}>
           <p style={{color:'var(--error)',margin:0,textAlign:'center'}}>{error}</p>
-          
+
           {isUnknownUid && (
-            <button 
+            <button
               className="btn btn--secondary btn--block"
               onClick={() => navigate(`/nuevo-individuo?uid=${encodeURIComponent(uidClean)}`)}
             >
@@ -125,4 +125,3 @@ export default function Scanner() {
     </div>
   )
 }
-

@@ -16,4 +16,3 @@ c = re.sub(r'style=\{s\.[a-zA-Z0-9_]+\}', '', c)
 
 with open('frontend/src/pages/EspecieDetail.jsx', 'w') as f:
     f.write(c)
-

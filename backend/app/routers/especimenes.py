@@ -73,14 +73,14 @@ def crear_bulk(payload: schemas.EspecimenBulkRequest, db: Session = Depends(get_
     # 1. Especie
     if esp_obj.config_estandar:
         defaults.update(esp_obj.config_estandar)
-    
+
     # 2. Línea
     if payload.linea_id:
         linea = db.query(models.Linea).filter(models.Linea.id == payload.linea_id).first()
         if linea and linea.config_estandar:
             defaults.update({k: v for k, v in linea.config_estandar.items() if v is not None})
-    
-    # Nota: En bulk create usualmente no hay un Experimento definido todavía, 
+
+    # Nota: En bulk create usualmente no hay un Experimento definido todavía,
     # pero si lo hubiera en el futuro, iría aquí.
 
     code = esp_obj.codigo or esp_obj.nombre_cientifico[:4].upper()
@@ -109,12 +109,12 @@ def crear_bulk(payload: schemas.EspecimenBulkRequest, db: Session = Depends(get_
         idx = 0
 
     nuevos = []
-    
+
     for item in payload.items:
         for _ in range(item.cantidad):
             idx += 1
             uid = f"{prefix}{idx:02d}"
-            
+
             nuevo_esp = models.Especimen(
                 uid=uid,
                 contenedor_uid=payload.contenedor_uid,
@@ -132,7 +132,7 @@ def crear_bulk(payload: schemas.EspecimenBulkRequest, db: Session = Depends(get_
             )
             db.add(nuevo_esp)
             db.flush()
-            
+
             # Crear registro de evolución inicial con herencia
             evo_data = {
                 "especimen_id": nuevo_esp.id,
@@ -141,7 +141,7 @@ def crear_bulk(payload: schemas.EspecimenBulkRequest, db: Session = Depends(get_
                 "fecha": now,
                 "notas": item.notas or "Registro inicial automático (Clonación Masiva)"
             }
-            
+
             # Auto-completar campos técnicos heredados
             campos_tecnicos = [
                 'temperatura_c', 'humedad_relativa_pct', 'humedad_sustrato_pct',
@@ -151,9 +151,9 @@ def crear_bulk(payload: schemas.EspecimenBulkRequest, db: Session = Depends(get_
             for campo in campos_tecnicos:
                 if campo in defaults:
                     evo_data[campo] = defaults[campo]
-            
+
             db.add(models.RegistroEvolucion(**evo_data))
-            
+
             # Evento de clonación
             evento = models.Evento(
                 tipo="clonacion",
@@ -169,7 +169,7 @@ def crear_bulk(payload: schemas.EspecimenBulkRequest, db: Session = Depends(get_
     db.commit()
     for e in nuevos:
         db.refresh(e)
-    
+
     return [_get_full(e.id, db) for e in nuevos]
 
 
@@ -213,7 +213,7 @@ def mover_a_contenedor(
             timestamp=now,
             meta={"notas": payload.notas} if payload.notas else None
         ))
-    
+
     db.commit()
     return {"status": "ok", "moved": len(especimenes), "destino": payload.destino_contenedor_uid}
 

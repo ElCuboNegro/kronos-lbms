@@ -52,4 +52,3 @@ c = re.sub(r' style=\{\{\s*\}\}', r'', c)
 
 with open('frontend/src/pages/EspecieDetail.jsx', 'w') as f:
     f.write(c)
-

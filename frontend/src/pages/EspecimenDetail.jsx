@@ -90,13 +90,13 @@ export default function EspecimenDetail() {
       {/* Tabs */}
       <div style={{ display: 'flex', borderBottom: '1px solid var(--theme-border)', background: 'var(--theme-surface)' }}>
         {['info', 'evolucion', 'eventos'].map(t => (
-          <button key={t} 
-            style={{ 
+          <button key={t}
+            style={{
               flex: 1, background: 'none', border: 'none', cursor: 'pointer', padding: '1rem 0.5rem', fontSize: '0.9rem',
               color: tab === t ? 'var(--theme-primary)' : 'var(--theme-text-muted)',
               borderBottom: tab === t ? '2px solid var(--theme-primary)' : '2px solid transparent',
               fontWeight: tab === t ? 600 : 400
-            }} 
+            }}
             onClick={() => setTab(t)}>
             {t === 'info' ? 'Info' : t === 'evolucion' ? `Evolución (${registros.length})` : `Eventos (${esp.eventos.length})`}
           </button>
@@ -395,7 +395,7 @@ function EditEspecimenSheet({ esp, onSaved, onCancel }) {
           )}
           <Sel2 label="Estado" value={form.estado} onChange={v => set('estado', v)}
             options={['activo', 'en_experimento', 'archivado', 'contaminado'].map(e => ({ value: e, label: e }))} />
-          
+
           <div className="grid-2">
             <EspecimenSearch label="Madre" value={form.madre_id} onChange={v => set('madre_id', v)} />
             <EspecimenSearch label="Padre" value={form.padre_id} onChange={v => set('padre_id', v)} />
@@ -408,9 +408,9 @@ function EditEspecimenSheet({ esp, onSaved, onCancel }) {
 
           <Txt2 label="Origen (descripción)" value={form.origen} onChange={v => set('origen', v)} />
           <Txt2 label="Notas" value={form.notas} onChange={v => set('notas', v)} textarea />
-          
+
           {error && <p className="text-danger" style={{ fontSize: '0.85rem' }}>{error}</p>}
-          
+
           <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
             <button type="button" className="btn btn--ghost" style={{ flex: 1 }} onClick={onCancel}>Cancelar</button>
             <button type="submit" className="btn btn--primary" style={{ flex: 2 }} disabled={loading}>{loading ? '…' : 'Guardar'}</button>

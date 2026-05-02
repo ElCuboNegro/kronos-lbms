@@ -10,7 +10,7 @@ def exp_data(db, inject_test_user):
     sp = models.Especimen(uid="EXP-SP-1", especie="Planta", estado="activo")
     el = models.Elemento(element_id="EXP-EL-1", tipo="equipo", descripcion="Lamp", estado="activo")
     proto = models.Protocolo(nombre="Acclimatization", tipo="aclimatacion", creado_por_id=inject_test_user.id)
-    
+
     db.add(sp)
     db.add(el)
     db.add(proto)
@@ -18,7 +18,7 @@ def exp_data(db, inject_test_user):
     db.refresh(sp)
     db.refresh(el)
     db.refresh(proto)
-    
+
     return {"specimen_id": str(sp.id), "elemento_id": str(el.id), "protocolo_id": str(proto.id)}
 
 
@@ -87,7 +87,7 @@ def log_research_result(res_type, res_type2, exp_data):
 def provide_res_details(auth_client, request, exp_data):
     exp_data["res_payload"]["titulo"] = "Observation 1"
     exp_data["res_payload"]["descripcion"] = "Plants look sad"
-    
+
     exp_id = exp_data["experimento_id"]
     request.node.response = auth_client.post(f"/experimentos/{exp_id}/resultados", json=exp_data["res_payload"])
 

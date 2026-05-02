@@ -31,8 +31,8 @@ export default function QRScanner({ onResult, onError }) {
 
     scanner.start(
       { facingMode: 'environment' },
-      { 
-        fps: 15, 
+      {
+        fps: 15,
         qrbox: { width: 300, height: 150 }, // Wider box for 1D barcodes
         formatsToSupport: [
           Html5QrcodeSupportedFormats.QR_CODE,
@@ -51,7 +51,7 @@ export default function QRScanner({ onResult, onError }) {
                scanner.pause()
              }
           } catch(e) { /* ignore */ }
-          
+
           setFlash(true)
 
           // Audio feedback (beep)
@@ -70,7 +70,7 @@ export default function QRScanner({ onResult, onError }) {
               osc.stop(ctx.currentTime + 0.1)
             }
           } catch(e) { /* ignore audio errors */ }
-          
+
           // Delay onResult slightly so user sees the flash
           setTimeout(() => {
             if (isMounted) onResult(text)
@@ -104,4 +104,3 @@ export default function QRScanner({ onResult, onError }) {
     </div>
   )
 }
-

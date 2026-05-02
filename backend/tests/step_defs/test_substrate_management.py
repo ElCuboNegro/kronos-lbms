@@ -71,7 +71,7 @@ def log_evo_entry(sub_data):
 def select_substrate_evo(auth_client, request, sname, sub_data):
     sub_data["evo_payload"]["sustrato_id"] = sub_data["sustrato_id"]
     sub_data["evo_payload"]["sustrato"] = sname
-    
+
     sp_id = sub_data["specimen_id"]
     request.node.response = auth_client.post(f"/especimenes/{sp_id}/evolucion", json=sub_data["evo_payload"])
 

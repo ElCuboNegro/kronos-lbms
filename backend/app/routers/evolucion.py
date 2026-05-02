@@ -148,7 +148,7 @@ def subir_foto_evolucion(
         raise HTTPException(status_code=422, detail=f"Ángulo inválido. Opciones: {ANGULOS}")
     if file.content_type not in ALLOWED:
         raise HTTPException(status_code=415, detail="Solo JPEG, PNG o WebP")
-        
+
     ext = file.filename.rsplit(".", 1)[-1].lower() if "." in file.filename else ""
     if ext not in {"jpg", "jpeg", "png", "webp"}:
         raise HTTPException(status_code=415, detail="Formato no permitido. Usa: jpg, jpeg, png, webp")

@@ -9,14 +9,14 @@ class TestUploadSecurityRegresion:
             "file": ("shell.php", b"<?php system('whoami'); ?>", "image/jpeg")
         }
         res = auth_client.post("/auth/me/foto", files=files)
-        
+
         assert res.status_code == 415
         assert "Formato no permitido" in res.text
 
     def test_upload_foto_evolucion_rechaza_extension_sh(self, auth_client, db):
         from app.models import Especie, Especimen, RegistroEvolucion
         import uuid
-        
+
         # 0. Obtener usuario
         user_id = auth_client.get("/auth/me").json()["id"]
 
@@ -46,6 +46,6 @@ class TestUploadSecurityRegresion:
             "file": ("script.sh", b"#!/bin/bash\nrm -rf /", "image/png")
         }
         res = auth_client.post(f"/especimenes/{test_esp_id}/evolucion/{test_reg_id}/fotos/arriba", files=files)
-        
+
         assert res.status_code == 415
         assert "Formato no permitido" in res.text

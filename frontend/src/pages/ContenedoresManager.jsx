@@ -11,13 +11,13 @@ export default function ContenedoresManager() {
 
   const [origenId, setOrigenId] = useState(initialContenedor)
   const [destinoId, setDestinoId] = useState('')
-  
+
   const [origenData, setOrigenData] = useState(null)
   const [destinoData, setDestinoData] = useState(null)
-  
+
   const [loadingOrigen, setLoadingOrigen] = useState(false)
   const [loadingDestino, setLoadingDestino] = useState(false)
-  
+
   const [selectedIds, setSelectedIds] = useState(new Set())
   const [showScanner, setShowScanner] = useState(null) // 'origen' | 'destino'
   const [moving, setMoving] = useState(false)
@@ -115,10 +115,10 @@ export default function ContenedoresManager() {
         destino_contenedor_uid: destinoId,
         notas: `Transferido desde ${origenData.contenedor_uid}`
       })
-      
+
       // Clear selection and refresh both sides
       setSelectedIds(new Set())
-      
+
       // Force re-triggering the useEffects
       const currentO = origenId
       const currentD = destinoId
@@ -128,7 +128,7 @@ export default function ContenedoresManager() {
         setOrigenId(currentO)
         setDestinoId(currentD)
       }, 50)
-      
+
     } catch (err) {
       setError(err.message || 'Error al mover elementos')
     } finally {
@@ -140,8 +140,8 @@ export default function ContenedoresManager() {
     return (
       <div style={{ position: 'fixed', inset: 0, zIndex: 2000, background: '#000' }}>
         <QRScanner onResult={handleScan} />
-        <button 
-          className="btn btn--secondary" 
+        <button
+          className="btn btn--secondary"
           style={{ position: 'absolute', bottom: '2rem', left: '50%', transform: 'translateX(-50%)', zIndex: 2010 }}
           onClick={() => setShowScanner(null)}
         >
@@ -167,15 +167,15 @@ export default function ContenedoresManager() {
           <h4 className="text-secondary" style={{ margin: 0, textTransform: 'uppercase', fontSize: '0.8rem' }}>1. Origen</h4>
           <button className="btn btn--secondary" style={{ padding: '0.2rem 0.6rem', fontSize: '0.9rem' }} onClick={() => setShowScanner('origen')}>📷 Escanear</button>
         </div>
-        <input 
+        <input
           style={{ background: 'var(--theme-background)', border: '1px solid var(--theme-border)', borderRadius: 8, padding: '0.6rem', color: 'var(--theme-text)', width: '100%' }}
-          value={origenId} 
-          onChange={e => setOrigenId(e.target.value)} 
-          placeholder="Código de contenedor (ej. CONT-123) o UID" 
+          value={origenId}
+          onChange={e => setOrigenId(e.target.value)}
+          placeholder="Código de contenedor (ej. CONT-123) o UID"
         />
-        
+
         {loadingOrigen && <p className="text-muted" style={{ fontSize: '0.8rem', margin: 0 }}>Cargando origen...</p>}
-        
+
         {origenData && !loadingOrigen && (
           <div style={{ marginTop: '0.5rem' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
@@ -186,13 +186,13 @@ export default function ContenedoresManager() {
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', maxHeight: '30vh', overflowY: 'auto', paddingRight: '0.5rem' }}>
               {origenData.especimenes.map(esp => (
-                <div 
-                  key={esp.id} 
-                  style={{ 
-                    display: 'flex', alignItems: 'center', gap: '0.8rem', padding: '0.6rem', 
-                    background: selectedIds.has(esp.id) ? 'rgba(125, 202, 143, 0.15)' : 'var(--theme-background)', 
-                    border: selectedIds.has(esp.id) ? '1px solid var(--theme-primary)' : '1px solid var(--theme-border)', 
-                    borderRadius: '8px', cursor: 'pointer' 
+                <div
+                  key={esp.id}
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: '0.8rem', padding: '0.6rem',
+                    background: selectedIds.has(esp.id) ? 'rgba(125, 202, 143, 0.15)' : 'var(--theme-background)',
+                    border: selectedIds.has(esp.id) ? '1px solid var(--theme-primary)' : '1px solid var(--theme-border)',
+                    borderRadius: '8px', cursor: 'pointer'
                   }}
                   onClick={() => toggleSelect(esp.id)}
                 >
@@ -218,15 +218,15 @@ export default function ContenedoresManager() {
           <h4 className="text-secondary" style={{ margin: 0, textTransform: 'uppercase', fontSize: '0.8rem' }}>2. Destino</h4>
           <button className="btn btn--secondary" style={{ padding: '0.2rem 0.6rem', fontSize: '0.9rem' }} onClick={() => setShowScanner('destino')}>📷 Escanear</button>
         </div>
-        <input 
+        <input
           style={{ background: 'var(--theme-background)', border: '1px solid var(--theme-border)', borderRadius: 8, padding: '0.6rem', color: 'var(--theme-text)', width: '100%' }}
-          value={destinoId} 
-          onChange={e => setDestinoId(e.target.value)} 
-          placeholder="Código de destino (ej. CONT-NUEVO)" 
+          value={destinoId}
+          onChange={e => setDestinoId(e.target.value)}
+          placeholder="Código de destino (ej. CONT-NUEVO)"
         />
-        
+
         {loadingDestino && <p className="text-muted" style={{ fontSize: '0.8rem', margin: 0 }}>Comprobando destino...</p>}
-        
+
         {destinoData && !loadingDestino && (
           <div style={{ marginTop: '0.5rem' }}>
             <span className="text-primary" style={{ fontWeight: 'bold', fontSize: '0.9rem' }}>
@@ -247,19 +247,19 @@ export default function ContenedoresManager() {
       </div>
 
       {error && <p className="badge badge--danger" style={{ width: '100%', textAlign: 'center', padding: '0.5rem' }}>{error}</p>}
-      
-      <button 
-        className="btn btn--primary btn--block" 
-        style={{ padding: '1rem', fontSize: '1.1rem', marginTop: '0.5rem' }} 
+
+      <button
+        className="btn btn--primary btn--block"
+        style={{ padding: '1rem', fontSize: '1.1rem', marginTop: '0.5rem' }}
         disabled={selectedIds.size === 0 || !destinoId || moving}
         onClick={moverElementos}
       >
         {moving ? 'Moviendo...' : `Mover ${selectedIds.size} elemento(s) al destino`}
       </button>
-      
+
       {destinoData && (destinoData.especimenes.length > 0 || moving) && (
-         <button 
-          className="btn btn--ghost btn--block" 
+         <button
+          className="btn btn--ghost btn--block"
           style={{ marginTop: '0.5rem' }}
           onClick={async () => {
             try {

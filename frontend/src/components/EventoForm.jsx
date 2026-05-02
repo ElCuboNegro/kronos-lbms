@@ -60,4 +60,3 @@ export default function EventoForm({ especimenId, elementoId, onSaved, onCancel 
     </div>
   )
 }
-

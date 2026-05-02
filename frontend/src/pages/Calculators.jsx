@@ -80,7 +80,7 @@ function C1V1Calculator() {
           <input type="number" step="any" value={v2} onChange={e => setV2(e.target.value)} placeholder="Ej: 1000" />
         </div>
       </div>
-      
+
       {v1 !== null ? (
         <div style={{ marginTop: '1.5rem', padding: '1rem', background: 'var(--theme-background)', borderRadius: 'var(--radius-base)', border: '1px solid var(--theme-primary)' }}>
           <p className="text-muted" style={{ margin: '0 0 0.5rem', fontSize: '0.85rem' }}>Resultados:</p>
@@ -125,7 +125,7 @@ function MolarityCalculator() {
           <input type="number" step="any" value={conc} onChange={e => setConc(e.target.value)} placeholder="Ej: 0.5" />
         </div>
       </div>
-      
+
       {mass !== null ? (
         <div style={{ marginTop: '1.5rem', padding: '1rem', background: 'var(--theme-background)', borderRadius: 'var(--radius-base)', border: '1px solid var(--theme-primary)' }}>
           <p className="text-muted" style={{ margin: '0 0 0.5rem', fontSize: '0.85rem' }}>Resultados:</p>
@@ -157,16 +157,16 @@ function CellViabilityCounter() {
         <h3 className="text-secondary" style={{ margin: 0 }}>Viabilidad Celular (Live/Dead)</h3>
         <button className="btn btn--ghost" style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem' }} onClick={() => { setLive(0); setDead(0) }}>Reset</button>
       </div>
-      
+
       <div style={{ display: 'flex', gap: '1rem', height: '200px' }}>
-        <button 
+        <button
           style={{ flex: 1, background: 'rgba(72, 187, 120, 0.1)', border: '2px solid var(--theme-secondary)', borderRadius: 'var(--radius-card)', color: 'var(--theme-primary)', fontSize: '2rem', fontWeight: 'bold', cursor: 'pointer', userSelect: 'none' }}
           onClick={() => handleTap('live')}
         >
           {live}
           <div style={{ fontSize: '0.9rem', color: 'var(--theme-secondary)', textTransform: 'uppercase', marginTop: '0.5rem' }}>Vivas (Tocar)</div>
         </button>
-        <button 
+        <button
           style={{ flex: 1, background: 'rgba(255, 87, 34, 0.1)', border: '2px solid var(--error)', borderRadius: 'var(--radius-card)', color: 'var(--error)', fontSize: '2rem', fontWeight: 'bold', cursor: 'pointer', userSelect: 'none' }}
           onClick={() => handleTap('dead')}
         >
@@ -196,7 +196,7 @@ function ColonyCounter() {
 
   const volVal = parseFloat(volume)
   const dilVal = Math.pow(10, parseFloat(dilution))
-  
+
   let cfu = null
   if (count > 0 && volVal > 0 && !isNaN(dilVal)) {
     cfu = count / (volVal * dilVal)
@@ -214,7 +214,7 @@ function ColonyCounter() {
         <button className="btn btn--ghost" style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem' }} onClick={() => setCount(0)}>Reset</button>
       </div>
 
-      <button 
+      <button
         style={{ width: '100%', height: '150px', background: 'rgba(2, 60, 105, 0.2)', border: '2px dashed var(--primary)', borderRadius: 'var(--radius-card)', color: 'var(--theme-text-inverse)', fontSize: '3rem', fontWeight: 'bold', cursor: 'pointer', userSelect: 'none', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}
         onClick={handleTap}
       >

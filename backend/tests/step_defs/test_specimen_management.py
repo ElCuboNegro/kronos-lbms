@@ -10,12 +10,12 @@ def spec_data(db):
     db.add(esp)
     db.commit()
     db.refresh(esp)
-    
+
     linea = models.Linea(nombre="Line1", especie_id=esp.id)
     db.add(linea)
     db.commit()
     db.refresh(linea)
-    
+
     return {"especie_id": str(esp.id), "linea_id": str(linea.id)}
 
 

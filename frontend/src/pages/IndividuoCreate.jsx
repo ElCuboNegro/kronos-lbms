@@ -58,7 +58,7 @@ export default function IndividuoCreate() {
     })
     set('linea_id', '')
     set('variegacion_id', '')
-    
+
     // Auto-generate semantic UID
     generarUID(form.especie_id)
   }, [form.especie_id])
@@ -112,7 +112,7 @@ export default function IndividuoCreate() {
             fecha: form.fecha_ingreso,
             notas: 'Registro inicial con fotografías.'
           })
-          
+
           const token = localStorage.getItem('token')
           await Promise.all(angulosPresentes.map(async (ang) => {
             const fd = new FormData()
@@ -172,7 +172,7 @@ export default function IndividuoCreate() {
           </div>
 
           {showEspecieForm && (
-            <EspecieForm 
+            <EspecieForm
               onSaved={(nueva) => {
                 setShowEspecieForm(false)
                 // Update local list immediately to avoid waiting for fetch
@@ -184,15 +184,15 @@ export default function IndividuoCreate() {
                 setEspecies(prev => {
                   const exists = prev.find(e => e.id === nueva.id)
                   if (exists) return prev
-                  return [...prev, listItem].sort((a, b) => 
+                  return [...prev, listItem].sort((a, b) =>
                     a.nombre_cientifico.localeCompare(b.nombre_cientifico)
                   )
                 })
                 // Set form values immediately
-                setForm(f => ({ 
-                  ...f, 
-                  especie_id: nueva.id, 
-                  especie: nueva.nombre_cientifico 
+                setForm(f => ({
+                  ...f,
+                  especie_id: nueva.id,
+                  especie: nueva.nombre_cientifico
                 }))
               }}
               onCancel={() => setShowEspecieForm(false)}
@@ -223,9 +223,9 @@ export default function IndividuoCreate() {
               <input value={form.uid} onChange={e => set('uid', e.target.value)}
                 placeholder="Genera o escribe…" />
             </div>
-            <button type="button" 
-              className={`btn ${form.especie_id ? 'btn--primary' : 'btn--ghost'}`} 
-              onClick={generarUID} 
+            <button type="button"
+              className={`btn ${form.especie_id ? 'btn--primary' : 'btn--ghost'}`}
+              onClick={generarUID}
               disabled={generating || !form.especie_id}
               title={!form.especie_id ? "Selecciona una especie primero" : ""}
             >
@@ -243,7 +243,7 @@ export default function IndividuoCreate() {
           </div>
 
           <Field label="Fecha de ingreso" type="date" value={form.fecha_ingreso} onChange={v => set('fecha_ingreso', v)} />
-          
+
           <div className="form-group">
             <label>Ubicación In Situ</label>
             <MapPicker value={form.coordenadas} onChange={v => set('coordenadas', v)} />
@@ -252,7 +252,7 @@ export default function IndividuoCreate() {
           <Field label="Descripción de origen / procedencia" value={form.origen} onChange={v => set('origen', v)} placeholder="Ej: Finca X, ladera norte..." />
           <Select label="Estado" value={form.estado} onChange={v => set('estado', v)}
             options={ESTADOS.map(e => ({ value: e, label: e }))} />
-          
+
           <div className="form-group">
             <label>Fotografías iniciales</label>
             <div style={{ display: 'flex', gap: '10px', marginTop: '4px' }}>
@@ -274,7 +274,7 @@ export default function IndividuoCreate() {
                     background: fotos[ang] ? 'transparent' : 'var(--theme-surface)',
                     color: 'var(--theme-text-muted)', cursor: 'pointer', overflow: 'hidden', textAlign: 'center'
                   }}>
-                    {fotos[ang] 
+                    {fotos[ang]
                       ? <img src={fotos[ang].preview} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                       : <span style={{ fontSize: '0.85rem' }}>📷<br/>{ang}</span>
                     }

@@ -22,8 +22,8 @@ export default function Home() {
       </div>
       <div className="grid-2">
         {sections.map(sec => (
-          <button 
-            key={sec.path} 
+          <button
+            key={sec.path}
             className="tile"
             onClick={() => navigate(sec.path)}
           >
@@ -36,4 +36,3 @@ export default function Home() {
     </div>
   )
 }
-

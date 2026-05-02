@@ -205,12 +205,12 @@ class Experimento(Base):
     # planificado, activo, pausado, completado, cancelado
     director_id = Column("director_id", UUID(as_uuid=True), ForeignKey("usuarios.id"), nullable=False)
     operador_id = Column(UUID(as_uuid=True), ForeignKey("usuarios.id"), nullable=True)
-    
+
     # ── Enfoque del experimento (Opcionales)
     especie_id = Column(UUID(as_uuid=True), ForeignKey("especies.id"), nullable=True)
     linea_id = Column(UUID(as_uuid=True), ForeignKey("lineas.id"), nullable=True)
     variegacion_id = Column(UUID(as_uuid=True), ForeignKey("variegaciones.id"), nullable=True)
-    
+
     config_estandar = Column(JSONB, nullable=True, default=dict)
     notas = Column(Text, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
@@ -286,11 +286,11 @@ class Sustrato(Base):
     componentes = Column(JSONB, nullable=True)
     ph_teorico = Column(Float, nullable=True)
     conductividad_teorica = Column(Float, nullable=True)
-    
+
     # ── Vinculación con Formulaciones y Lotes
     formulacion_id = Column(UUID(as_uuid=True), ForeignKey("formulaciones.id"), nullable=True)
     lote_id = Column(UUID(as_uuid=True), ForeignKey("lotes_preparados.id"), nullable=True)
-    
+
     created_at = Column(DateTime, default=datetime.utcnow)
 
     formulacion = relationship("Formulacion")

@@ -44,7 +44,7 @@ def resolver_qr(
         if el:
             return schemas.ScanResult(tipo="elemento", elemento=_elemento_out(el))
         raise HTTPException(status_code=404, detail=f"Elemento con ID '{eid}' no encontrado")
-        
+
     if qr_data.startswith("REAC-"):
         lote = db.query(models.LotePreparado).options(
             joinedload(models.LotePreparado.formulacion).joinedload(models.Formulacion.componentes).joinedload(models.FormulacionComponente.reactivo),
@@ -54,16 +54,16 @@ def resolver_qr(
             from app.routers.reactivos import _map_lote
             return schemas.ScanResult(tipo="lote", lote=_map_lote(lote))
         raise HTTPException(status_code=404, detail=f"Lote Preparado con UID '{qr_data}' no encontrado")
-        
+
     if qr_data.startswith("CONT-"):
         especimenes = db.query(models.Especimen).options(
             joinedload(models.Especimen.linea_rel),
             joinedload(models.Especimen.variegacion_rel)
         ).filter(models.Especimen.contenedor_uid == qr_data).all()
-        
+
         if especimenes:
             return schemas.ScanResult(
-                tipo="contenedor", 
+                tipo="contenedor",
                 contenedor={"contenedor_uid": qr_data, "especimenes": [_especimen_out(e) for e in especimenes]}
             )
         raise HTTPException(status_code=404, detail=f"Contenedor '{qr_data}' vacío o no encontrado")

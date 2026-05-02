@@ -6,11 +6,11 @@ class TestExperimentoResultadosRegresion:
     def test_frontend_debe_poder_listar_resultados(self, auth_client, db):
         from app.models import Experimento, ResultadoInvestigacion
         import uuid
-        
+
         # 1. Crear Experimento
         exp_id = uuid.uuid4()
         user_id = auth_client.get("/auth/me").json()["id"]
-        
+
         exp = Experimento(
             id=exp_id,
             nombre="Exp Resultados Test",

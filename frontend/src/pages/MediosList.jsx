@@ -13,36 +13,36 @@ export default function LaboratorioDashboard() {
   const navigate = useNavigate()
   const [showForm, setShowForm] = useState(false)
   const [refreshCount, setRefreshCount] = useState(0)
-  
+
   return (
     <div className="page-container" style={{display:'flex',flexDirection:'column',gap:'1rem'}}>
       <h2 className="page-title" style={{color:'var(--theme-primary)',margin:0,fontSize:'1.4rem'}}>Gestión de Laboratorio</h2>
       <p style={{color:'var(--theme-secondary)',fontSize:'0.85rem',margin:'-0.5rem 0 1rem'}}>Inventario químico, formulaciones y trazabilidad de medios.</p>
 
       <div style={{display:'flex',flexDirection:'column',gap:12,marginBottom:'1.5rem'}}>
-        <MenuCard 
-          title="Reactivos" 
-          desc="Catálogo de químicos, hormonas y sales puras." 
-          icon="🧪" 
-          onClick={() => navigate('/reactivos')} 
+        <MenuCard
+          title="Reactivos"
+          desc="Catálogo de químicos, hormonas y sales puras."
+          icon="🧪"
+          onClick={() => navigate('/reactivos')}
         />
-        <MenuCard 
-          title="Recetario" 
-          desc="Define formulaciones y composiciones estándar." 
-          icon="📖" 
-          onClick={() => navigate('/formulaciones')} 
+        <MenuCard
+          title="Recetario"
+          desc="Define formulaciones y composiciones estándar."
+          icon="📖"
+          onClick={() => navigate('/formulaciones')}
         />
-        <MenuCard 
-          title="Lotes Preparados" 
-          desc="Historial de medios listos y trazabilidad." 
-          icon="📦" 
-          onClick={() => navigate('/lotes')} 
+        <MenuCard
+          title="Lotes Preparados"
+          desc="Historial de medios listos y trazabilidad."
+          icon="📦"
+          onClick={() => navigate('/lotes')}
         />
-        <MenuCard 
-          title="Micro-Herramientas" 
-          desc="Diluciones, molaridad y contadores biológicos." 
-          icon="🧮" 
-          onClick={() => navigate('/calculadoras')} 
+        <MenuCard
+          title="Micro-Herramientas"
+          desc="Diluciones, molaridad y contadores biológicos."
+          icon="🧮"
+          onClick={() => navigate('/calculadoras')}
         />
       </div>
 
@@ -50,13 +50,13 @@ export default function LaboratorioDashboard() {
         <h3 style={{color:'var(--theme-primary)',fontSize:'0.9rem',fontWeight:700,textTransform:'uppercase',letterSpacing:1, margin: 0}}>Formulaciones de Medios / Sustratos</h3>
         <button className="btn btn--primary" style={{ padding: '0.4rem 0.8rem', fontSize: '0.85rem' }} onClick={() => setShowForm(true)}>+ Nuevo Medio</button>
       </div>
-      
+
       <MediosSubList refreshCounter={refreshCount} />
 
       {showForm && (
-        <SustratoForm 
-          onSaved={() => { setShowForm(false); setRefreshCount(c => c + 1) }} 
-          onCancel={() => setShowForm(false)} 
+        <SustratoForm
+          onSaved={() => { setShowForm(false); setRefreshCount(c => c + 1) }}
+          onCancel={() => setShowForm(false)}
         />
       )}
     </div>
@@ -141,10 +141,10 @@ function PrintSustratoBtn({ id }) {
   }
 
   return (
-    <button 
-      className="btn btn--ghost" 
-      style={{ padding: '0.1rem 0.4rem', fontSize: '0.8rem' }} 
-      onClick={handlePrint} 
+    <button
+      className="btn btn--ghost"
+      style={{ padding: '0.1rem 0.4rem', fontSize: '0.8rem' }}
+      onClick={handlePrint}
       disabled={printing}
       title="Imprimir Etiqueta"
     >
@@ -222,7 +222,7 @@ function SustratoForm({ onSaved, onCancel }) {
       <div style={{ background: 'var(--theme-surface)', borderRadius: '24px 24px 0 0', width: '100%', maxWidth: '500px', padding: '1.5rem', maxHeight: '90dvh', overflowY: 'auto' }}>
         <h3 className="text-primary" style={{ margin: '0 0 1rem', fontSize: '1.2rem' }}>Registrar Sustrato / Medio</h3>
         <form onSubmit={submit} style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
-          
+
           <div className="grid-2">
             <div className="form-group" style={{ marginBottom: 0 }}>
               <label>Código *</label>
@@ -290,7 +290,7 @@ function SustratoForm({ onSaved, onCancel }) {
           </div>
 
           {error && <p className="text-danger" style={{ fontSize: '0.85rem', margin: 0 }}>{error}</p>}
-          
+
           <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
             <button type="button" className="btn btn--ghost" style={{ flex: 1 }} onClick={onCancel}>Cancelar</button>
             <button type="submit" className="btn btn--primary" style={{ flex: 2 }} disabled={loading}>{loading ? 'Guardando…' : 'Registrar'}</button>
@@ -300,4 +300,3 @@ function SustratoForm({ onSaved, onCancel }) {
     </div>
   )
 }
-
