@@ -9,11 +9,19 @@ async function request(method, path, body) {
   const token = getToken()
   if (token) headers['Authorization'] = `Bearer ${token}`
 
-  const res = await fetch(`${BASE}${path}`, {
-    method,
-    headers,
-    body: body !== undefined ? JSON.stringify(body) : undefined,
-  })
+  let res;
+  try {
+    res = await fetch(`${BASE}${path}`, {
+      method,
+      headers,
+      body: body !== undefined ? JSON.stringify(body) : undefined,
+    })
+  } catch (err) {
+    if (err.name === 'TypeError' && err.message.includes('fetch')) {
+      throw new Error('Error de conexión con el servidor (Revisa tu red o CORS).')
+    }
+    throw err;
+  }
 
   if (res.status === 401) {
     localStorage.removeItem('token')
@@ -36,11 +44,19 @@ export const api = {
 
   login: async (email, password) => {
     const form = new URLSearchParams({ username: email, password })
-    const res = await fetch(`${BASE}/auth/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: form,
-    })
+    let res;
+    try {
+      res = await fetch(`${BASE}/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: form,
+      })
+    } catch (err) {
+      if (err.name === 'TypeError' && err.message.includes('fetch')) {
+        throw new Error('Error de conexión con el servidor (Revisa tu red o CORS).')
+      }
+      throw err;
+    }
 
     if (res.status === 502) {
       throw new Error('Servidor fuera de línea o reiniciándose (502 Bad Gateway)')
