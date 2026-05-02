@@ -136,7 +136,7 @@ def actualizar(id: UUID, payload: schemas.EspecieUpdate,
     e = db.query(models.Especie).filter(models.Especie.id == id).first()
     if not e:
         raise HTTPException(status_code=404, detail="Especie no encontrada")
-    for k, v in payload.model_dump(exclude_none=True).items():
+    for k, v in payload.model_dump(exclude_unset=True).items():
         setattr(e, k, v)
     db.commit()
     return _especie_out(_load_especie(id, db))
@@ -167,7 +167,7 @@ def actualizar_linea(linea_id: UUID, payload: schemas.LineaUpdate,
     l = db.query(models.Linea).filter(models.Linea.id == linea_id).first()
     if not l:
         raise HTTPException(status_code=404, detail="Línea no encontrada")
-    for k, v in payload.model_dump(exclude_none=True).items():
+    for k, v in payload.model_dump(exclude_unset=True).items():
         setattr(l, k, v)
     db.commit()
     db.refresh(l)
@@ -199,7 +199,7 @@ def actualizar_variegacion(var_id: UUID, payload: schemas.VariegacionUpdate,
     v = db.query(models.Variegacion).filter(models.Variegacion.id == var_id).first()
     if not v:
         raise HTTPException(status_code=404, detail="Variegación no encontrada")
-    for k, v2 in payload.model_dump(exclude_none=True).items():
+    for k, v2 in payload.model_dump(exclude_unset=True).items():
         setattr(v, k, v2)
     db.commit()
     db.refresh(v)

@@ -107,7 +107,7 @@ def actualizar(id: UUID, payload: schemas.ExperimentoUpdate,
     exp = db.query(models.Experimento).filter(models.Experimento.id == id).first()
     if not exp:
         raise HTTPException(status_code=404, detail="Experimento no encontrado")
-    for k, v in payload.model_dump(exclude_none=True).items():
+    for k, v in payload.model_dump(exclude_unset=True).items():
         setattr(exp, k, v)
     db.commit()
     exp = _query_exp(db).filter(models.Experimento.id == id).first()

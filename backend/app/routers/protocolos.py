@@ -104,7 +104,7 @@ def actualizar(id: UUID, payload: schemas.ProtocoloUpdate,
     proto = db.query(models.Protocolo).filter(models.Protocolo.id == id).first()
     if not proto:
         raise HTTPException(status_code=404, detail="Protocolo no encontrado")
-    for k, v in payload.model_dump(exclude_none=True).items():
+    for k, v in payload.model_dump(exclude_unset=True).items():
         setattr(proto, k, v)
     db.commit()
     return _get_full(id, db)

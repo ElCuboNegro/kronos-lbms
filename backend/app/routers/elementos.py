@@ -62,7 +62,7 @@ def actualizar(id: UUID, payload: schemas.ElementoUpdate,
     el = db.query(models.Elemento).filter(models.Elemento.id == id).first()
     if not el:
         raise HTTPException(status_code=404, detail="Elemento no encontrado")
-    for k, v in payload.model_dump(exclude_none=True).items():
+    for k, v in payload.model_dump(exclude_unset=True).items():
         setattr(el, k, v)
     db.commit()
     return _get_full(id, db)
