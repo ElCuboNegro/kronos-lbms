@@ -1,5 +1,5 @@
 import uuid
-from datetime import datetime, date
+from datetime import datetime, timezone, date
 from sqlalchemy import (
     Column, String, Text, Boolean, DateTime, Date,
     Float, ForeignKey, Integer, Table
@@ -37,7 +37,7 @@ class Usuario(Base):
     rol = Column(String(20), nullable=False, default="tecnico")  # admin, tecnico, observador
     activo = Column(Boolean, default=True)
     foto_url = Column(String(500), nullable=True)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=datetime.now(timezone.utc))
 
     eventos_registrados = relationship("Evento", foreign_keys="Evento.usuario_id", back_populates="usuario")
     eventos_ejecutados = relationship("Evento", foreign_keys="Evento.ejecutado_por_id", back_populates="ejecutado_por")
@@ -59,7 +59,7 @@ class Especie(Base):
     config_estandar = Column(JSONB, nullable=True, default=dict)
     ficha = Column(JSONB, nullable=True)
   # ciclo_vida, maduracion, wiki_url, wiki_lang, wiki_fetched_at
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=datetime.now(timezone.utc))
 
     lineas = relationship("Linea", back_populates="especie", order_by="Linea.nombre")
     especimenes = relationship("Especimen", back_populates="especie_rel")
@@ -76,7 +76,7 @@ class Linea(Base):
     descripcion = Column(Text, nullable=True)
     config_estandar = Column(JSONB, nullable=True, default=dict)
     notas = Column(Text, nullable=True)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=datetime.now(timezone.utc))
 
     especie = relationship("Especie", back_populates="lineas")
     variegaciones = relationship("Variegacion", back_populates="linea", order_by="Variegacion.nombre")
@@ -93,7 +93,7 @@ class Variegacion(Base):
     descripcion = Column(Text, nullable=True)
     config_estandar = Column(JSONB, nullable=True, default=dict)
     notas = Column(Text, nullable=True)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=datetime.now(timezone.utc))
 
     linea = relationship("Linea", back_populates="variegaciones")
     especimenes = relationship("Especimen", back_populates="variegacion_rel")
@@ -117,7 +117,7 @@ class Especimen(Base):
     indice = Column(Integer, nullable=True) # Para generación de UID secuencial
     estado = Column(String(30), nullable=False, default="activo")
     notas = Column(Text, nullable=True)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=datetime.now(timezone.utc))
 
     especie_rel = relationship("Especie", back_populates="especimenes")
     linea_rel = relationship("Linea", back_populates="especimenes")
@@ -144,7 +144,7 @@ class Elemento(Base):
     unidad = Column(String(30), nullable=True)
     estado = Column(String(30), nullable=False, default="activo")
     notas = Column(Text, nullable=True)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=datetime.now(timezone.utc))
 
     eventos = relationship("Evento", foreign_keys="Evento.elemento_id", back_populates="elemento",
                            order_by="Evento.timestamp.desc()")
@@ -165,8 +165,8 @@ class Protocolo(Base):
     materiales = Column(JSONB, nullable=True, default=list)
     estado_validacion = Column(String(30), nullable=False, default="borrador")
     creado_por_id = Column(UUID(as_uuid=True), ForeignKey("usuarios.id"), nullable=False)
-    created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = Column(DateTime, default=datetime.now(timezone.utc))
+    updated_at = Column(DateTime, default=datetime.now(timezone.utc), onupdate=datetime.now(timezone.utc))
 
     creado_por = relationship("Usuario")
     validaciones = relationship("ValidacionProtocolo", back_populates="protocolo",
@@ -184,7 +184,7 @@ class ValidacionProtocolo(Base):
     resultado = Column(String(20), nullable=False)
     observaciones = Column(Text, nullable=False)
     metricas = Column(JSONB, nullable=True)
-    fecha = Column(DateTime, default=datetime.utcnow)
+    fecha = Column(DateTime, default=datetime.now(timezone.utc))
 
     protocolo = relationship("Protocolo", back_populates="validaciones")
     usuario = relationship("Usuario")
@@ -213,7 +213,7 @@ class Experimento(Base):
 
     config_estandar = Column(JSONB, nullable=True, default=dict)
     notas = Column(Text, nullable=True)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=datetime.now(timezone.utc))
 
     protocolo = relationship("Protocolo", back_populates="experimentos")
     director = relationship("Usuario", foreign_keys=[director_id])
@@ -238,7 +238,7 @@ class ResultadoInvestigacion(Base):
     datos = Column(JSONB, nullable=True)
     archivos = Column(JSONB, nullable=True)
     registrado_por_id = Column(UUID(as_uuid=True), ForeignKey("usuarios.id"), nullable=False)
-    fecha = Column(DateTime, default=datetime.utcnow, index=True)
+    fecha = Column(DateTime, default=datetime.now(timezone.utc), index=True)
 
     experimento = relationship("Experimento", back_populates="resultados")
     registrado_por = relationship("Usuario")
@@ -259,7 +259,7 @@ class Evento(Base):
     experimento_id = Column(UUID(as_uuid=True), ForeignKey("experimentos.id"), nullable=True, index=True)
     usuario_id = Column(UUID(as_uuid=True), ForeignKey("usuarios.id"), nullable=False)
     ejecutado_por_id = Column(UUID(as_uuid=True), ForeignKey("usuarios.id"), nullable=True)
-    timestamp = Column(DateTime, default=datetime.utcnow, index=True)
+    timestamp = Column(DateTime, default=datetime.now(timezone.utc), index=True)
     meta = Column(JSONB, nullable=True)
 
     especimen = relationship("Especimen", foreign_keys=[especimen_id], back_populates="eventos")
@@ -291,7 +291,7 @@ class Sustrato(Base):
     formulacion_id = Column(UUID(as_uuid=True), ForeignKey("formulaciones.id"), nullable=True)
     lote_id = Column(UUID(as_uuid=True), ForeignKey("lotes_preparados.id"), nullable=True)
 
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=datetime.now(timezone.utc))
 
     formulacion = relationship("Formulacion")
     lote = relationship("LotePreparado")
@@ -304,7 +304,7 @@ class RegistroEvolucion(Base):
     especimen_id = Column(UUID(as_uuid=True), ForeignKey("especimenes.id"), nullable=False, index=True)
     registrado_por_id = Column(UUID(as_uuid=True), ForeignKey("usuarios.id"), nullable=False)
     protocolo_clonacion_id = Column(UUID(as_uuid=True), ForeignKey("protocolos.id"), nullable=True)
-    fecha = Column(DateTime, default=datetime.utcnow, index=True)
+    fecha = Column(DateTime, default=datetime.now(timezone.utc), index=True)
 
     # ── Morfológicas
     altura_cm = Column(Float, nullable=True)
@@ -367,7 +367,7 @@ class Reactivo(Base):
     unidad_medida = Column(String(20), default="g")
     peligrosidad = Column(JSONB, default=list) # ['inflamable', 'corrosivo']
     notas = Column(Text, nullable=True)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=datetime.now(timezone.utc))
 
 
 class Formulacion(Base):
@@ -380,7 +380,7 @@ class Formulacion(Base):
     procedimiento = Column(Text, nullable=True)
     volumen_base_l = Column(Float, default=1.0)
     caducidad_dias = Column(Integer, default=30)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=datetime.now(timezone.utc))
 
     componentes = relationship("FormulacionComponente", foreign_keys="[FormulacionComponente.formulacion_id]", back_populates="formulacion", cascade="all, delete-orphan")
 
@@ -407,7 +407,7 @@ class LotePreparado(Base):
     uid = Column(String(100), unique=True, nullable=False)
     formulacion_id = Column(UUID(as_uuid=True), ForeignKey("formulaciones.id"))
     preparado_por_id = Column(UUID(as_uuid=True), ForeignKey("usuarios.id"))
-    fecha_preparacion = Column(DateTime, default=datetime.utcnow)
+    fecha_preparacion = Column(DateTime, default=datetime.now(timezone.utc))
     fecha_expiracion = Column(DateTime, nullable=True)
     volumen_l = Column(Float, nullable=False)
     concentracion_x = Column(Float, default=1.0)
