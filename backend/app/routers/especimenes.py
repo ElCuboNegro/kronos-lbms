@@ -218,7 +218,7 @@ def actualizar(id: UUID, payload: schemas.EspecimenUpdate,
     esp = db.query(models.Especimen).filter(models.Especimen.id == id).first()
     if not esp:
         raise HTTPException(status_code=404, detail="Espécimen no encontrado")
-    for k, v in payload.model_dump(exclude_none=True).items():
+    for k, v in payload.model_dump(exclude_unset=True).items():
         setattr(esp, k, v)
     db.commit()
     return _get_full(id, db)
