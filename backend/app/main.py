@@ -1,9 +1,12 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from slowapi import _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
 from app.database import engine, Base, get_db
 from sqlalchemy.orm import Session
 from sqlalchemy import func
+from app.limiter import limiter
 from app.routers import auth as auth_router, especimenes, elementos, eventos, scan, especies, protocolos, experimentos, evolucion, printer, sustratos, reactivos
 from fastapi import Depends
 from app import models, auth
@@ -17,6 +20,9 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(title="Seymour-OS API", version="0.2.0", lifespan=lifespan)
+
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 import os
 
