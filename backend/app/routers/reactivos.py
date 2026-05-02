@@ -21,26 +21,6 @@ def crear_reactivo(payload: schemas.ReactivoCreate, db: Session = Depends(get_db
     db.refresh(r)
     return r
 
-@router.get("/{id}", response_model=schemas.ReactivoOut)
-def obtener_reactivo(id: UUID, db: Session = Depends(get_db), _=Depends(auth.get_current_user)):
-    r = db.query(models.Reactivo).filter(models.Reactivo.id == id).first()
-    if not r:
-        raise HTTPException(status_code=404, detail="Reactivo no encontrado")
-    return r
-
-@router.patch("/{id}", response_model=schemas.ReactivoOut)
-def actualizar_reactivo(id: UUID, payload: schemas.ReactivoUpdate, db: Session = Depends(get_db), _=Depends(auth.get_current_user)):
-    r = db.query(models.Reactivo).filter(models.Reactivo.id == id).first()
-    if not r:
-        raise HTTPException(status_code=404, detail="Reactivo no encontrado")
-    
-    for k, v in payload.model_dump(exclude_unset=True).items():
-        setattr(r, k, v)
-        
-    db.commit()
-    db.refresh(r)
-    return r
-
 # ── Formulaciones ─────────────────────────────────────────────────────────
 
 @router.get("/formulaciones", response_model=list[schemas.FormulacionOut])
@@ -154,6 +134,28 @@ def preparar_lote(payload: schemas.LotePreparadoCreate, db: Session = Depends(ge
     ).filter(models.LotePreparado.id == lote.id).first()
     
     return _map_lote(full_lote)
+
+# ── Dynamic Routes (Must be at the end) ───────────────────────────────────
+
+@router.get("/{id}", response_model=schemas.ReactivoOut)
+def obtener_reactivo(id: UUID, db: Session = Depends(get_db), _=Depends(auth.get_current_user)):
+    r = db.query(models.Reactivo).filter(models.Reactivo.id == id).first()
+    if not r:
+        raise HTTPException(status_code=404, detail="Reactivo no encontrado")
+    return r
+
+@router.patch("/{id}", response_model=schemas.ReactivoOut)
+def actualizar_reactivo(id: UUID, payload: schemas.ReactivoUpdate, db: Session = Depends(get_db), _=Depends(auth.get_current_user)):
+    r = db.query(models.Reactivo).filter(models.Reactivo.id == id).first()
+    if not r:
+        raise HTTPException(status_code=404, detail="Reactivo no encontrado")
+    
+    for k, v in payload.model_dump(exclude_unset=True).items():
+        setattr(r, k, v)
+        
+    db.commit()
+    db.refresh(r)
+    return r
 
 def _map_lote(l):
     return schemas.LotePreparadoOut(

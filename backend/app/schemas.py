@@ -766,7 +766,7 @@ class LotePreparadoOut(BaseModel):
     formulacion: FormulacionOut
     preparado_por_nombre: str
     fecha_preparacion: datetime
-    fecha_expiracion: datetime
+    fecha_expiracion: Optional[datetime] = None
     volumen_l: float
     concentracion_x: float
     ph_final: Optional[float]
