@@ -16,8 +16,8 @@ export default function LaboratorioDashboard() {
   
   return (
     <div className="page-container" style={{display:'flex',flexDirection:'column',gap:'1rem'}}>
-      <h2 className="page-title" style={{color:'var(--bio-primary)',margin:0,fontSize:'1.4rem'}}>Gestión de Laboratorio</h2>
-      <p style={{color:'var(--bio-secondary)',fontSize:'0.85rem',margin:'-0.5rem 0 1rem'}}>Inventario químico, formulaciones y trazabilidad de medios.</p>
+      <h2 className="page-title" style={{color:'var(--theme-primary)',margin:0,fontSize:'1.4rem'}}>Gestión de Laboratorio</h2>
+      <p style={{color:'var(--theme-secondary)',fontSize:'0.85rem',margin:'-0.5rem 0 1rem'}}>Inventario químico, formulaciones y trazabilidad de medios.</p>
 
       <div style={{display:'flex',flexDirection:'column',gap:12,marginBottom:'1.5rem'}}>
         <MenuCard 
@@ -47,7 +47,7 @@ export default function LaboratorioDashboard() {
       </div>
 
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-        <h3 style={{color:'var(--bio-primary)',fontSize:'0.9rem',fontWeight:700,textTransform:'uppercase',letterSpacing:1, margin: 0}}>Formulaciones de Medios / Sustratos</h3>
+        <h3 style={{color:'var(--theme-primary)',fontSize:'0.9rem',fontWeight:700,textTransform:'uppercase',letterSpacing:1, margin: 0}}>Formulaciones de Medios / Sustratos</h3>
         <button className="btn btn--primary" style={{ padding: '0.4rem 0.8rem', fontSize: '0.85rem' }} onClick={() => setShowForm(true)}>+ Nuevo Medio</button>
       </div>
       
@@ -65,11 +65,11 @@ export default function LaboratorioDashboard() {
 
 function MenuCard({ title, desc, icon, onClick }) {
   return (
-    <div style={{background:'var(--bio-surface)',border:'1px solid var(--bio-border)',borderRadius:12,padding:'1.25rem',display:'flex',gap:15,alignItems:'center',cursor:'pointer'}} onClick={onClick}>
+    <div style={{background:'var(--theme-surface)',border:'1px solid var(--theme-border)',borderRadius:12,padding:'1.25rem',display:'flex',gap:15,alignItems:'center',cursor:'pointer'}} onClick={onClick}>
       <span style={{fontSize:'2rem'}}>{icon}</span>
       <div>
-        <h4 style={{color:'var(--bio-text)',margin:0,fontSize:'1.05rem'}}>{title}</h4>
-        <p style={{color:'var(--bio-secondary)',margin:'2px 0 0',fontSize:'0.82rem',lineHeight:1.3}}>{desc}</p>
+        <h4 style={{color:'var(--theme-text)',margin:0,fontSize:'1.05rem'}}>{title}</h4>
+        <p style={{color:'var(--theme-secondary)',margin:'2px 0 0',fontSize:'0.82rem',lineHeight:1.3}}>{desc}</p>
       </div>
     </div>
   )
@@ -104,8 +104,8 @@ function MediosSubList({ refreshCounter }) {
           </div>
 
           {(m.componentes && m.componentes.length > 0) && (
-            <div style={{ marginTop: 6, fontSize: '0.8rem', color: 'var(--bio-text)' }}>
-              <ul style={{ margin: 0, paddingLeft: '1.2rem', color: 'var(--bio-text)', fontSize: '0.82rem' }}>
+            <div style={{ marginTop: 6, fontSize: '0.8rem', color: 'var(--theme-text)' }}>
+              <ul style={{ margin: 0, paddingLeft: '1.2rem', color: 'var(--theme-text)', fontSize: '0.82rem' }}>
                 {m.componentes.map((c, idx) => (
                   <li key={idx}>{(c.reactivo || c.formulacion_ingrediente)?.nombre}: {c.cantidad_base}</li>
                 ))}
@@ -114,7 +114,7 @@ function MediosSubList({ refreshCounter }) {
           )}
 
           {(m.ph_teorico || m.conductividad_teorica) && (
-            <div style={{display:'flex',gap:12,marginTop:6,fontSize:'0.75rem',color:'var(--bio-secondary)'}}>
+            <div style={{display:'flex',gap:12,marginTop:6,fontSize:'0.75rem',color:'var(--theme-secondary)'}}>
               {m.ph_teorico && <span>pH Teórico: {m.ph_teorico}</span>}
               {m.conductividad_teorica && <span>EC Teórica: {m.conductividad_teorica}</span>}
             </div>
@@ -219,7 +219,7 @@ function SustratoForm({ onSaved, onCancel }) {
 
   return (
     <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', zIndex: 1000, display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}>
-      <div style={{ background: 'var(--bio-surface)', borderRadius: '24px 24px 0 0', width: '100%', maxWidth: '500px', padding: '1.5rem', maxHeight: '90dvh', overflowY: 'auto' }}>
+      <div style={{ background: 'var(--theme-surface)', borderRadius: '24px 24px 0 0', width: '100%', maxWidth: '500px', padding: '1.5rem', maxHeight: '90dvh', overflowY: 'auto' }}>
         <h3 className="text-primary" style={{ margin: '0 0 1rem', fontSize: '1.2rem' }}>Registrar Sustrato / Medio</h3>
         <form onSubmit={submit} style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
           
@@ -258,8 +258,8 @@ function SustratoForm({ onSaved, onCancel }) {
             </div>
           </div>
 
-          <div style={{ borderTop: '1px solid var(--bio-border)', paddingTop: '0.5rem', marginTop: '0.5rem' }}>
-            <label style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--bio-secondary)' }}>Componentes Adicionales / Mezcla</label>
+          <div style={{ borderTop: '1px solid var(--theme-border)', paddingTop: '0.5rem', marginTop: '0.5rem' }}>
+            <label style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--theme-secondary)' }}>Componentes Adicionales / Mezcla</label>
             {form.componentes.map(c => (
               <div key={c.id} style={{ display: 'flex', gap: '0.4rem', marginTop: '0.4rem', alignItems: 'center' }}>
                 <select style={{ flex: 1.2, padding: '0.4rem', fontSize: '0.75rem' }} value={c.type} onChange={e => { updateComp(c.id, 'type', e.target.value); updateComp(c.id, 'item_id', '') }}>

@@ -53,15 +53,15 @@ export default function MapPicker({ value, onChange }) {
   return (
     <div style={{display:'flex',flexDirection:'column',gap:8}}>
       <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
-        <span style={{color:'var(--bio-text)',fontSize:'0.85rem',fontStyle:'italic'}}>
+        <span style={{color:'var(--theme-text)',fontSize:'0.85rem',fontStyle:'italic'}}>
           {value ? `${value.lat.toFixed(5)}, ${value.lng.toFixed(5)}` : 'Sin ubicar'}
         </span>
-        <button type="button" style={{background:'var(--bio-primary)',border:'none',borderRadius:8,color:'#fff',padding:'0.6rem 1rem',fontSize:'0.9rem',fontWeight:'bold',cursor:'pointer',display:'flex',alignItems:'center',gap:6,boxShadow:'0 2px 4px rgba(0,0,0,0.2)'}} onClick={handleGetLocation} disabled={locating}>
+        <button type="button" style={{background:'var(--theme-primary)',border:'none',borderRadius:8,color:'#fff',padding:'0.6rem 1rem',fontSize:'0.9rem',fontWeight:'bold',cursor:'pointer',display:'flex',alignItems:'center',gap:6,boxShadow:'0 2px 4px rgba(0,0,0,0.2)'}} onClick={handleGetLocation} disabled={locating}>
           {locating ? 'Activando GPS...' : '📍 En este lugar'}
         </button>
       </div>
       
-      <div style={{height:200,width:'100%',borderRadius:8,border:'2px solid var(--bio-primary)',overflow:'hidden',marginTop:4}}>
+      <div style={{height:200,width:'100%',borderRadius:8,border:'2px solid var(--theme-primary)',overflow:'hidden',marginTop:4}}>
         <MapContainer 
           center={center} 
           zoom={value ? 16 : 4} 
@@ -74,7 +74,7 @@ export default function MapPicker({ value, onChange }) {
           <LocationMarker position={value} setPosition={onChange} />
         </MapContainer>
       </div>
-      <p style={{color:'var(--bio-text-muted)',fontSize:'0.75rem',margin:0,textAlign:'center'}}>Toca el mapa para ajustar el pin</p>
+      <p style={{color:'var(--theme-text-muted)',fontSize:'0.75rem',margin:0,textAlign:'center'}}>Toca el mapa para ajustar el pin</p>
     </div>
   )
 }

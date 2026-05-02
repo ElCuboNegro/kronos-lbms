@@ -28,9 +28,9 @@ export default function ElementosList() {
       </div>
 
       {loading ? (
-        <p style={{ color: 'var(--bio-text-muted)', fontSize: '0.9rem', margin: 0 }}>Cargando…</p>
+        <p style={{ color: 'var(--theme-text-muted)', fontSize: '0.9rem', margin: 0 }}>Cargando…</p>
       ) : elementos.length === 0 ? (
-        <p style={{ color: 'var(--bio-text-muted)', fontSize: '0.9rem', margin: 0 }}>No hay elementos registrados en el inventario.</p>
+        <p style={{ color: 'var(--theme-text-muted)', fontSize: '0.9rem', margin: 0 }}>No hay elementos registrados en el inventario.</p>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           {elementos.map(el => (
@@ -39,7 +39,7 @@ export default function ElementosList() {
                 <span className="text-primary" style={{ fontWeight: 600, fontSize: '0.95rem' }}>{el.descripcion}</span>
                 <span className="badge badge--outline font-mono">{el.element_id}</span>
               </div>
-              <div style={{ display: 'flex', gap: 12, marginTop: 4, color: 'var(--bio-text-muted)', fontSize: '0.78rem', flexWrap: 'wrap' }}>
+              <div style={{ display: 'flex', gap: 12, marginTop: 4, color: 'var(--theme-text-muted)', fontSize: '0.78rem', flexWrap: 'wrap' }}>
                 <span style={{ textTransform: 'capitalize' }}>{el.tipo}</span>
                 {el.cantidad && <span>{el.cantidad} {el.unidad || ''}</span>}
                 <span className={`badge ${el.estado === 'activo' ? 'badge--success' : el.estado === 'roto' ? 'badge--danger' : 'badge--outline'}`}>
@@ -135,11 +135,11 @@ function ElementoForm({ onSaved, onCancel }) {
 
   return (
     <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.8)', zIndex: 1000, display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}>
-      <div style={{ background: 'var(--bio-surface)', borderRadius: '24px 24px 0 0', width: '100%', maxWidth: '500px', padding: '1.5rem', paddingBottom: 'calc(1.5rem + env(safe-area-inset-bottom))', maxHeight: '90dvh', overflowY: 'auto' }}>
+      <div style={{ background: 'var(--theme-surface)', borderRadius: '24px 24px 0 0', width: '100%', maxWidth: '500px', padding: '1.5rem', paddingBottom: 'calc(1.5rem + env(safe-area-inset-bottom))', maxHeight: '90dvh', overflowY: 'auto' }}>
         <h3 className="text-primary" style={{ margin: '0 0 1rem', fontSize: '1.2rem' }}>Registrar Nuevo Elemento</h3>
         
         {existingElement ? (
-          <div className="card" style={{ background: 'rgba(125, 202, 143, 0.1)', border: '1px solid var(--bio-primary)', textAlign: 'center', display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
+          <div className="card" style={{ background: 'rgba(125, 202, 143, 0.1)', border: '1px solid var(--theme-primary)', textAlign: 'center', display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
             <p className="text-primary" style={{ margin: 0, fontWeight: 'bold' }}>¡Este elemento ya existe en el sistema!</p>
             <p className="text-muted" style={{ margin: 0, fontSize: '0.9rem' }}>
               El código <strong>{existingElement.element_id}</strong> corresponde a <strong>{existingElement.descripcion}</strong>.

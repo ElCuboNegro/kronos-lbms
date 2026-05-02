@@ -64,7 +64,7 @@ export default function EspecimenDetail() {
   return (
     <div className="page-container" style={{ padding: 0 }}>
       {/* Header */}
-      <div style={{ padding: '1.5rem', background: 'var(--bio-surface)', borderBottom: '1px solid var(--bio-border)' }}>
+      <div style={{ padding: '1.5rem', background: 'var(--theme-surface)', borderBottom: '1px solid var(--theme-border)' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
           <div>
             <span className={`badge ${ESTADO_BADGE[esp.estado] || 'badge--outline'}`} style={{ marginBottom: '0.5rem' }}>{esp.estado.replace('_', ' ')}</span>
@@ -88,13 +88,13 @@ export default function EspecimenDetail() {
       </div>
 
       {/* Tabs */}
-      <div style={{ display: 'flex', borderBottom: '1px solid var(--bio-border)', background: 'var(--bio-surface)' }}>
+      <div style={{ display: 'flex', borderBottom: '1px solid var(--theme-border)', background: 'var(--theme-surface)' }}>
         {['info', 'evolucion', 'eventos'].map(t => (
           <button key={t} 
             style={{ 
               flex: 1, background: 'none', border: 'none', cursor: 'pointer', padding: '1rem 0.5rem', fontSize: '0.9rem',
-              color: tab === t ? 'var(--bio-primary)' : 'var(--bio-text-muted)',
-              borderBottom: tab === t ? '2px solid var(--bio-primary)' : '2px solid transparent',
+              color: tab === t ? 'var(--theme-primary)' : 'var(--theme-text-muted)',
+              borderBottom: tab === t ? '2px solid var(--theme-primary)' : '2px solid transparent',
               fontWeight: tab === t ? 600 : 400
             }} 
             onClick={() => setTab(t)}>
@@ -111,17 +111,17 @@ export default function EspecimenDetail() {
             {esp.origen && <InfoRow label="Origen" value={esp.origen} />}
             {esp.madre_uid && (
               <InfoRow label="Planta Madre" value={
-                <button onClick={() => navigate(`/especimen/${esp.madre_id}`)} style={{ background: 'none', border: 'none', color: 'var(--bio-primary)', fontSize: '0.9rem', cursor: 'pointer', padding: 0 }}>{esp.madre_uid} ↗</button>
+                <button onClick={() => navigate(`/especimen/${esp.madre_id}`)} style={{ background: 'none', border: 'none', color: 'var(--theme-primary)', fontSize: '0.9rem', cursor: 'pointer', padding: 0 }}>{esp.madre_uid} ↗</button>
               } />
             )}
             {esp.padre_uid && (
               <InfoRow label="Planta Padre" value={
-                <button onClick={() => navigate(`/especimen/${esp.padre_id}`)} style={{ background: 'none', border: 'none', color: 'var(--bio-primary)', fontSize: '0.9rem', cursor: 'pointer', padding: 0 }}>{esp.padre_uid} ↗</button>
+                <button onClick={() => navigate(`/especimen/${esp.padre_id}`)} style={{ background: 'none', border: 'none', color: 'var(--theme-primary)', fontSize: '0.9rem', cursor: 'pointer', padding: 0 }}>{esp.padre_uid} ↗</button>
               } />
             )}
             {esp.coordenadas && (
               <InfoRow label="Ubicación In Situ" value={
-                <a href={`https://www.google.com/maps/search/?api=1&query=${esp.coordenadas.lat},${esp.coordenadas.lng}`} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--bio-primary)', fontSize: '0.9rem', textDecoration: 'none' }}>
+                <a href={`https://www.google.com/maps/search/?api=1&query=${esp.coordenadas.lat},${esp.coordenadas.lng}`} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--theme-primary)', fontSize: '0.9rem', textDecoration: 'none' }}>
                   {esp.coordenadas.lat.toFixed(5)}, {esp.coordenadas.lng.toFixed(5)} 📍
                 </a>
               } />
@@ -212,7 +212,7 @@ function MedidasGrid({ r }) {
   return (
     <div className="grid-2" style={{ gap: '0.5rem', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))' }}>
       {items.map(([label, val, unit]) => (
-        <div key={label} style={{ background: 'var(--bio-background)', borderRadius: '8px', padding: '0.6rem 0.8rem', display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
+        <div key={label} style={{ background: 'var(--theme-background)', borderRadius: '8px', padding: '0.6rem 0.8rem', display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
           <span className="text-muted" style={{ fontSize: '0.7rem' }}>{label}</span>
           <span className="text-primary" style={{ fontSize: '1rem', fontWeight: 600 }}>{val}{unit && <span style={{ fontSize: '0.8rem', marginLeft: '0.1rem' }}>{unit}</span>}</span>
         </div>
@@ -237,7 +237,7 @@ function CondicionesGrid({ r }) {
       <p className="text-muted" style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: 1, margin: '0 0 0.5rem' }}>Condiciones ambientales</p>
       <div className="grid-2" style={{ gap: '0.5rem', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))' }}>
         {items.map(([label, val, unit]) => (
-           <div key={label} style={{ background: 'var(--bio-background)', borderRadius: '8px', padding: '0.6rem 0.8rem', display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
+           <div key={label} style={{ background: 'var(--theme-background)', borderRadius: '8px', padding: '0.6rem 0.8rem', display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
              <span className="text-muted" style={{ fontSize: '0.7rem' }}>{label}</span>
              <span className="text-primary" style={{ fontSize: '1rem', fontWeight: 600 }}>{val}{unit && <span style={{ fontSize: '0.8rem', marginLeft: '0.1rem' }}>{unit}</span>}</span>
            </div>
@@ -254,7 +254,7 @@ function FotosRow({ fotos }) {
         <div key={angulo} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.3rem', flexShrink: 0 }}>
           <img
             src={`/api${url}?t=${Date.now()}`}
-            style={{ width: 80, height: 80, objectFit: 'cover', borderRadius: '10px', border: '1px solid var(--bio-border)' }}
+            style={{ width: 80, height: 80, objectFit: 'cover', borderRadius: '10px', border: '1px solid var(--theme-border)' }}
             alt={angulo}
             onError={e => { e.target.style.display = 'none' }}
           />
@@ -280,7 +280,7 @@ function RegistroCard({ r }) {
           <MedidasGrid r={r} />
           {tieneCondiciones(r) && <CondicionesGrid r={r} />}
           {r.fotos && Object.keys(r.fotos).length > 0 && <FotosRow fotos={r.fotos} />}
-          {r.notas && <p className="text-muted" style={{ fontSize: '0.9rem', margin: 0, fontStyle: 'italic', borderLeft: '2px solid var(--bio-border)', paddingLeft: '0.5rem' }}>"{r.notas}"</p>}
+          {r.notas && <p className="text-muted" style={{ fontSize: '0.9rem', margin: 0, fontStyle: 'italic', borderLeft: '2px solid var(--theme-border)', paddingLeft: '0.5rem' }}>"{r.notas}"</p>}
         </div>
       )}
     </div>
@@ -306,7 +306,7 @@ function EventoCard({ ev }) {
 
 function InfoRow({ label, value, isLast }) {
   return (
-    <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0.65rem 0', borderBottom: isLast ? 'none' : '1px solid var(--bio-background)' }}>
+    <div style={{ display: 'flex', justifyContent: 'space-between', padding: '0.65rem 0', borderBottom: isLast ? 'none' : '1px solid var(--theme-background)' }}>
       <span className="text-secondary" style={{ fontSize: '0.85rem', fontWeight: 600 }}>{label}</span>
       <span className="text-primary" style={{ fontSize: '0.9rem', maxWidth: '60%', textAlign: 'right' }}>{value}</span>
     </div>
@@ -380,7 +380,7 @@ function EditEspecimenSheet({ esp, onSaved, onCancel }) {
 
   return (
     <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'flex-end', zIndex: 200 }}>
-      <div style={{ background: 'var(--bio-surface)', borderRadius: '24px 24px 0 0', padding: '2rem 1.5rem', width: '100%', maxHeight: '90dvh', overflowY: 'auto' }}>
+      <div style={{ background: 'var(--theme-surface)', borderRadius: '24px 24px 0 0', padding: '2rem 1.5rem', width: '100%', maxHeight: '90dvh', overflowY: 'auto' }}>
         <h3 className="text-primary" style={{ margin: '0 0 1.5rem', fontSize: '1.2rem' }}>Editar individuo</h3>
         <form onSubmit={submit} style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
           <Sel2 label="Especie" value={form.especie_id} onChange={v => set('especie_id', v)}
@@ -474,9 +474,9 @@ function EspecimenSearch({ label, value, onChange }) {
       <label>{label}</label>
       <input value={query} onChange={e => search(e.target.value)} placeholder="Buscar UID..." />
       {results.length > 0 && (
-        <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, background: 'var(--bio-surface)', border: '1px solid var(--bio-border)', borderRadius: 8, zIndex: 200, marginTop: 4, boxShadow: '0 4px 12px rgba(0,0,0,0.5)' }}>
+        <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, background: 'var(--theme-surface)', border: '1px solid var(--theme-border)', borderRadius: 8, zIndex: 200, marginTop: 4, boxShadow: '0 4px 12px rgba(0,0,0,0.5)' }}>
           {results.map(r => (
-            <div key={r.id} style={{ padding: '0.8rem', cursor: 'pointer', borderBottom: '1px solid var(--bio-background)' }} onClick={() => select(r)}>
+            <div key={r.id} style={{ padding: '0.8rem', cursor: 'pointer', borderBottom: '1px solid var(--theme-background)' }} onClick={() => select(r)}>
               <span className="text-primary" style={{ fontWeight: 'bold' }}>{r.uid}</span>
               <span className="text-muted" style={{ fontSize: '0.8rem', marginLeft: 8 }}>{r.especie}</span>
             </div>

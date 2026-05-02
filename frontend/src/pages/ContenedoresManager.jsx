@@ -162,13 +162,13 @@ export default function ContenedoresManager() {
       </p>
 
       {/* ORIGEN */}
-      <div className="card" style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem', padding: '1rem', borderColor: selectedIds.size > 0 ? 'var(--bio-primary)' : 'var(--bio-border)' }}>
+      <div className="card" style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem', padding: '1rem', borderColor: selectedIds.size > 0 ? 'var(--theme-primary)' : 'var(--theme-border)' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <h4 className="text-secondary" style={{ margin: 0, textTransform: 'uppercase', fontSize: '0.8rem' }}>1. Origen</h4>
           <button className="btn btn--secondary" style={{ padding: '0.2rem 0.6rem', fontSize: '0.9rem' }} onClick={() => setShowScanner('origen')}>📷 Escanear</button>
         </div>
         <input 
-          style={{ background: 'var(--bio-background)', border: '1px solid var(--bio-border)', borderRadius: 8, padding: '0.6rem', color: 'var(--bio-text)', width: '100%' }}
+          style={{ background: 'var(--theme-background)', border: '1px solid var(--theme-border)', borderRadius: 8, padding: '0.6rem', color: 'var(--theme-text)', width: '100%' }}
           value={origenId} 
           onChange={e => setOrigenId(e.target.value)} 
           placeholder="Código de contenedor (ej. CONT-123) o UID" 
@@ -190,13 +190,13 @@ export default function ContenedoresManager() {
                   key={esp.id} 
                   style={{ 
                     display: 'flex', alignItems: 'center', gap: '0.8rem', padding: '0.6rem', 
-                    background: selectedIds.has(esp.id) ? 'rgba(125, 202, 143, 0.15)' : 'var(--bio-background)', 
-                    border: selectedIds.has(esp.id) ? '1px solid var(--bio-primary)' : '1px solid var(--bio-border)', 
+                    background: selectedIds.has(esp.id) ? 'rgba(125, 202, 143, 0.15)' : 'var(--theme-background)', 
+                    border: selectedIds.has(esp.id) ? '1px solid var(--theme-primary)' : '1px solid var(--theme-border)', 
                     borderRadius: '8px', cursor: 'pointer' 
                   }}
                   onClick={() => toggleSelect(esp.id)}
                 >
-                  <input type="checkbox" checked={selectedIds.has(esp.id)} readOnly style={{ width: '1.2rem', height: '1.2rem', margin: 0, accentColor: 'var(--bio-primary)' }} />
+                  <input type="checkbox" checked={selectedIds.has(esp.id)} readOnly style={{ width: '1.2rem', height: '1.2rem', margin: 0, accentColor: 'var(--theme-primary)' }} />
                   <div style={{ display: 'flex', flexDirection: 'column' }}>
                     <span className="font-mono text-primary" style={{ fontSize: '0.85rem', fontWeight: 'bold' }}>{esp.uid}</span>
                     <span className="text-muted" style={{ fontSize: '0.75rem' }}>{esp.especie} {esp.notas ? `(${esp.notas})` : ''}</span>
@@ -209,7 +209,7 @@ export default function ContenedoresManager() {
       </div>
 
       <div style={{ textAlign: 'center', margin: '-0.5rem 0' }}>
-        <span style={{ background: 'var(--bio-surface)', padding: '0.5rem', borderRadius: '50%', fontSize: '1.2rem' }}>⬇️</span>
+        <span style={{ background: 'var(--theme-surface)', padding: '0.5rem', borderRadius: '50%', fontSize: '1.2rem' }}>⬇️</span>
       </div>
 
       {/* DESTINO */}
@@ -219,7 +219,7 @@ export default function ContenedoresManager() {
           <button className="btn btn--secondary" style={{ padding: '0.2rem 0.6rem', fontSize: '0.9rem' }} onClick={() => setShowScanner('destino')}>📷 Escanear</button>
         </div>
         <input 
-          style={{ background: 'var(--bio-background)', border: '1px solid var(--bio-border)', borderRadius: 8, padding: '0.6rem', color: 'var(--bio-text)', width: '100%' }}
+          style={{ background: 'var(--theme-background)', border: '1px solid var(--theme-border)', borderRadius: 8, padding: '0.6rem', color: 'var(--theme-text)', width: '100%' }}
           value={destinoId} 
           onChange={e => setDestinoId(e.target.value)} 
           placeholder="Código de destino (ej. CONT-NUEVO)" 
@@ -235,7 +235,7 @@ export default function ContenedoresManager() {
             {destinoData.especimenes.length > 0 && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', marginTop: '0.5rem', maxHeight: '15vh', overflowY: 'auto' }}>
                 {destinoData.especimenes.map(esp => (
-                  <div key={esp.id} style={{ display: 'flex', justifyContent: 'space-between', padding: '0.4rem 0.6rem', background: 'var(--bio-background)', borderRadius: '6px', border: '1px solid var(--bio-border)' }}>
+                  <div key={esp.id} style={{ display: 'flex', justifyContent: 'space-between', padding: '0.4rem 0.6rem', background: 'var(--theme-background)', borderRadius: '6px', border: '1px solid var(--theme-border)' }}>
                     <span className="font-mono text-muted" style={{ fontSize: '0.8rem' }}>{esp.uid}</span>
                     <span className="text-muted" style={{ fontSize: '0.7rem' }}>{esp.especie}</span>
                   </div>

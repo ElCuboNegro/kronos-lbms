@@ -30,13 +30,13 @@ export default function FormulacionesList() {
             items.map(f => (
               <div key={f.id} className="card">
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '0.5rem' }}>
-                  <span style={{ color: 'var(--bio-text)', fontWeight: 600, fontSize: '1.1rem' }}>{f.nombre}</span>
+                  <span style={{ color: 'var(--theme-text)', fontWeight: 600, fontSize: '1.1rem' }}>{f.nombre}</span>
                   {f.codigo_referencia && <span className="font-mono text-primary" style={{ fontWeight: 'bold', fontSize: '0.85rem' }}>{f.codigo_referencia}</span>}
                 </div>
                 <p className="text-muted" style={{ fontSize: '0.88rem', margin: '0.2rem 0' }}>{f.descripcion}</p>
-                <div style={{ background: 'var(--bio-background)', borderRadius: 'var(--radius-base)', padding: '0.75rem', marginTop: '0.6rem' }}>
-                  <p style={{ color: 'var(--bio-secondary)', fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', margin: '0 0 5px' }}>Composición base ({f.volumen_base_l}L):</p>
-                  <ul style={{ margin: 0, paddingLeft: '1.2rem', color: 'var(--bio-text)', fontSize: '0.85rem' }}>
+                <div style={{ background: 'var(--theme-background)', borderRadius: 'var(--radius-base)', padding: '0.75rem', marginTop: '0.6rem' }}>
+                  <p style={{ color: 'var(--theme-secondary)', fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', margin: '0 0 5px' }}>Composición base ({f.volumen_base_l}L):</p>
+                  <ul style={{ margin: 0, paddingLeft: '1.2rem', color: 'var(--theme-text)', fontSize: '0.85rem' }}>
                     {f.componentes.map(c => {
                       const item = c.reactivo || c.formulacion_ingrediente;
                       const unidad = c.reactivo ? c.reactivo.unidad_medida : (c.formulacion_ingrediente.unidad_medida || 'ml');
@@ -176,7 +176,7 @@ function FormulacionForm({ onSaved, onCancel }) {
 
   return (
     <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'flex-end', zIndex: 1000 }}>
-      <div style={{ background: 'var(--bio-surface)', borderRadius: '24px 24px 0 0', width: '100%', maxWidth: 500, padding: '1.5rem', maxHeight: '90dvh', overflowY: 'auto' }}>
+      <div style={{ background: 'var(--theme-surface)', borderRadius: '24px 24px 0 0', width: '100%', maxWidth: 500, padding: '1.5rem', maxHeight: '90dvh', overflowY: 'auto' }}>
         <h3 className="page-title text-primary" style={{ margin: '0 0 1rem' }}>Nueva Formulación</h3>
         
         <form onSubmit={submit} style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
@@ -215,7 +215,7 @@ function FormulacionForm({ onSaved, onCancel }) {
                 <button type="button" onClick={() => removeComp(c.id)} style={{ background: 'none', border: 'none', color: 'var(--error)', fontSize: '1.2rem', cursor: 'pointer', padding: '0 5px' }}>✕</button>
               </div>
             ))}
-            <button type="button" onClick={addComponente} className="btn btn--ghost btn--block" style={{ border: '1px dashed var(--bio-border)' }}>+ Añadir ingrediente</button>
+            <button type="button" onClick={addComponente} className="btn btn--ghost btn--block" style={{ border: '1px dashed var(--theme-border)' }}>+ Añadir ingrediente</button>
           </div>
 
           <Field label="Caducidad estimada (días)" type="number" value={form.caducidad_dias} onChange={v => set('caducidad_dias', v)} />

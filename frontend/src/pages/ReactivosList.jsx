@@ -189,11 +189,11 @@ export function ReactivoForm({ onSaved, onCancel }) {
 
   return (
     <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.8)", display: "flex", alignItems: "flex-end", zIndex: 1000 }}>
-      <div style={{ background: "var(--bio-surface)", borderRadius: "24px 24px 0 0", width: "100%", maxWidth: 500, padding: "1.5rem", maxHeight: "90dvh", overflowY: "auto" }}>
+      <div style={{ background: "var(--theme-surface)", borderRadius: "24px 24px 0 0", width: "100%", maxWidth: 500, padding: "1.5rem", maxHeight: "90dvh", overflowY: "auto" }}>
         <h3 className="page-title text-primary" style={{ margin: "0 0 1rem" }}>Nuevo Reactivo / Medio Stock</h3>
         
         {existingElement ? (
-          <div className="card" style={{ background: "rgba(125, 202, 143, 0.1)", border: "1px solid var(--bio-primary)", textAlign: "center", display: "flex", flexDirection: "column", gap: "0.8rem" }}>
+          <div className="card" style={{ background: "rgba(125, 202, 143, 0.1)", border: "1px solid var(--theme-primary)", textAlign: "center", display: "flex", flexDirection: "column", gap: "0.8rem" }}>
             <p className="text-primary" style={{ margin: 0, fontWeight: "bold" }}>¡Este químico ya está en catálogo!</p>
             <p className="text-muted" style={{ margin: 0, fontSize: "0.9rem" }}>
               El código de barras <strong className="font-mono text-primary">{existingElement.codigo_barras}</strong> corresponde a <strong>{existingElement.nombre}</strong>.
@@ -256,11 +256,11 @@ export function ReactivoForm({ onSaved, onCancel }) {
                 <button key={p.id} type="button" 
                   onClick={() => togglePeligro(p.id)}
                   style={{ 
-                    background: "var(--bio-background)", 
-                    border: form.peligrosidad.includes(p.id) ? "1px solid var(--error)" : "1px solid var(--bio-border)", 
+                    background: "var(--theme-background)", 
+                    border: form.peligrosidad.includes(p.id) ? "1px solid var(--error)" : "1px solid var(--theme-border)", 
                     borderRadius: "var(--radius-base)", 
                     padding: "0.5rem", 
-                    color: form.peligrosidad.includes(p.id) ? "var(--error)" : "var(--bio-secondary)", 
+                    color: form.peligrosidad.includes(p.id) ? "var(--error)" : "var(--theme-secondary)", 
                     fontSize: "0.8rem", 
                     cursor: "pointer", 
                     textAlign: "left" 

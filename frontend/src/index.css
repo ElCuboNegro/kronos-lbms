@@ -29,15 +29,6 @@
   --radius-button: 10px;
   --radius-tile: 14px;
   --radius-card: 16px;
-  
-  /* Biological Compatibility (Mapping to Blueprint) */
-  --bio-primary: var(--theme-primary);
-  --bio-secondary: var(--theme-secondary);
-  --bio-background: var(--theme-background);
-  --bio-surface: var(--theme-surface);
-  --bio-text: var(--theme-text);
-  --bio-text-muted: var(--theme-text-muted);
-  --bio-border: var(--theme-border);
 }
 
 :root[data-theme='light'] {
@@ -47,12 +38,6 @@
   --theme-text: #1B1F23;
   --theme-text-muted: #57606A;
   --theme-border: #D0D7DE;
-  
-  --bio-background: var(--theme-background);
-  --bio-surface: var(--theme-surface);
-  --bio-text: var(--theme-text);
-  --bio-text-muted: var(--theme-text-muted);
-  --bio-border: var(--theme-border);
 }
 
 * {
