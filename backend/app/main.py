@@ -1,8 +1,12 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.database import engine, Base
-from app.routers import auth, especimenes, elementos, eventos, scan, especies, protocolos, experimentos, evolucion, printer, sustratos, reactivos
+from app.database import engine, Base, get_db
+from sqlalchemy.orm import Session
+from sqlalchemy import func
+from app.routers import auth as auth_router, especimenes, elementos, eventos, scan, especies, protocolos, experimentos, evolucion, printer, sustratos, reactivos
+from fastapi import Depends
+from app import models, auth
 
 
 @asynccontextmanager
@@ -22,7 +26,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(auth.router)
+app.include_router(auth_router.router)
 app.include_router(especies.router)
 app.include_router(especimenes.router)
 app.include_router(elementos.router)
@@ -39,3 +43,13 @@ app.include_router(reactivos.router)
 @app.get("/health")
 def health():
     return {"status": "ok"}
+
+@app.get("/stats")
+def stats(db: Session = Depends(get_db), _=Depends(auth.get_current_user)):
+    return {
+        "especies": db.query(func.count(models.Especie.id)).scalar(),
+        "individuos": db.query(func.count(models.Especimen.id)).scalar(),
+        "experimentos_activos": db.query(func.count(models.Experimento.id))
+                                  .filter(models.Experimento.estado == "activo").scalar(),
+        "protocolos": db.query(func.count(models.Protocolo.id)).scalar(),
+    }
