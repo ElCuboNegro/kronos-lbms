@@ -127,9 +127,9 @@ class LineaOut(BaseModel):
     especie_id: UUID
     nombre: str
     metodo_propagacion: str
-    descripcion: Optional[str]
+    descripcion: Optional[str] = None
     config_estandar: Optional[dict[str, Any]] = None
-    notas: Optional[str]
+    notas: Optional[str] = None
     created_at: datetime
     variegaciones: list[VariegacionOut] = []
     total_individuos: int = 0
@@ -141,11 +141,11 @@ class EspecieOut(BaseModel):
     codigo: Optional[str] = None
     nombre_cientifico: str
     categoria: str
-    nombre_comun: Optional[str]
-    familia: Optional[str]
-    genero: Optional[str]
-    descripcion: Optional[str]
-    requerimientos: Optional[dict[str, Any]]
+    nombre_comun: Optional[str] = None
+    familia: Optional[str] = None
+    genero: Optional[str] = None
+    descripcion: Optional[str] = None
+    requerimientos: Optional[dict[str, Any]] = None
     config_estandar: Optional[dict[str, Any]] = None
     ficha: Optional[dict[str, Any]] = None
     created_at: datetime
@@ -159,8 +159,8 @@ class EspecieListItem(BaseModel):
     codigo: Optional[str] = None
     nombre_cientifico: str
     categoria: str
-    nombre_comun: Optional[str]
-    familia: Optional[str]
+    nombre_comun: Optional[str] = None
+    familia: Optional[str] = None
     total_lineas: int = 0
     total_individuos: int = 0
     model_config = {"from_attributes": True}
@@ -236,20 +236,20 @@ class EspecimenOut(BaseModel):
     uid: str
     contenedor_uid: Optional[str] = None
     especie: str
-    especie_id: Optional[UUID]
-    linea_id: Optional[UUID]
+    especie_id: Optional[UUID] = None
+    linea_id: Optional[UUID] = None
     linea_nombre: Optional[str] = None
-    variegacion_id: Optional[UUID]
+    variegacion_id: Optional[UUID] = None
     variegacion_nombre: Optional[str] = None
     madre_id: Optional[UUID] = None
     madre_uid: Optional[str] = None
     padre_id: Optional[UUID] = None
     padre_uid: Optional[str] = None
     fecha_ingreso: date
-    origen: Optional[str]
+    origen: Optional[str] = None
     coordenadas: Optional[dict[str, float]] = None
     estado: str
-    notas: Optional[str]
+    notas: Optional[str] = None
     created_at: datetime
     eventos: list[EventoSummary] = []
     model_config = {"from_attributes": True}
@@ -295,10 +295,10 @@ class ElementoOut(BaseModel):
     element_id: str
     tipo: str
     descripcion: str
-    cantidad: Optional[float]
-    unidad: Optional[str]
+    cantidad: Optional[float] = None
+    unidad: Optional[str] = None
     estado: str
-    notas: Optional[str]
+    notas: Optional[str] = None
     created_at: datetime
     eventos: list[EventoSummary] = []
     model_config = {"from_attributes": True}
@@ -349,7 +349,7 @@ class ValidacionOut(BaseModel):
     id: UUID
     resultado: str
     observaciones: str
-    metricas: Optional[dict[str, Any]]
+    metricas: Optional[dict[str, Any]] = None
     fecha: datetime
     usuario_nombre: str
     model_config = {"from_attributes": True}
@@ -360,9 +360,9 @@ class ProtocoloOut(BaseModel):
     nombre: str
     tipo: str
     version: str
-    descripcion: Optional[str]
+    descripcion: Optional[str] = None
     pasos: list[dict[str, Any]]
-    materiales: Optional[list[dict[str, Any]]]
+    materiales: Optional[list[dict[str, Any]]] = None
     estado_validacion: str
     creado_por_id: UUID
     created_at: datetime
@@ -425,20 +425,20 @@ class ExperimentoUpdate(BaseModel):
 class ExperimentoOut(BaseModel):
     id: UUID
     nombre: str
-    hipotesis: Optional[str]
-    protocolo_id: Optional[UUID]
+    hipotesis: Optional[str] = None
+    protocolo_id: Optional[UUID] = None
     especie_id: Optional[UUID] = None
     linea_id: Optional[UUID] = None
     variegacion_id: Optional[UUID] = None
     fecha_inicio: date
-    fecha_fin: Optional[date]
+    fecha_fin: Optional[date] = None
     estado: str
     director_id: UUID
     director_nombre: Optional[str] = None
-    operador_id: Optional[UUID]
+    operador_id: Optional[UUID] = None
     operador_nombre: Optional[str] = None
     config_estandar: Optional[dict[str, Any]] = None
-    notas: Optional[str]
+    notas: Optional[str] = None
     created_at: datetime
     especimenes: list[EspecimenListItem] = []
     model_config = {"from_attributes": True}
@@ -468,8 +468,8 @@ class ResultadoOut(BaseModel):
     titulo: str
     tipo: str
     descripcion: str
-    datos: Optional[dict[str, Any]]
-    archivos: Optional[list[str]]
+    datos: Optional[dict[str, Any]] = None
+    archivos: Optional[list[str]] = None
     registrado_por_id: UUID
     fecha: datetime
     model_config = {"from_attributes": True}
@@ -491,14 +491,14 @@ class EventoOut(BaseModel):
     id: UUID
     tipo: str
     descripcion: str
-    especimen_id: Optional[UUID]
-    elemento_id: Optional[UUID]
-    experimento_id: Optional[UUID]
+    especimen_id: Optional[UUID] = None
+    elemento_id: Optional[UUID] = None
+    experimento_id: Optional[UUID] = None
     usuario_id: UUID
-    ejecutado_por_id: Optional[UUID]
+    ejecutado_por_id: Optional[UUID] = None
     ejecutado_por_nombre: Optional[str] = None
     timestamp: datetime
-    meta: Optional[dict[str, Any]]
+    meta: Optional[dict[str, Any]] = None
     model_config = {"from_attributes": True}
 
 
@@ -521,10 +521,10 @@ class SustratoOut(BaseModel):
     codigo_formulacion: str
     tipo: str
     nombre: str
-    descripcion: Optional[str]
+    descripcion: Optional[str] = None
     componentes: Optional[list[ComponenteOut]] = None
-    ph_teorico: Optional[float]
-    conductividad_teorica: Optional[float]
+    ph_teorico: Optional[float] = None
+    conductividad_teorica: Optional[float] = None
     formulacion_id: Optional[UUID] = None
     lote_id: Optional[UUID] = None
     formulacion: Optional[FormulacionOut] = None
@@ -588,39 +588,39 @@ class RegistroEvolucionOut(BaseModel):
     especimen_id: UUID
     registrado_por_id: UUID
     registrado_por_nombre: str
-    protocolo_clonacion_id: Optional[UUID]
+    protocolo_clonacion_id: Optional[UUID] = None
     protocolo_clonacion_nombre: Optional[str] = None
     fecha: datetime
     # Morfológicas
-    altura_cm: Optional[float]
-    ancho_hoja_max_cm: Optional[float]
-    largo_hoja_max_cm: Optional[float]
-    num_hojas: Optional[int]
-    num_brotes: Optional[int]
-    num_hijuelos: Optional[int]
-    num_nodos: Optional[int]
-    diametro_tallo_mm: Optional[float]
+    altura_cm: Optional[float] = None
+    ancho_hoja_max_cm: Optional[float] = None
+    largo_hoja_max_cm: Optional[float] = None
+    num_hojas: Optional[int] = None
+    num_brotes: Optional[int] = None
+    num_hijuelos: Optional[int] = None
+    num_nodos: Optional[int] = None
+    diametro_tallo_mm: Optional[float] = None
     # Variegación
-    porcentaje_variegacion: Optional[float]
-    patron_variegacion: Optional[str]
-    color_variegacion: Optional[str]
+    porcentaje_variegacion: Optional[float] = None
+    patron_variegacion: Optional[str] = None
+    color_variegacion: Optional[str] = None
     # Contenedor
-    sustrato: Optional[str]
+    sustrato: Optional[str] = None
     sustrato_id: Optional[UUID] = None
     sustrato_nombre: Optional[str] = None
-    tipo_contenedor: Optional[str]
-    diametro_contenedor_cm: Optional[float]
+    tipo_contenedor: Optional[str] = None
+    diametro_contenedor_cm: Optional[float] = None
     # Condiciones ambientales
-    temperatura_c: Optional[float]
-    humedad_relativa_pct: Optional[float]
-    humedad_sustrato_pct: Optional[float]
-    ph_sustrato: Optional[float]
-    luz_lux: Optional[float]
-    conductividad_ec: Optional[float]
+    temperatura_c: Optional[float] = None
+    humedad_relativa_pct: Optional[float] = None
+    humedad_sustrato_pct: Optional[float] = None
+    ph_sustrato: Optional[float] = None
+    luz_lux: Optional[float] = None
+    conductividad_ec: Optional[float] = None
     npk: Optional[str] = None
     ppm: Optional[float] = None
     fotos: Optional[dict[str, str]] = None
-    notas: Optional[str]
+    notas: Optional[str] = None
     model_config = {"from_attributes": True}
 
 
@@ -728,7 +728,7 @@ class ComponenteOut(BaseModel):
     reactivo: Optional[ReactivoOut] = None
     formulacion_ingrediente: Optional[FormulacionIngredienteOut] = None
     cantidad_base: float
-    notas_pesaje: Optional[str]
+    notas_pesaje: Optional[str] = None
     model_config = {"from_attributes": True}
 
 class FormulacionCreate(BaseModel):
@@ -743,9 +743,9 @@ class FormulacionCreate(BaseModel):
 class FormulacionOut(BaseModel):
     id: UUID
     nombre: str
-    codigo_referencia: Optional[str]
-    descripcion: Optional[str]
-    procedimiento: Optional[str]
+    codigo_referencia: Optional[str] = None
+    descripcion: Optional[str] = None
+    procedimiento: Optional[str] = None
     volumen_base_l: float
     caducidad_dias: int
     created_at: datetime
@@ -769,8 +769,8 @@ class LotePreparadoOut(BaseModel):
     fecha_expiracion: Optional[datetime] = None
     volumen_l: float
     concentracion_x: float
-    ph_final: Optional[float]
+    ph_final: Optional[float] = None
     trazabilidad_reactivos: Optional[dict[str, str]] = None
     estado: str
-    notas: Optional[str]
+    notas: Optional[str] = None
     model_config = {"from_attributes": True}
