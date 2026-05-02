@@ -167,10 +167,25 @@ def crear_bulk(payload: schemas.EspecimenBulkRequest, db: Session = Depends(get_
             nuevos.append(nuevo_esp)
 
     db.commit()
-    for e in nuevos:
-        db.refresh(e)
 
-    return [_get_full(e.id, db) for e in nuevos]
+    ids_creados = [e.id for e in nuevos]
+
+    # Hacer una sola consulta grande en lugar de N consultas individuales
+    especimenes_creados = (
+        db.query(models.Especimen)
+        .options(
+            joinedload(models.Especimen.eventos).joinedload(models.Evento.usuario),
+            joinedload(models.Especimen.eventos).joinedload(models.Evento.ejecutado_por),
+            joinedload(models.Especimen.linea_rel),
+            joinedload(models.Especimen.variegacion_rel),
+            joinedload(models.Especimen.madre),
+            joinedload(models.Especimen.padre),
+        )
+        .filter(models.Especimen.id.in_(ids_creados))
+        .all()
+    )
+
+    return [_especimen_out(e) for e in especimenes_creados]
 
 
 @router.get("/by-uid/{uid}", response_model=schemas.EspecimenOut)
