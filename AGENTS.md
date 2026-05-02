@@ -12,6 +12,8 @@ Este archivo complementa `CLAUDE.md` (stack, modelos, rutas). Aquí está el **c
 
 ### Ciclo por issue
 
+> **REGLA ESTRICTA:** Un solo issue por rama (Single Responsibility). Nunca mezcles múltiples fixes o features en una sola rama `feature/*` o `hotfix/*`. Si ves varios problemas, abre ramas separadas y PRs separados.
+
 ```bash
 # 1. Crear rama desde develop
 git checkout develop
