@@ -171,7 +171,7 @@ async def imprimir_contenedor(
         resumen_componentes += f" (+{len(tipos_origen)-4} más)"
 
     payload = {
-        "modo": "reactivo",
+        "modo": "contenedor",
         "arg1": "Contenedor Múltiple",
         "arg2": contenedor_uid,
         "arg3": f"{len(especimenes)} Especímenes",

@@ -65,11 +65,15 @@ class LabelEngine:
         y_cursor = SAFE_Y_START + 4
         x_base = OFFSET_X_PX + 4
         
-        if req.modo == 'reactivo':
+        if req.modo in ['reactivo', 'contenedor']:
             # ETIQUETA GRANDE (Toda la cara visible)
             draw.text((x_base, y_cursor), "KRONOS BIOLABS", font=f_body, fill=0)
-            lote_id = req.extra.get('preparador', '—')
-            draw.text((self.width - 200, y_cursor), f"LOTE: {lote_id[:16]}", font=f_body, fill=0)
+            
+            if req.modo == 'reactivo':
+                lote_id = req.extra.get('preparador', '—')
+                draw.text((self.width - 200, y_cursor), f"LOTE: {lote_id[:16]}", font=f_body, fill=0)
+            else:
+                draw.text((self.width - 150, y_cursor), "CONTENEDOR", font=f_body, fill=0)
             
             y = y_cursor + 24
             y = self.draw_text(draw, req.arg1, f_title, x_base, y, max_chars=22)
@@ -85,28 +89,45 @@ class LabelEngine:
             
             # Bloque de Información Técnica
             y += 10
-            conc_pct = req.extra.get('conc. (%)', '—')
-            conc_gl = req.extra.get('conc. (g/L)', '—')
-            vol = req.extra.get('volumen', '—')
             
-            draw.text((x_base, y), f"VOL: {vol}", font=f_body, fill=0)
-            y += 20
-            draw.text((x_base, y), f"CONC: {conc_pct} | {conc_gl}", font=f_body, fill=0)
-            
-            y += 20
-            f_date = req.extra.get('formulado', '—')
-            v_date = req.extra.get('vencimiento', req.arg3 or '—')
-            draw.text((x_base, y), f"FABRICADO: {f_date}", font=f_body, fill=0)
-            y += 20
-            draw.text((x_base, y), f"VENCIMIENTO: {v_date}", font=f_title, fill=0)
-            
-            y += 26
-            comps = req.extra.get('componentes', '—')
-            y = self.draw_text(draw, f"COMP: {comps}", f_micro, x_base, y, max_chars=40)
-            
-            peligros = req.extra.get('peligros', [])
-            if peligros:
-                draw.text((x_base, y + 5), "PELIGRO: " + " ".join([p.upper() for p in peligros]), font=f_micro, fill=0)
+            if req.modo == 'reactivo':
+                conc_pct = req.extra.get('conc. (%)', '—')
+                conc_gl = req.extra.get('conc. (g/L)', '—')
+                vol = req.extra.get('volumen', '—')
+                
+                draw.text((x_base, y), f"VOL: {vol}", font=f_body, fill=0)
+                y += 20
+                draw.text((x_base, y), f"CONC: {conc_pct} | {conc_gl}", font=f_body, fill=0)
+                
+                y += 20
+                f_date = req.extra.get('formulado', '—')
+                v_date = req.extra.get('vencimiento', req.arg3 or '—')
+                draw.text((x_base, y), f"FABRICADO: {f_date}", font=f_body, fill=0)
+                y += 20
+                draw.text((x_base, y), f"VENCIMIENTO: {v_date}", font=f_title, fill=0)
+                
+                y += 26
+                comps = req.extra.get('componentes', '—')
+                y = self.draw_text(draw, f"COMP: {comps}", f_micro, x_base, y, max_chars=40)
+                
+                peligros = req.extra.get('peligros', [])
+                if peligros:
+                    draw.text((x_base, y + 5), "PELIGRO: " + " ".join([p.upper() for p in peligros]), font=f_micro, fill=0)
+            else:
+                # Layout para contenedor
+                especie = req.extra.get('especie', '—')
+                cantidad = req.arg3
+                fecha_ingreso = req.extra.get('fecha_ingreso', '—')
+                
+                draw.text((x_base, y), f"ESPECIE: {especie}", font=f_body, fill=0)
+                y += 20
+                draw.text((x_base, y), f"CANTIDAD: {cantidad}", font=f_body, fill=0)
+                y += 20
+                draw.text((x_base, y), f"F. INGRESO: {fecha_ingreso}", font=f_body, fill=0)
+                
+                y += 30
+                comps = req.extra.get('componentes', '—')
+                y = self.draw_text(draw, f"CONTENIDO: {comps}", f_micro, x_base, y, max_chars=40)
                 
             return img.rotate(180)
             
