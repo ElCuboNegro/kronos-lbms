@@ -89,6 +89,12 @@ def crear_bulk(payload: schemas.EspecimenBulkRequest, db: Session = Depends(get_
     time_part = now.strftime("%H%M%S")
     prefix = f"{code}-{date_part}-{time_part}-"
 
+    from sqlalchemy import text
+    import hashlib
+    # Generar un hash determinista de 32-bits (positivo) a partir del prefijo para el lock
+    lock_key = int(hashlib.md5(prefix.encode()).hexdigest()[:8], 16) % (2**31)
+    db.execute(text("SELECT pg_advisory_xact_lock(:k)"), {"k": lock_key})
+
     # Get last index for the same second
     ultimo = db.query(models.Especimen).filter(
         models.Especimen.uid.like(f"{prefix}%")
