@@ -1,5 +1,5 @@
 from uuid import UUID
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session, joinedload
 from app.database import get_db
 from app import models, schemas, auth
@@ -46,7 +46,12 @@ def _exp_out(exp: models.Experimento) -> schemas.ExperimentoOut:
 
 
 @router.get("", response_model=list[schemas.ExperimentoListItem])
-def listar(db: Session = Depends(get_db), _=Depends(auth.get_current_user)):
+def listar(
+    skip: int = 0,
+    limit: int = Query(default=50, le=200),
+    db: Session = Depends(get_db),
+    _=Depends(auth.get_current_user)
+):
     return (
         db.query(models.Experimento)
         .options(
@@ -54,6 +59,8 @@ def listar(db: Session = Depends(get_db), _=Depends(auth.get_current_user)):
             joinedload(models.Experimento.operador)
         )
         .order_by(models.Experimento.fecha_inicio.desc())
+        .offset(skip)
+        .limit(limit)
         .all()
     )
 
