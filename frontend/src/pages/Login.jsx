@@ -28,7 +28,7 @@ export default function Login() {
     <div style={{ minHeight: '100dvh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
       <div className="card" style={{ width: '100%', maxWidth: 360, margin: '1rem' }}>
         <h1 className="text-primary" style={{ margin: 0, fontSize: '2rem', textAlign: 'center', letterSpacing: 2 }}>Seymour-OS</h1>
-        <p style={{ color: 'var(--bio-secondary)', textAlign: 'center', marginTop: 4, marginBottom: '2rem', fontSize: '0.85rem' }}>Kronos Biolabs SAS</p>
+        <p style={{ color: 'var(--theme-secondary)', textAlign: 'center', marginTop: 4, marginBottom: '2rem', fontSize: '0.85rem' }}>Kronos Biolabs SAS</p>
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           <input
             type="email"

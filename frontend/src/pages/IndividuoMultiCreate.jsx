@@ -280,7 +280,7 @@ export default function IndividuoMultiCreate() {
         </label>
         
         {printAfter && (
-          <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', marginBottom: '1.5rem', background: 'var(--bio-background)', padding: '0.8rem', borderRadius: '8px' }}>
+          <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', marginBottom: '1.5rem', background: 'var(--theme-background)', padding: '0.8rem', borderRadius: '8px' }}>
             <input type="checkbox" checked={agruparContenedor} onChange={e => setAgruparContenedor(e.target.checked)} style={{ width: 'auto', marginTop: 0 }} />
             <span className="text-primary" style={{ fontSize: '0.9rem', textTransform: 'none', letterSpacing: 'normal' }}>Agrupar en 1 solo contenedor físico (imprimir 1 sola etiqueta múltiple)</span>
           </label>

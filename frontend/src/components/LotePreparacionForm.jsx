@@ -46,7 +46,7 @@ export default function LotePreparacionForm({ formulacion, onSaved, onCancel }) 
 
   return (
     <div style={{position:'fixed',inset:0,background:'rgba(0,0,0,0.8)',display:'flex',alignItems:'flex-end',zIndex:200}}>
-      <div style={{background:'var(--bio-surface)',borderRadius:'24px 24px 0 0',padding:'1.5rem',width:'100%',maxHeight:'90dvh',overflowY:'auto'}}>
+      <div style={{background:'var(--theme-surface)',borderRadius:'24px 24px 0 0',padding:'1.5rem',width:'100%',maxHeight:'90dvh',overflowY:'auto'}}>
         <h3 className="page-title text-primary" style={{margin:'0 0 1.5rem'}}>Preparar: {formulacion.nombre}</h3>
         
         <div className="grid-2" style={{marginBottom:'1.5rem'}}>
@@ -70,7 +70,7 @@ export default function LotePreparacionForm({ formulacion, onSaved, onCancel }) 
               const itemId = esReactivo ? c.reactivo.id : c.formulacion_ingrediente.id;
               
               return (
-                <div key={c.id} style={{ display: 'flex', flexDirection: 'column', gap: 4, paddingBottom: '0.8rem', borderBottom: '1px solid var(--bio-background)' }}>
+                <div key={c.id} style={{ display: 'flex', flexDirection: 'column', gap: 4, paddingBottom: '0.8rem', borderBottom: '1px solid var(--theme-background)' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <span className="text-text" style={{ fontSize: '0.95rem' }}>{itemNombre}</span>
                     <span className="text-primary" style={{ fontWeight: 'bold', fontSize: '1.1rem' }}>

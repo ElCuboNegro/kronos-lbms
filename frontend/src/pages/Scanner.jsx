@@ -42,7 +42,7 @@ export default function Scanner() {
 
   return (
     <div className="page-container" style={{display:'flex',flexDirection:'column',gap:'1.25rem',alignItems:'center',minHeight:'80dvh',justifyContent:'center'}}>
-      <h2 className="page-title" style={{color:'var(--bio-primary)',margin:0,fontSize:'1.3rem',position:'absolute',top:'1.5rem',left:'1.5rem'}}>Escanear etiqueta</h2>
+      <h2 className="page-title" style={{color:'var(--theme-primary)',margin:0,fontSize:'1.3rem',position:'absolute',top:'1.5rem',left:'1.5rem'}}>Escanear etiqueta</h2>
       
       {scanning && !loading && !error && (
         <QRScanner
@@ -51,7 +51,7 @@ export default function Scanner() {
         />
       )}
 
-      {loading && <p style={{color:'var(--bio-secondary)',fontSize:'1rem'}}>Identificando…</p>}
+      {loading && <p style={{color:'var(--theme-secondary)',fontSize:'1rem'}}>Identificando…</p>}
 
       {scanResult && (
         <div className="card" style={{ width: '100%', maxWidth: 320, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
@@ -63,7 +63,7 @@ export default function Scanner() {
             {scanResult.tipo === 'sustrato' && '🪨'}
             {scanResult.tipo === 'contenedor' && '🗃️'}
           </div>
-          <h3 style={{ color: 'var(--bio-text)', margin: '0 0 0.5rem', textAlign: 'center', fontSize: '1.2rem' }}>
+          <h3 style={{ color: 'var(--theme-text)', margin: '0 0 0.5rem', textAlign: 'center', fontSize: '1.2rem' }}>
             {scanResult.tipo === 'especimen' && scanResult.especimen.especie}
             {scanResult.tipo === 'elemento' && scanResult.elemento.descripcion}
             {scanResult.tipo === 'lote' && scanResult.lote.formulacion.nombre}
@@ -71,7 +71,7 @@ export default function Scanner() {
             {scanResult.tipo === 'sustrato' && scanResult.sustrato.nombre}
             {scanResult.tipo === 'contenedor' && `Contenedor (${scanResult.contenedor.especimenes.length} elementos)`}
           </h3>
-          <p className="font-mono" style={{ color: 'var(--bio-primary)', margin: '0 0 1.5rem', fontSize: '0.9rem' }}>
+          <p className="font-mono" style={{ color: 'var(--theme-primary)', margin: '0 0 1.5rem', fontSize: '0.9rem' }}>
             UID: {
               scanResult.tipo === 'especimen' ? scanResult.especimen.uid : 
               scanResult.tipo === 'elemento' ? scanResult.elemento.element_id :
