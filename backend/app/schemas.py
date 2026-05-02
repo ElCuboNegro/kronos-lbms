@@ -1,8 +1,8 @@
 from __future__ import annotations
 from datetime import datetime, date
-from typing import Optional, Any
+from typing import Optional, Any, Annotated
 from uuid import UUID
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, Field
 
 
 # ── Auth ──────────────────────────────────────────────────────────────────────
@@ -557,7 +557,7 @@ class RegistroEvolucionCreate(BaseModel):
     num_nodos: Optional[int] = None
     diametro_tallo_mm: Optional[float] = None
     # Variegación
-    porcentaje_variegacion: Optional[float] = None
+    porcentaje_variegacion: Annotated[Optional[float], Field(ge=0, le=100)] = None
     patron_variegacion: Optional[str] = None
     color_variegacion: Optional[str] = None
     # Contenedor
@@ -565,10 +565,10 @@ class RegistroEvolucionCreate(BaseModel):
     tipo_contenedor: Optional[str] = None
     diametro_contenedor_cm: Optional[float] = None
     # Condiciones ambientales
-    temperatura_c: Optional[float] = None
-    humedad_relativa_pct: Optional[float] = None
-    humedad_sustrato_pct: Optional[float] = None
-    ph_sustrato: Optional[float] = None
+    temperatura_c: Annotated[Optional[float], Field(ge=-20, le=60)] = None
+    humedad_relativa_pct: Annotated[Optional[float], Field(ge=0, le=100)] = None
+    humedad_sustrato_pct: Annotated[Optional[float], Field(ge=0, le=100)] = None
+    ph_sustrato: Annotated[Optional[float], Field(ge=0, le=14)] = None
     luz_lux: Optional[float] = None
     conductividad_ec: Optional[float] = None
     npk: Optional[str] = None
