@@ -6,12 +6,19 @@ export default function ExperimentoDetail() {
   const { id } = useParams()
   const navigate = useNavigate()
   const [exp, setExp] = useState(null)
+  const [resultados, setResultados] = useState([])
   const [loading, setLoading] = useState(true)
   const [showConfig, setShowConfig] = useState(false)
+  const [showResForm, setShowResForm] = useState(false)
 
   const fetchExp = async () => {
     setLoading(true)
-    try { setExp(await api.get(`/experimentos/${id}`)) }
+    try { 
+      const e = await api.get(`/experimentos/${id}`)
+      setExp(e)
+      const res = await api.get(`/experimentos/${id}/resultados`)
+      setResultados(res)
+    }
     finally { setLoading(false) }
   }
 
@@ -39,14 +46,94 @@ export default function ExperimentoDetail() {
       {showConfig && (
         <ExpConfigForm 
           exp={exp} 
-          onSaved={() => { setShowConfig(false); fetchExp() }} 
-          onCancel={() => setShowConfig(false)} 
+          onSaved={() => { setShowConfig(false); fetchExp() }}
+          onCancel={() => setShowConfig(false)}
         />
       )}
-      
+
+      {showResForm && (
+        <ResultadoForm 
+          expId={id} 
+          onSaved={() => { setShowResForm(false); fetchExp() }}
+          onCancel={() => setShowResForm(false)}
+        />
+      )}
+
+      <div style={{background:'var(--theme-surface)',padding:'1rem',borderRadius:12}}>
+         <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:10}}>
+           <h4 style={{color:'var(--theme-secondary)',fontSize:'0.75rem',fontWeight:700,textTransform:'uppercase',letterSpacing:1,margin:0}}>Resultados ({resultados.length})</h4>
+           <button style={{background:'var(--theme-primary)',border:'none',borderRadius:20,color:'#fff',padding:'0.2rem 0.75rem',fontSize:'0.75rem',fontWeight:700,cursor:'pointer'}} onClick={() => setShowResForm(true)}>+ Añadir</button>
+         </div>
+         {resultados.length === 0 ? (
+           <p style={{color:'var(--theme-text-muted)',textAlign:'center',padding:'1rem 0',fontSize:'0.9rem'}}>No hay resultados registrados aún.</p>
+         ) : (
+           <div style={{display:'flex',flexDirection:'column',gap:10}}>
+             {resultados.map(r => (
+               <div key={r.id} style={{background:'var(--theme-background)',border:'1px solid var(--theme-border)',borderRadius:8,padding:'0.8rem'}}>
+                 <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:4}}>
+                   <span style={{color:'var(--theme-primary)',fontSize:'0.95rem',fontWeight:600}}>{r.titulo}</span>
+                   <span style={{background:'var(--theme-border)',color:'var(--theme-primary)',fontSize:'0.65rem',padding:'2px 6px',borderRadius:4,textTransform:'uppercase',fontWeight:700}}>{r.tipo}</span>
+                 </div>
+                 <p style={{color:'var(--theme-text)',fontSize:'0.85rem',margin:'0 0 6px 0',lineHeight:1.4}}>{r.descripcion}</p>
+                 <span style={{color:'var(--theme-text-muted)',fontSize:'0.7rem'}}>{new Date(r.fecha).toLocaleDateString()}</span>
+               </div>
+             ))}
+           </div>
+         )}
+      </div>
+
       <div style={{background:'var(--theme-surface)',padding:'1rem',borderRadius:12}}>
          <h4 style={{color:'var(--theme-secondary)',fontSize:'0.75rem',fontWeight:700,textTransform:'uppercase',letterSpacing:1,margin:'0 0 8px 0'}}>Especímenes en estudio</h4>
          <p style={{color:'var(--theme-text-muted)',textAlign:'center',padding:'2rem'}}>Próximamente: Lista de individuos vinculados.</p>
+      </div>
+    </div>
+  )
+}
+
+function ResultadoForm({ expId, onSaved, onCancel }) {
+  const [form, setForm] = useState({ titulo: '', tipo: 'observacion', descripcion: '' })
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+
+  const submit = async (e) => {
+    e.preventDefault()
+    setLoading(true)
+    setError('')
+    try {
+      await api.post(`/experimentos/${expId}/resultados`, form)
+      onSaved()
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', zIndex: 1000, display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}>
+      <div style={{ background: 'var(--theme-surface)', borderRadius: '24px 24px 0 0', width: '100%', maxWidth: '500px', padding: '1.5rem', paddingBottom: 'calc(1.5rem + env(safe-area-inset-bottom))' }}>
+        <h3 className="text-primary" style={{ margin: '0 0 1rem', fontSize: '1.2rem' }}>Añadir Resultado</h3>
+        <form onSubmit={submit} style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
+          <Field label="Título" value={form.titulo} onChange={v => setForm({...form, titulo: v})} required />
+          <div className="form-group" style={{ margin: 0 }}>
+            <label style={{ color: 'var(--theme-secondary)', fontSize: '0.78rem', fontWeight: 600 }}>Tipo de resultado</label>
+            <select style={{background:'var(--theme-background)',border:'1px solid var(--theme-border)',borderRadius:8,padding:'0.6rem',color:'var(--theme-text)',fontSize:'0.9rem',outline:'none'}} value={form.tipo} onChange={e => setForm({...form, tipo: e.target.value})}>
+              <option value="observacion">Observación General</option>
+              <option value="medicion">Medición Física</option>
+              <option value="fotografia">Fotografía / Visual</option>
+              <option value="hallazgo">Hallazgo Crítico</option>
+              <option value="anomalia">Anomalía / Contaminación</option>
+              <option value="conclusion">Conclusión Final</option>
+            </select>
+          </div>
+          <Field label="Descripción detallada" value={form.descripcion} onChange={v => setForm({...form, descripcion: v})} textarea required />
+
+          {error && <p className="text-danger" style={{ margin: 0, fontSize: '0.85rem' }}>{error}</p>}
+          <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
+            <button type="button" className="btn btn--ghost" style={{ flex: 1 }} onClick={onCancel}>Cancelar</button>
+            <button type="submit" className="btn btn--primary" style={{ flex: 1 }} disabled={loading}>{loading ? 'Guardando...' : 'Guardar Resultado'}</button>
+          </div>
+        </form>
       </div>
     </div>
   )
@@ -166,11 +253,15 @@ function Section({ title, children }) {
   )
 }
 
-function Field({ label, value, onChange, type="text" }) {
+function Field({ label, value, onChange, type="text", textarea=false, required=false }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
       <label style={{ color: 'var(--theme-secondary)', fontSize: '0.78rem', fontWeight: 600 }}>{label}</label>
-      <input type={type} step="0.1" style={{background:'var(--theme-background)',border:'1px solid var(--theme-border)',borderRadius:8,padding:'0.6rem',color:'var(--theme-text)',fontSize:'0.9rem',outline:'none'}} value={value || ''} onChange={e => onChange(e.target.value)} placeholder="—" />
+      {textarea ? (
+         <textarea style={{background:'var(--theme-background)',border:'1px solid var(--theme-border)',borderRadius:8,padding:'0.6rem',color:'var(--theme-text)',fontSize:'0.9rem',outline:'none', minHeight: 80}} value={value || ''} onChange={e => onChange(e.target.value)} placeholder="—" required={required} />
+      ) : (
+         <input type={type} step="0.1" style={{background:'var(--theme-background)',border:'1px solid var(--theme-border)',borderRadius:8,padding:'0.6rem',color:'var(--theme-text)',fontSize:'0.9rem',outline:'none'}} value={value || ''} onChange={e => onChange(e.target.value)} placeholder="—" required={required} />
+      )}
     </div>
   )
 }
