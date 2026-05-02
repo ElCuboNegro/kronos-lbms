@@ -21,7 +21,7 @@ export default function IndividuoCreate() {
     variegacion_id: '',
     especie: '',
     uid: params.get('uid') || '',
-    madre_id: '',
+    madre_id: params.get('madre') || '',
     padre_id: '',
     fecha_ingreso: new Date().toISOString().slice(0, 10),
     origen: '',
@@ -58,6 +58,9 @@ export default function IndividuoCreate() {
     })
     set('linea_id', '')
     set('variegacion_id', '')
+    
+    // Auto-generate semantic UID
+    generarUID(form.especie_id)
   }, [form.especie_id])
 
   // Cargar variegaciones cuando cambia línea
@@ -68,11 +71,12 @@ export default function IndividuoCreate() {
     set('variegacion_id', '')
   }, [form.linea_id])
 
-  async function generarUID() {
-    if (!form.especie_id) return
+  async function generarUID(overrideEspecieId) {
+    const targetId = overrideEspecieId || form.especie_id
+    if (!targetId) return
     setGenerating(true)
     try {
-      const { uid } = await api.get(`/printer/generar-uid?especie_id=${form.especie_id}`)
+      const { uid } = await api.get(`/printer/generar-uid?especie_id=${targetId}`)
       set('uid', uid)
     } finally { setGenerating(false) }
   }

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { Html5Qrcode } from 'html5-qrcode'
+import { Html5Qrcode, Html5QrcodeSupportedFormats } from 'html5-qrcode'
 
 export default function QRScanner({ onResult, onError }) {
   const scannerRef = useRef(null)
@@ -31,7 +31,19 @@ export default function QRScanner({ onResult, onError }) {
 
     scanner.start(
       { facingMode: 'environment' },
-      { fps: 15, qrbox: { width: 250, height: 250 } },
+      { 
+        fps: 15, 
+        qrbox: { width: 300, height: 150 }, // Wider box for 1D barcodes
+        formatsToSupport: [
+          Html5QrcodeSupportedFormats.QR_CODE,
+          Html5QrcodeSupportedFormats.EAN_13,
+          Html5QrcodeSupportedFormats.EAN_8,
+          Html5QrcodeSupportedFormats.CODE_128,
+          Html5QrcodeSupportedFormats.CODE_39,
+          Html5QrcodeSupportedFormats.UPC_A,
+          Html5QrcodeSupportedFormats.UPC_E,
+        ]
+      },
       (text) => {
         if (isMounted) {
           try {
@@ -86,7 +98,9 @@ export default function QRScanner({ onResult, onError }) {
         <div id={divId} style={{ width:'100%',borderRadius:12,overflow:'hidden',border:'3px solid var(--bio-primary)',transition:'border-color 0.2s', borderColor: flash ? '#4ade80' : 'var(--bio-primary)' }} />
         {flash && <div style={{position:'absolute',top:0,left:0,right:0,bottom:0,backgroundColor:'rgba(74, 222, 128, 0.4)',borderRadius:12,zIndex:10,pointerEvents:'none'}}></div>}
       </div>
-      <p style={{color:'var(--bio-secondary)',fontSize:'0.95rem',margin:0,fontWeight:600,minHeight:'1.2rem'}}>{flash ? '¡Código detectado!' : 'Apunta al código QR de la etiqueta'}</p>
+      <p style={{color:'var(--bio-secondary)',fontSize:'0.95rem',margin:0,fontWeight:600,minHeight:'1.2rem',textAlign:'center'}}>
+        {flash ? '¡Código detectado!' : 'Apunta a un código QR o Código de Barras (EAN/UPC)'}
+      </p>
     </div>
   )
 }

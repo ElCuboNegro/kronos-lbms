@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { api } from '../api/client'
 import LotePreparacionForm from '../components/LotePreparacionForm'
+import { ReactivoForm } from './ReactivosList'
 
 export default function FormulacionesList() {
   const [items, setItems] = useState([])
@@ -17,31 +18,35 @@ export default function FormulacionesList() {
   useEffect(() => { fetchItems() }, [])
 
   return (
-    <div className="page-container" style={{display:'flex',flexDirection:'column',gap:'1rem'}}>
-      <div className="page-header" style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
-        <h2 className="page-title" style={{color:'var(--bio-primary)',margin:0,fontSize:'1.3rem'}}>Recetario (Formulaciones)</h2>
-        <button style={{background:'var(--bio-primary)',border:'none',borderRadius:'50%',color:'#fff',width:40,height:40,fontSize:'1.5rem',cursor:'pointer'}} onClick={() => setShowForm(true)}>+</button>
+    <div className="page-container">
+      <div className="page-header">
+        <h2 className="page-title">Recetario (Formulaciones)</h2>
+        <button className="btn btn--primary" style={{ borderRadius: '50%', width: 40, height: 40, padding: 0 }} onClick={() => setShowForm(true)}>+</button>
       </div>
 
-      {loading ? <p style={{color:'var(--bio-text-muted)',textAlign:'center',padding:'2rem'}}>Cargando…</p> : (
-        <div style={{display:'flex',flexDirection:'column',gap:15}}>
-          {items.length === 0 ? <p style={{color:'var(--bio-text-muted)',textAlign:'center',padding:'2rem'}}>No hay formulaciones registradas</p> : (
+      {loading ? <p className="text-muted text-center" style={{ padding: '2rem' }}>Cargando…</p> : (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          {items.length === 0 ? <p className="text-muted text-center" style={{ padding: '2rem' }}>No hay formulaciones registradas</p> : (
             items.map(f => (
               <div key={f.id} className="card">
-                <div style={{display:'flex',justifyContent:'space-between',alignItems:'baseline',marginBottom:8}}>
-                  <span style={{color:'var(--bio-text)',fontWeight:600,fontSize:'1.1rem'}}>{f.nombre}</span>
-                  {f.codigo_referencia && <span style={{color:'var(--bio-primary)',fontWeight:'bold',fontFamily:'monospace',fontSize:'0.85rem'}}>{f.codigo_referencia}</span>}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '0.5rem' }}>
+                  <span style={{ color: 'var(--bio-text)', fontWeight: 600, fontSize: '1.1rem' }}>{f.nombre}</span>
+                  {f.codigo_referencia && <span className="font-mono text-primary" style={{ fontWeight: 'bold', fontSize: '0.85rem' }}>{f.codigo_referencia}</span>}
                 </div>
-                <p style={{color:'var(--bio-text-muted)',fontSize:'0.88rem',margin:'4px 0'}}>{f.descripcion}</p>
-                <div style={{background:'var(--bio-background)',borderRadius:8,padding:'0.75rem',marginTop:10}}>
-                  <p style={{color:'var(--bio-secondary)',fontSize:'0.75rem',fontWeight:700,textTransform:'uppercase',margin:'0 0 5px'}}>Composición base ({f.volumen_base_l}L):</p>
-                  <ul style={{margin:0,paddingLeft:15,color:'var(--bio-text)',fontSize:'0.85rem'}}>
-                    {f.componentes.map(c => (
-                      <li key={c.id}>{c.reactivo.nombre}: {c.cantidad_base}{c.reactivo.unidad_medida}</li>
-                    ))}
+                <p className="text-muted" style={{ fontSize: '0.88rem', margin: '0.2rem 0' }}>{f.descripcion}</p>
+                <div style={{ background: 'var(--bio-background)', borderRadius: 'var(--radius-base)', padding: '0.75rem', marginTop: '0.6rem' }}>
+                  <p style={{ color: 'var(--bio-secondary)', fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', margin: '0 0 5px' }}>Composición base ({f.volumen_base_l}L):</p>
+                  <ul style={{ margin: 0, paddingLeft: '1.2rem', color: 'var(--bio-text)', fontSize: '0.85rem' }}>
+                    {f.componentes.map(c => {
+                      const item = c.reactivo || c.formulacion_ingrediente;
+                      const unidad = c.reactivo ? c.reactivo.unidad_medida : (c.formulacion_ingrediente.unidad_medida || 'ml');
+                      return (
+                        <li key={c.id}>{item.nombre}: {c.cantidad_base} {unidad}</li>
+                      );
+                    })}
                   </ul>
                 </div>
-                <button style={{background:'var(--bio-primary)',color:'#fff',border:'none',borderRadius:8,padding:'0.6rem 1rem',fontSize:'0.85rem',cursor:'pointer',marginTop:12,width:'100%'}} onClick={() => setActiveFormulacion(f)}>
+                <button className="btn btn--primary btn--block" style={{ marginTop: '0.8rem' }} onClick={() => setActiveFormulacion(f)}>
                   🧪 Preparar este medio
                 </button>
               </div>
@@ -70,6 +75,7 @@ export default function FormulacionesList() {
 
 function FormulacionForm({ onSaved, onCancel }) {
   const [reactivos, setReactivos] = useState([])
+  const [formulaciones, setFormulaciones] = useState([])
   const [form, setForm] = useState({ 
     nombre: '', 
     codigo_referencia: '', 
@@ -81,15 +87,26 @@ function FormulacionForm({ onSaved, onCancel }) {
   })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [showReactivoModalForComp, setShowReactivoModalForComp] = useState(null)
+  const [showFormulacionModalForComp, setShowFormulacionModalForComp] = useState(null)
+
+  const fetchLists = async () => {
+    const [r, f] = await Promise.all([
+      api.get('/reactivos'),
+      api.get('/reactivos/formulaciones')
+    ])
+    setReactivos(r)
+    setFormulaciones(f)
+  }
 
   useEffect(() => {
-    api.get('/reactivos').then(setReactivos)
+    fetchLists()
   }, [])
 
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }))
 
   const addComponente = () => {
-    set('componentes', [...form.componentes, { reactivo_id: '', cantidad_base: '', id: Date.now() }])
+    set('componentes', [...form.componentes, { type: 'reactivo', item_id: '', cantidad_base: '', id: Date.now() }])
   }
 
   const updateComp = (id, k, v) => {
@@ -100,6 +117,20 @@ function FormulacionForm({ onSaved, onCancel }) {
     set('componentes', form.componentes.filter(c => c.id !== id))
   }
 
+  const handleNewReactivoSaved = async (newReactivo) => {
+    await fetchLists()
+    if (showReactivoModalForComp) {
+      updateComp(showReactivoModalForComp, 'item_id', newReactivo.id)
+    }
+    setShowReactivoModalForComp(null)
+  }
+
+  const handleNewFormulacionSaved = async () => {
+    await fetchLists()
+    // No seleccionamos automáticamente porque no tenemos el ID fácilmente aquí sin cambiar el API return o buscarlo
+    setShowFormulacionModalForComp(null)
+  }
+
   async function submit(e) {
     e.preventDefault()
     if (form.componentes.length === 0) { setError('Debe añadir al menos un componente'); return }
@@ -108,10 +139,12 @@ function FormulacionForm({ onSaved, onCancel }) {
       const payload = { ...form,
         volumen_base_l: parseFloat(form.volumen_base_l),
         caducidad_dias: parseInt(form.caducidad_dias),
-        componentes: form.componentes.map(({ id, ...rest }) => ({
-          ...rest,
-          cantidad_base: parseFloat(rest.cantidad_base)
-        }))
+        componentes: form.componentes.filter(c => c.item_id).map(({ id, type, item_id, cantidad_base }) => {
+          const comp = { cantidad_base: parseFloat(cantidad_base) }
+          if (type === 'reactivo') comp.reactivo_id = item_id
+          if (type === 'formulacion') comp.formulacion_ingrediente_id = item_id
+          return comp
+        })
       }
       await api.post('/reactivos/formulaciones', payload)
       onSaved()
@@ -119,41 +152,79 @@ function FormulacionForm({ onSaved, onCancel }) {
     finally { setLoading(false) }
   }
 
-  const inputStyle = { background: 'var(--bio-background)', border: '1px solid var(--bio-border)', borderRadius: 8, padding: '0.65rem 0.9rem', color: 'var(--bio-text)', fontSize: '0.95rem', outline: 'none', width: '100%', boxSizing: 'border-box' }
+  if (showReactivoModalForComp) {
+    return (
+      <div style={{ zIndex: 1100, position: 'relative' }}>
+        <ReactivoForm 
+          onSaved={handleNewReactivoSaved} 
+          onCancel={() => setShowReactivoModalForComp(null)} 
+        />
+      </div>
+    )
+  }
+
+  if (showFormulacionModalForComp) {
+    return (
+      <div style={{ zIndex: 1100, position: 'relative' }}>
+        <FormulacionForm 
+          onSaved={handleNewFormulacionSaved} 
+          onCancel={() => setShowFormulacionModalForComp(null)} 
+        />
+      </div>
+    )
+  }
 
   return (
-    <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.6)', zIndex: 1000, display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}>
-      <div style={{ background: 'var(--theme-surface)', borderTopLeftRadius: '20px', borderTopRightRadius: '20px', width: '100%', maxWidth: '500px', padding: '1.5rem', paddingBottom: 'calc(1.5rem + env(safe-area-inset-bottom))', animation: 'slideUp 0.3s ease-out', maxHeight: '88dvh', overflowY: 'auto' }}>
-        <h3 style={{ color: 'var(--bio-primary)', margin: '0 0 1rem', fontSize: '1rem' }}>Nueva Formulación (Receta)</h3>
-        <form onSubmit={submit} style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          <Field label="Nombre de la mezcla *" value={form.nombre} onChange={v => set('nombre', v)} required />
-          <div style={{ display: 'flex', gap: 10 }}>
-            <Field label="Código Ref." value={form.codigo_referencia} onChange={v => set('codigo_referencia', v.toUpperCase())} />
-            <Field label="Volumen Base (L)" type="number" step="0.1" value={form.volumen_base_l} onChange={v => set('volumen_base_l', v)} />
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'flex-end', zIndex: 1000 }}>
+      <div style={{ background: 'var(--bio-surface)', borderRadius: '24px 24px 0 0', width: '100%', maxWidth: 500, padding: '1.5rem', maxHeight: '90dvh', overflowY: 'auto' }}>
+        <h3 className="page-title text-primary" style={{ margin: '0 0 1rem' }}>Nueva Formulación</h3>
+        
+        <form onSubmit={submit} style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
+          <Field label="Nombre del Medio / Receta *" value={form.nombre} onChange={v => set('nombre', v)} required />
+          <div className="grid-2">
+            <Field label="Código Ref. (Opcional)" value={form.codigo_referencia} onChange={v => set('codigo_referencia', v)} />
+            <Field label="Volumen Base (Litros)" type="number" step="0.1" value={form.volumen_base_l} onChange={v => set('volumen_base_l', v)} required />
           </div>
 
-          <p style={{ color: 'var(--bio-secondary)', fontSize: '0.85rem', fontWeight: 600, margin: '10px 0 0' }}>Componentes / Reactivos</p>
-          <div style={{ background: 'var(--bio-background)', borderRadius: 8, padding: 10, display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <Field label="Procedimiento (Cómo preparar el stock/medio)" value={form.procedimiento} onChange={v => set('procedimiento', v)} textarea />
+
+          <div className="form-group" style={{ margin: '0.5rem 0' }}>
+            <label>Componentes (Reactivos o Stocks)</label>
             {form.componentes.map(c => (
-              <div key={c.id} style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
-                <select style={{ ...inputStyle, flex: 2 }} value={c.reactivo_id} onChange={e => updateComp(c.id, 'reactivo_id', e.target.value)}>
-                  <option value="">— Reactivo —</option>
-                  {reactivos.map(r => <option key={r.id} value={r.id}>{r.nombre} ({r.unidad_medida})</option>)}
+              <div key={c.id} style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginBottom: '0.5rem' }}>
+                <select style={{ flex: 1.2, padding: '0.5rem', fontSize: '0.8rem' }} value={c.type} onChange={e => { updateComp(c.id, 'type', e.target.value); updateComp(c.id, 'item_id', '') }}>
+                  <option value="reactivo">Químico Puro</option>
+                  <option value="formulacion">Solución Stock</option>
                 </select>
-                <input style={{ ...inputStyle, flex: 1 }} type="number" step="0.001" placeholder="Cant." value={c.cantidad_base} onChange={e => updateComp(c.id, 'cantidad_base', e.target.value)} />
+
+                <div style={{ flex: 2, display: 'flex', gap: '0.2rem' }}>
+                  <select style={{ width: '100%', padding: '0.5rem', fontSize: '0.85rem' }} value={c.item_id} onChange={e => updateComp(c.id, 'item_id', e.target.value)}>
+                    <option value="">— Seleccionar —</option>
+                    {c.type === 'reactivo' && reactivos.map(r => <option key={r.id} value={r.id}>{r.nombre} ({r.unidad_medida})</option>)}
+                    {c.type === 'formulacion' && formulaciones.map(f => <option key={f.id} value={f.id}>{f.nombre} (ml)</option>)}
+                  </select>
+                  {c.type === 'reactivo' && (
+                    <button type="button" className="btn btn--secondary" style={{ padding: '0 0.5rem' }} onClick={() => setShowReactivoModalForComp(c.id)} title="Añadir nuevo químico">+</button>
+                  )}
+                  {c.type === 'formulacion' && (
+                    <button type="button" className="btn btn--secondary" style={{ padding: '0 0.5rem' }} onClick={() => setShowFormulacionModalForComp(c.id)} title="Añadir nueva formulación">+</button>
+                  )}
+                </div>
+
+                <input style={{ flex: 1, padding: '0.5rem', fontSize: '0.85rem' }} type="number" step="0.001" placeholder="Cant." value={c.cantidad_base} onChange={e => updateComp(c.id, 'cantidad_base', e.target.value)} />
                 <button type="button" onClick={() => removeComp(c.id)} style={{ background: 'none', border: 'none', color: 'var(--error)', fontSize: '1.2rem', cursor: 'pointer', padding: '0 5px' }}>✕</button>
               </div>
             ))}
-            <button type="button" onClick={addComponente} style={{ background: 'none', border: '1px dashed var(--bio-border)', borderRadius: 8, color: 'var(--bio-secondary)', padding: '0.5rem', fontSize: '0.85rem', cursor: 'pointer', marginTop: 4 }}>+ Añadir ingrediente</button>
+            <button type="button" onClick={addComponente} className="btn btn--ghost btn--block" style={{ border: '1px dashed var(--bio-border)' }}>+ Añadir ingrediente</button>
           </div>
 
           <Field label="Caducidad estimada (días)" type="number" value={form.caducidad_dias} onChange={v => set('caducidad_dias', v)} />
           <Field label="Descripción / Uso" value={form.descripcion} onChange={v => set('descripcion', v)} textarea />
           
-          {error && <p style={{ color: 'var(--error)', fontSize: '0.85rem', margin: 0 }}>{error}</p>}
-          <div style={{ display: 'flex', gap: 8, marginTop: 4 }}>
-            <button type="button" className="btn btn--ghost" onClick={onCancel}>Cancelar</button>
-            <button type="submit" className="btn btn--primary" disabled={loading}>Guardar Receta</button>
+          {error && <p className="badge badge--danger" style={{ width: '100%', textAlign: 'center' }}>{error}</p>}
+          <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem' }}>
+            <button type="button" className="btn btn--ghost btn--block" onClick={onCancel}>Cancelar</button>
+            <button type="submit" className="btn btn--primary btn--block" disabled={loading}>Guardar Receta</button>
           </div>
         </form>
       </div>
@@ -162,13 +233,12 @@ function FormulacionForm({ onSaved, onCancel }) {
 }
 
 function Field({ label, value, onChange, textarea, type="text", step, required }) {
-  const inputStyle = { background: 'var(--bio-background)', border: '1px solid var(--bio-border)', borderRadius: 8, padding: '0.65rem 0.9rem', color: 'var(--bio-text)', fontSize: '0.95rem', outline: 'none', width: '100%', boxSizing: 'border-box' }
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 4, flex: 1 }}>
-      <label style={{ color: 'var(--bio-secondary)', fontSize: '0.78rem', fontWeight: 600 }}>{label}</label>
+    <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
+      <label>{label}</label>
       {textarea
-        ? <textarea style={{ ...inputStyle, minHeight: 60 }} value={value} onChange={e => onChange(e.target.value)} />
-        : <input type={type} step={step} style={inputStyle} value={value} onChange={e => onChange(e.target.value)} required={required} />
+        ? <textarea style={{ minHeight: 60 }} value={value} onChange={e => onChange(e.target.value)} />
+        : <input type={type} step={step} value={value} onChange={e => onChange(e.target.value)} required={required} />
       }
     </div>
   )

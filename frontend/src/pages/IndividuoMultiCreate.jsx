@@ -21,7 +21,7 @@ export default function IndividuoMultiCreate() {
     especie_id: params.get('especie') || '',
     linea_id: params.get('linea') || '',
     variegacion_id: '',
-    madre_id: '',
+    madre_id: params.get('madre') || '',
     padre_id: '',
     fecha_ingreso: new Date().toISOString().slice(0, 10),
     origen: '',
@@ -36,6 +36,7 @@ export default function IndividuoMultiCreate() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [printAfter, setPrintAfter] = useState(true)
+  const [agruparContenedor, setAgruparContenedor] = useState(false)
 
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }))
 
@@ -87,12 +88,19 @@ export default function IndividuoMultiCreate() {
     setError('')
     setLoading(true)
     try {
+      let contenedorUid = undefined
+      if (agruparContenedor) {
+        const d = new Date()
+        contenedorUid = `CONT-${d.getFullYear().toString().slice(2)}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}-${String(Math.floor(Math.random() * 9000) + 1000)}`
+      }
+
       const payload = {
         especie_id: form.especie_id,
         linea_id: form.linea_id || undefined,
         variegacion_id: form.variegacion_id || undefined,
         madre_id: form.madre_id || undefined,
         padre_id: form.padre_id || undefined,
+        contenedor_uid: contenedorUid,
         fecha_ingreso: form.fecha_ingreso,
         origen: form.origen || undefined,
         coordenadas: form.coordenadas || undefined,
@@ -127,11 +135,17 @@ export default function IndividuoMultiCreate() {
       }
 
       if (printAfter) {
-        // Enviar impresión asíncrona
-        Promise.allSettled(creados.map(ind => api.post(`/printer/imprimir/${ind.id}`)))
+        if (agruparContenedor && contenedorUid) {
+          // Si están agrupados, solo imprimir la etiqueta maestra del contenedor
+          try { await api.post(`/printer/imprimir-contenedor/${contenedorUid}`) }
+          catch (e) { console.error("Impresora offline", e) }
+        } else {
+          // Si están sueltos, imprimir etiqueta para cada uno individualmente
+          Promise.allSettled(creados.map(ind => api.post(`/printer/imprimir/${ind.id}`)))
+        }
       }
 
-      alert(`Se crearon ${creados.length} etiquetas correctamente.`)
+      alert(agruparContenedor ? `Se creó 1 etiqueta agrupada (Contenedor) para ${creados.length} individuos.` : `Se crearon ${creados.length} etiquetas individuales correctamente.`)
       navigate(`/especies/${form.especie_id}`)
     } catch (err) { 
       setError(err.message) 
@@ -262,8 +276,15 @@ export default function IndividuoMultiCreate() {
 
         <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', marginBottom: '1.5rem' }}>
           <input type="checkbox" checked={printAfter} onChange={e => setPrintAfter(e.target.checked)} style={{ width: 'auto', marginTop: 0 }} />
-          <span className="text-primary" style={{ fontSize: '0.9rem', textTransform: 'none', letterSpacing: 'normal' }}>Imprimir todas las etiquetas generadas automáticamente</span>
+          <span className="text-primary" style={{ fontSize: '0.9rem', textTransform: 'none', letterSpacing: 'normal' }}>Imprimir etiqueta(s) automáticamente</span>
         </label>
+        
+        {printAfter && (
+          <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', marginBottom: '1.5rem', background: 'var(--bio-background)', padding: '0.8rem', borderRadius: '8px' }}>
+            <input type="checkbox" checked={agruparContenedor} onChange={e => setAgruparContenedor(e.target.checked)} style={{ width: 'auto', marginTop: 0 }} />
+            <span className="text-primary" style={{ fontSize: '0.9rem', textTransform: 'none', letterSpacing: 'normal' }}>Agrupar en 1 solo contenedor físico (imprimir 1 sola etiqueta múltiple)</span>
+          </label>
+        )}
 
         {error && <p className="text-center text-error" style={{ color: 'var(--error)', marginBottom: '1rem' }}>{error}</p>}
         <button type="submit" className="btn btn--primary btn--block" disabled={loading || !form.especie_id}>

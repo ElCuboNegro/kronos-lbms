@@ -104,6 +104,7 @@ class Especimen(Base):
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     uid = Column(String(100), unique=True, nullable=False, index=True)
+    contenedor_uid = Column(String(100), nullable=True, index=True) # Para agrupar multiples especimenes en 1 etiqueta
     especie = Column(String(255), nullable=False)  # texto libre para compatibilidad QR
     especie_id = Column(UUID(as_uuid=True), ForeignKey("especies.id"), nullable=True, index=True)
     linea_id = Column(UUID(as_uuid=True), ForeignKey("lineas.id"), nullable=True, index=True)
@@ -285,7 +286,15 @@ class Sustrato(Base):
     componentes = Column(JSONB, nullable=True)
     ph_teorico = Column(Float, nullable=True)
     conductividad_teorica = Column(Float, nullable=True)
+    
+    # ── Vinculación con Formulaciones y Lotes
+    formulacion_id = Column(UUID(as_uuid=True), ForeignKey("formulaciones.id"), nullable=True)
+    lote_id = Column(UUID(as_uuid=True), ForeignKey("lotes_preparados.id"), nullable=True)
+    
     created_at = Column(DateTime, default=datetime.utcnow)
+
+    formulacion = relationship("Formulacion")
+    lote = relationship("LotePreparado")
 
 
 class RegistroEvolucion(Base):
@@ -348,10 +357,13 @@ class Reactivo(Base):
     __tablename__ = "reactivos"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    codigo_barras = Column(String(255), unique=True, nullable=True, index=True)
     nombre = Column(String(255), nullable=False)
     formula_quimica = Column(String(255), nullable=True)
     marca = Column(String(100), nullable=True)
     pureza_pct = Column(Float, nullable=True)
+    concentracion_gl = Column(Float, nullable=True)
+    fecha_expiracion = Column(Date, nullable=True)
     unidad_medida = Column(String(20), default="g")
     peligrosidad = Column(JSONB, default=list) # ['inflamable', 'corrosivo']
     notas = Column(Text, nullable=True)
@@ -370,7 +382,7 @@ class Formulacion(Base):
     caducidad_dias = Column(Integer, default=30)
     created_at = Column(DateTime, default=datetime.utcnow)
 
-    componentes = relationship("FormulacionComponente", back_populates="formulacion", cascade="all, delete-orphan")
+    componentes = relationship("FormulacionComponente", foreign_keys="[FormulacionComponente.formulacion_id]", back_populates="formulacion", cascade="all, delete-orphan")
 
 
 class FormulacionComponente(Base):
@@ -378,12 +390,14 @@ class FormulacionComponente(Base):
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     formulacion_id = Column(UUID(as_uuid=True), ForeignKey("formulaciones.id", ondelete="CASCADE"))
-    reactivo_id = Column(UUID(as_uuid=True), ForeignKey("reactivos.id"))
+    reactivo_id = Column(UUID(as_uuid=True), ForeignKey("reactivos.id"), nullable=True)
+    formulacion_ingrediente_id = Column(UUID(as_uuid=True), ForeignKey("formulaciones.id"), nullable=True)
     cantidad_base = Column(Float, nullable=False)
     notas_pesaje = Column(Text, nullable=True)
 
-    formulacion = relationship("Formulacion", back_populates="componentes")
+    formulacion = relationship("Formulacion", foreign_keys=[formulacion_id], back_populates="componentes")
     reactivo = relationship("Reactivo")
+    formulacion_ingrediente = relationship("Formulacion", foreign_keys=[formulacion_ingrediente_id])
 
 
 class LotePreparado(Base):

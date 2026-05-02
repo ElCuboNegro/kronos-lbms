@@ -1,6 +1,34 @@
 import { useState, useEffect } from 'react'
 import { api } from '../api/client'
 
+function PrintLoteBtn({ id }) {
+  const [printing, setPrinting] = useState(false)
+
+  const handlePrint = async (e) => {
+    e.stopPropagation()
+    setPrinting(true)
+    try {
+      await api.post(`/printer/imprimir-lote/${id}`)
+    } catch (err) {
+      alert(err.message)
+    } finally {
+      setPrinting(false)
+    }
+  }
+
+  return (
+    <button 
+      className="btn btn--ghost" 
+      style={{ padding: '0.2rem 0.5rem', fontSize: '0.9rem' }} 
+      onClick={handlePrint} 
+      disabled={printing}
+      title="Imprimir Etiqueta"
+    >
+      {printing ? '…' : '🖨'}
+    </button>
+  )
+}
+
 export default function LotesPreparadosList() {
   const [lotes, setLotes] = useState([])
   const [loading, setLoading] = useState(true)
@@ -25,7 +53,10 @@ export default function LotesPreparadosList() {
             lotes.map(l => (
               <div key={l.id} className="card">
                 <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:4}}>
-                  <span style={{color:'var(--bio-primary)',fontWeight:'bold',fontFamily:'monospace',fontSize:'0.9rem'}}>{l.uid}</span>
+                  <div style={{display:'flex',gap:'0.5rem',alignItems:'center'}}>
+                    <span style={{color:'var(--bio-primary)',fontWeight:'bold',fontFamily:'monospace',fontSize:'0.9rem'}}>{l.uid}</span>
+                    <PrintLoteBtn id={l.id} />
+                  </div>
                   <span style={{ borderRadius:20,padding:'0.1rem 0.6rem',fontSize:'0.6rem',color:'#fff',textTransform:'uppercase', background: l.estado === 'disponible' ? 'var(--bio-primary)' : 'var(--bio-text-muted)' }}>{l.estado}</span>
                 </div>
                 <h3 style={{color:'var(--bio-text)',margin:'4px 0',fontSize:'1.05rem'}}>{l.formulacion.nombre}</h3>

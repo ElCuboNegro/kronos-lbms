@@ -3,7 +3,7 @@ from datetime import date, datetime
 from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException
 import httpx
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from app.database import get_db
 from app import models, schemas, auth
 
@@ -83,6 +83,114 @@ async def imprimir_etiqueta(
         raise HTTPException(status_code=503, detail=f"Servicio de impresión no disponible ({type(exc).__name__})")
 
 
+@router.post("/imprimir-reactivo/{reactivo_id}", status_code=200)
+async def imprimir_reactivo(
+    reactivo_id: str,
+    db: Session = Depends(get_db),
+    _=Depends(auth.get_current_user),
+):
+    reactivo = db.query(models.Reactivo).filter(models.Reactivo.id == reactivo_id).first()
+    
+    if not reactivo:
+        raise HTTPException(status_code=404, detail="Reactivo no encontrado")
+
+    payload = {
+        "modo": "reactivo",
+        "arg1": reactivo.nombre,
+        "arg2": f"STOCK-{reactivo.id}",
+        "arg3": reactivo.marca or "S/M",
+        "extra": {
+            "preparador": "Stock Puro",
+            "volumen": "N/A",
+            "vencimiento": reactivo.fecha_expiracion.isoformat() if reactivo.fecha_expiracion else "N/A",
+            "conc. (%)": f"{reactivo.pureza_pct}%" if reactivo.pureza_pct else "N/A",
+            "conc. (g/L)": f"{reactivo.concentracion_gl}" if reactivo.concentracion_gl else "N/A",
+            "componentes": reactivo.formula_quimica or "N/A",
+            "peligros": reactivo.peligrosidad or [],
+            "notas": reactivo.notas or ""
+        }
+    }
+
+    try:
+        async with httpx.AsyncClient(timeout=15) as client:
+            r = await client.post(f"{PRINTER_URL}/imprimir", json=payload)
+        if r.status_code != 200:
+            raise HTTPException(status_code=502, detail=f"Error de impresora: {r.text}")
+        return {"status": "impreso", "uid": f"STOCK-{reactivo.id}"}
+    except httpx.RequestError as exc:
+        raise HTTPException(status_code=503, detail=f"Servicio de impresión no disponible ({type(exc).__name__})")
+
+@router.post("/imprimir-sustrato/{sustrato_id}", status_code=200)
+async def imprimir_sustrato(
+    sustrato_id: str,
+    db: Session = Depends(get_db),
+    _=Depends(auth.get_current_user),
+):
+    sustrato = db.query(models.Sustrato).filter(models.Sustrato.id == sustrato_id).first()
+    
+    if not sustrato:
+        raise HTTPException(status_code=404, detail="Sustrato no encontrado")
+
+    payload = {
+        "modo": "reactivo",
+        "arg1": sustrato.nombre,
+        "arg2": f"SUST-{sustrato.codigo_formulacion}",
+        "arg3": sustrato.tipo.upper(),
+        "extra": {
+            "pH Teórico": str(sustrato.ph_teorico) if sustrato.ph_teorico else "N/A",
+            "EC Teórica": str(sustrato.conductividad_teorica) if sustrato.conductividad_teorica else "N/A",
+            "notas": sustrato.notas or ""
+        }
+    }
+
+    try:
+        async with httpx.AsyncClient(timeout=15) as client:
+            r = await client.post(f"{PRINTER_URL}/imprimir", json=payload)
+        if r.status_code != 200:
+            raise HTTPException(status_code=502, detail=f"Error de impresora: {r.text}")
+        return {"status": "impreso", "uid": f"SUST-{sustrato.codigo_formulacion}"}
+    except httpx.RequestError as exc:
+        raise HTTPException(status_code=503, detail=f"Servicio de impresión no disponible ({type(exc).__name__})")
+
+
+@router.post("/imprimir-contenedor/{contenedor_uid}", status_code=200)
+async def imprimir_contenedor(
+    contenedor_uid: str,
+    db: Session = Depends(get_db),
+    _=Depends(auth.get_current_user),
+):
+    especimenes = db.query(models.Especimen).filter(models.Especimen.contenedor_uid == contenedor_uid).all()
+    
+    if not especimenes:
+        raise HTTPException(status_code=404, detail="No hay especímenes asociados a este contenedor")
+
+    # Resumen de lo que hay dentro
+    tipos_origen = [e.notas or e.origen or "Explanto" for e in especimenes]
+    resumen_componentes = ", ".join(tipos_origen[:4])
+    if len(tipos_origen) > 4:
+        resumen_componentes += f" (+{len(tipos_origen)-4} más)"
+
+    payload = {
+        "modo": "reactivo",
+        "arg1": "Contenedor Múltiple",
+        "arg2": contenedor_uid,
+        "arg3": f"{len(especimenes)} Especímenes",
+        "extra": {
+            "especie": especimenes[0].especie,
+            "componentes": resumen_componentes,
+            "fecha_ingreso": especimenes[0].fecha_ingreso.isoformat() if especimenes[0].fecha_ingreso else "N/A"
+        }
+    }
+
+    try:
+        async with httpx.AsyncClient(timeout=15) as client:
+            r = await client.post(f"{PRINTER_URL}/imprimir", json=payload)
+        if r.status_code != 200:
+            raise HTTPException(status_code=502, detail=f"Error de impresora: {r.text}")
+        return {"status": "impreso", "uid": contenedor_uid}
+    except httpx.RequestError as exc:
+        raise HTTPException(status_code=503, detail=f"Servicio de impresión no disponible ({type(exc).__name__})")
+
 @router.post("/imprimir-lote/{lote_id}", status_code=200)
 async def imprimir_lote(
     lote_id: str,
@@ -91,6 +199,7 @@ async def imprimir_lote(
 ):
     lote = db.query(models.LotePreparado).options(
         joinedload(models.LotePreparado.formulacion).joinedload(models.Formulacion.componentes).joinedload(models.FormulacionComponente.reactivo),
+        joinedload(models.LotePreparado.formulacion).joinedload(models.Formulacion.componentes).joinedload(models.FormulacionComponente.formulacion_ingrediente),
         joinedload(models.LotePreparado.preparado_por)
     ).filter(models.LotePreparado.id == lote_id).first()
     
@@ -105,9 +214,12 @@ async def imprimir_lote(
     peligros = set()
     for c in lote.formulacion.componentes:
         cant = c.cantidad_base * ratio
-        unit = c.reactivo.unidad_medida
-        comps.append(f"{c.reactivo.nombre}: {cant:.2f}{unit}")
-        if c.reactivo.peligrosidad:
+        es_reactivo = c.reactivo is not None
+        nombre = c.reactivo.nombre if es_reactivo else c.formulacion_ingrediente.nombre
+        unit = c.reactivo.unidad_medida if es_reactivo else 'ml'
+        
+        comps.append(f"{nombre}: {cant:.2f}{unit}")
+        if es_reactivo and c.reactivo.peligrosidad:
             peligros.update(c.reactivo.peligrosidad)
 
     payload = {

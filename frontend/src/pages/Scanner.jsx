@@ -18,7 +18,7 @@ export default function Scanner() {
     setLastScan(qrText)
     try {
       const result = await api.get(`/scan/${encodeURIComponent(qrText)}`)
-      if (result.tipo === 'especimen' || result.tipo === 'elemento') {
+      if (['especimen', 'elemento', 'lote', 'reactivo', 'sustrato', 'contenedor'].includes(result.tipo)) {
         setScanResult(result)
       } else {
         setError('QR no reconocido por el sistema')
@@ -55,15 +55,43 @@ export default function Scanner() {
 
       {scanResult && (
         <div className="card" style={{ width: '100%', maxWidth: 320, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-          <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>{scanResult.tipo === 'especimen' ? '🌿' : '🧪'}</div>
-          <h3 style={{ color: 'var(--theme-text)', margin: '0 0 0.5rem', textAlign: 'center', fontSize: '1.2rem' }}>
-            {scanResult.tipo === 'especimen' ? scanResult.especimen.especie : scanResult.elemento.descripcion}
+          <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>
+            {scanResult.tipo === 'especimen' && '🌿'}
+            {scanResult.tipo === 'elemento' && '🔧'}
+            {scanResult.tipo === 'lote' && '📦'}
+            {scanResult.tipo === 'reactivo' && '🧪'}
+            {scanResult.tipo === 'sustrato' && '🪨'}
+            {scanResult.tipo === 'contenedor' && '🗃️'}
+          </div>
+          <h3 style={{ color: 'var(--bio-text)', margin: '0 0 0.5rem', textAlign: 'center', fontSize: '1.2rem' }}>
+            {scanResult.tipo === 'especimen' && scanResult.especimen.especie}
+            {scanResult.tipo === 'elemento' && scanResult.elemento.descripcion}
+            {scanResult.tipo === 'lote' && scanResult.lote.formulacion.nombre}
+            {scanResult.tipo === 'reactivo' && scanResult.reactivo.nombre}
+            {scanResult.tipo === 'sustrato' && scanResult.sustrato.nombre}
+            {scanResult.tipo === 'contenedor' && `Contenedor (${scanResult.contenedor.especimenes.length} elementos)`}
           </h3>
-          <p className="font-mono" style={{ color: 'var(--theme-primary)', margin: '0 0 1.5rem', fontSize: '0.9rem' }}>UID: {scanResult.tipo === 'especimen' ? scanResult.especimen.uid : scanResult.elemento.element_id}</p>
+          <p className="font-mono" style={{ color: 'var(--bio-primary)', margin: '0 0 1.5rem', fontSize: '0.9rem' }}>
+            UID: {
+              scanResult.tipo === 'especimen' ? scanResult.especimen.uid : 
+              scanResult.tipo === 'elemento' ? scanResult.elemento.element_id :
+              scanResult.tipo === 'lote' ? scanResult.lote.uid : 
+              scanResult.tipo === 'reactivo' ? `STOCK-${scanResult.reactivo.id.substring(0,8)}` :
+              scanResult.tipo === 'sustrato' ? `SUST-${scanResult.sustrato.codigo_formulacion}` :
+              scanResult.contenedor.contenedor_uid
+            }
+          </p>
           
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10, width: '100%', marginBottom: '1rem' }}>
-            <button className="btn btn--primary btn--block" onClick={() => navigate(scanResult.tipo === 'especimen' ? `/especimen/${scanResult.especimen.id}` : `/elemento/${scanResult.elemento.id}`)}>
-              Ver Ficha
+            <button className="btn btn--primary btn--block" onClick={() => {
+              if (scanResult.tipo === 'especimen') navigate(`/especimen/${scanResult.especimen.id}`)
+              else if (scanResult.tipo === 'elemento') navigate(`/elemento/${scanResult.elemento.id}`)
+              else if (scanResult.tipo === 'lote') navigate('/lotes')
+              else if (scanResult.tipo === 'reactivo') navigate('/reactivos')
+              else if (scanResult.tipo === 'sustrato') navigate('/lab')
+              else if (scanResult.tipo === 'contenedor') navigate(`/contenedores?c=${scanResult.contenedor.contenedor_uid}`)
+            }}>
+              Ver Inventario / Ficha
             </button>
             {scanResult.tipo === 'especimen' && (
               <button className="btn btn--accent btn--block" onClick={() => navigate(`/especimen/${scanResult.especimen.id}?quick=foto`)}>

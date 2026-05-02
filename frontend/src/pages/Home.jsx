@@ -6,12 +6,12 @@ export default function Home() {
   const navigate = useNavigate()
 
   const sections = [
-    { label: 'Escanear QR', icon: '⬛', path: '/scan', desc: 'Identificar etiqueta con cámara' },
-    { label: 'Especies', icon: '🌿', path: '/especies', desc: 'Especies, líneas, variegaciones e individuos' },
-    { label: 'Elementos', icon: '🧪', path: '/elementos', desc: 'Reactivos, equipos e insumos' },
-    { label: 'Protocolos', icon: '📋', path: '/protocolos', desc: 'Procedimientos y validaciones' },
-    { label: 'Experimentos', icon: '🔬', path: '/experimentos', desc: 'Seguimiento experimental' },
-    { label: 'Resultados', icon: '📊', path: '/resultados', desc: 'Resultados de investigación' },
+    { label: 'Escanear', icon: '⬛', path: '/scan', desc: 'Identificar etiqueta con cámara' },
+    { label: 'Especies', icon: '🌿', path: '/especies', desc: 'Líneas, variegaciones e individuos' },
+    { label: 'Contenedores', icon: '🗃️', path: '/contenedores', desc: 'Mover y agrupar especímenes' },
+    { label: 'Laboratorio', icon: '🧪', path: '/lab', desc: 'Medios, reactivos y formulaciones' },
+    { label: 'Elementos', icon: '🔧', path: '/elementos', desc: 'Equipos, herramientas e insumos' },
+    { label: 'Protocolos', icon: '📋', path: '/protocolos', desc: 'Procedimientos y ejecuciones AI' },
   ]
 
   return (

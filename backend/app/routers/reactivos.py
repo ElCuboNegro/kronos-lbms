@@ -21,35 +21,84 @@ def crear_reactivo(payload: schemas.ReactivoCreate, db: Session = Depends(get_db
     db.refresh(r)
     return r
 
+@router.get("/{id}", response_model=schemas.ReactivoOut)
+def obtener_reactivo(id: UUID, db: Session = Depends(get_db), _=Depends(auth.get_current_user)):
+    r = db.query(models.Reactivo).filter(models.Reactivo.id == id).first()
+    if not r:
+        raise HTTPException(status_code=404, detail="Reactivo no encontrado")
+    return r
+
+@router.patch("/{id}", response_model=schemas.ReactivoOut)
+def actualizar_reactivo(id: UUID, payload: schemas.ReactivoUpdate, db: Session = Depends(get_db), _=Depends(auth.get_current_user)):
+    r = db.query(models.Reactivo).filter(models.Reactivo.id == id).first()
+    if not r:
+        raise HTTPException(status_code=404, detail="Reactivo no encontrado")
+    
+    for k, v in payload.model_dump(exclude_unset=True).items():
+        setattr(r, k, v)
+        
+    db.commit()
+    db.refresh(r)
+    return r
+
 # ── Formulaciones ─────────────────────────────────────────────────────────
 
 @router.get("/formulaciones", response_model=list[schemas.FormulacionOut])
 def listar_formulaciones(db: Session = Depends(get_db), _=Depends(auth.get_current_user)):
-    return db.query(models.Formulacion).options(joinedload(models.Formulacion.componentes).joinedload(models.FormulacionComponente.reactivo)).all()
+    return (
+        db.query(models.Formulacion)
+        .options(
+            joinedload(models.Formulacion.componentes).joinedload(models.FormulacionComponente.reactivo),
+            joinedload(models.Formulacion.componentes).joinedload(models.FormulacionComponente.formulacion_ingrediente)
+        )
+        .all()
+    )
 
 @router.post("/formulaciones", response_model=schemas.FormulacionOut, status_code=201)
 def crear_formulacion(payload: schemas.FormulacionCreate, db: Session = Depends(get_db), _=Depends(auth.get_current_user)):
     # 1. Crear la base de la formulación
     f_data = payload.model_dump()
     componentes_data = f_data.pop('componentes')
-    
+
+    if not componentes_data:
+        raise HTTPException(status_code=422, detail="La formulación debe tener al menos un componente")
+
     f = models.Formulacion(**f_data)
     db.add(f)
     db.flush() # Para obtener f.id
-    
+
     # 2. Agregar componentes
     for comp in componentes_data:
+        if not comp.get('reactivo_id') and not comp.get('formulacion_ingrediente_id'):
+            raise HTTPException(status_code=422, detail="Cada componente debe especificar un reactivo o una formulación origen")
         c = models.FormulacionComponente(formulacion_id=f.id, **comp)
         db.add(c)
-    
+
     db.commit()
     db.refresh(f)
-    return db.query(models.Formulacion).options(joinedload(models.Formulacion.componentes).joinedload(models.FormulacionComponente.reactivo)).filter(models.Formulacion.id == f.id).first()
+    return (
+        db.query(models.Formulacion)
+        .options(
+            joinedload(models.Formulacion.componentes).joinedload(models.FormulacionComponente.reactivo),
+            joinedload(models.Formulacion.componentes).joinedload(models.FormulacionComponente.formulacion_ingrediente)
+        )
+        .filter(models.Formulacion.id == f.id)
+        .first()
+    )
 
 @router.get("/formulaciones/{id}", response_model=schemas.FormulacionOut)
 def obtener_formulacion(id: UUID, db: Session = Depends(get_db), _=Depends(auth.get_current_user)):
-    f = db.query(models.Formulacion).options(joinedload(models.Formulacion.componentes).joinedload(models.FormulacionComponente.reactivo)).filter(models.Formulacion.id == id).first()
-    if not f: raise HTTPException(status_code=404, detail="Formulación no encontrada")
+    f = (
+        db.query(models.Formulacion)
+        .options(
+            joinedload(models.Formulacion.componentes).joinedload(models.FormulacionComponente.reactivo),
+            joinedload(models.Formulacion.componentes).joinedload(models.FormulacionComponente.formulacion_ingrediente)
+        )
+        .filter(models.Formulacion.id == id)
+        .first()
+    )
+    if not f:
+        raise HTTPException(status_code=404, detail="Formulación no encontrada")
     return f
 
 # ── Lotes Preparados (Batch Tracking) ──────────────────────────────────────
@@ -71,11 +120,18 @@ def preparar_lote(payload: schemas.LotePreparadoCreate, db: Session = Depends(ge
     # Generar UID: REAC-YYMMDD-XXX
     now = datetime.now()
     prefix = f"REAC-{now.strftime('%y%m%d')}-"
-    ultimo = db.query(models.LotePreparado).filter(models.LotePreparado.uid.like(f"{prefix}%")).order_by(models.LotePreparado.uid.desc()).first()
-    idx = 1
-    if ultimo:
-        try: idx = int(ultimo.uid.split("-")[-1]) + 1
-        except: pass
+    lotes_del_dia = db.query(models.LotePreparado).filter(models.LotePreparado.uid.like(f"{prefix}%")).all()
+    
+    max_idx = 0
+    for l in lotes_del_dia:
+        try:
+            val = int(l.uid.split("-")[-1])
+            if val > max_idx:
+                max_idx = val
+        except:
+            pass
+            
+    idx = max_idx + 1
     uid = f"{prefix}{idx:03d}"
     
     # Calcular expiración

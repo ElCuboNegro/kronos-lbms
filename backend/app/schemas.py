@@ -170,6 +170,7 @@ class EspecieListItem(BaseModel):
 
 class EspecimenCreate(BaseModel):
     uid: str
+    contenedor_uid: Optional[str] = None
     especie: str
     especie_id: Optional[UUID] = None
     linea_id: Optional[UUID] = None
@@ -184,6 +185,7 @@ class EspecimenCreate(BaseModel):
 
 
 class EspecimenUpdate(BaseModel):
+    contenedor_uid: Optional[str] = None
     especie: Optional[str] = None
     especie_id: Optional[UUID] = None
     linea_id: Optional[UUID] = None
@@ -211,12 +213,18 @@ class EspecimenBulkItem(BaseModel):
     protocolo_id: Optional[UUID] = None
     notas: Optional[str] = None
 
+class MoverContenedorRequest(BaseModel):
+    especimen_ids: list[UUID]
+    destino_contenedor_uid: str
+    notas: Optional[str] = None
+
 class EspecimenBulkRequest(BaseModel):
     especie_id: UUID
     linea_id: Optional[UUID] = None
     variegacion_id: Optional[UUID] = None
     madre_id: Optional[UUID] = None
     padre_id: Optional[UUID] = None
+    contenedor_uid: Optional[str] = None
     fecha_ingreso: date
     origen: Optional[str] = None
     coordenadas: Optional[dict[str, float]] = None
@@ -226,6 +234,7 @@ class EspecimenBulkRequest(BaseModel):
 class EspecimenOut(BaseModel):
     id: UUID
     uid: str
+    contenedor_uid: Optional[str] = None
     especie: str
     especie_id: Optional[UUID]
     linea_id: Optional[UUID]
@@ -249,6 +258,7 @@ class EspecimenOut(BaseModel):
 class EspecimenListItem(BaseModel):
     id: UUID
     uid: str
+    contenedor_uid: Optional[str] = None
     especie: str
     especie_id: Optional[UUID] = None
     linea_id: Optional[UUID] = None
@@ -498,9 +508,11 @@ class SustratoCreate(BaseModel):
     tipo: str = "sustrato"
     nombre: str
     descripcion: Optional[str] = None
-    componentes: Optional[dict[str, float]] = None
+    componentes: Optional[list[ComponenteCreate]] = None
     ph_teorico: Optional[float] = None
     conductividad_teorica: Optional[float] = None
+    formulacion_id: Optional[UUID] = None
+    lote_id: Optional[UUID] = None
 
 
 class SustratoOut(BaseModel):
@@ -509,9 +521,13 @@ class SustratoOut(BaseModel):
     tipo: str
     nombre: str
     descripcion: Optional[str]
-    componentes: Optional[dict[str, float]]
+    componentes: Optional[list[ComponenteOut]] = None
     ph_teorico: Optional[float]
     conductividad_teorica: Optional[float]
+    formulacion_id: Optional[UUID] = None
+    lote_id: Optional[UUID] = None
+    formulacion: Optional[FormulacionOut] = None
+    lote: Optional[LotePreparadoOut] = None
     created_at: datetime
     model_config = {"from_attributes": True}
 
@@ -646,19 +662,30 @@ class ImprimirRequest(BaseModel):
 
 # ── QR Scan ───────────────────────────────────────────────────────────────────
 
+class ScanContenedor(BaseModel):
+    contenedor_uid: str
+    especimenes: list[EspecimenOut]
+
 class ScanResult(BaseModel):
-    tipo: str  # "especimen" | "elemento" | "desconocido"
+    tipo: str  # "especimen" | "elemento" | "desconocido" | "lote" | "reactivo" | "sustrato" | "contenedor"
     especimen: Optional[EspecimenOut] = None
     elemento: Optional[ElementoOut] = None
+    lote: Optional[Any] = None
+    reactivo: Optional[Any] = None
+    sustrato: Optional[Any] = None
+    contenedor: Optional[ScanContenedor] = None
 
 
 # ── Reactivos y Formulaciones ───────────────────────────────────────────────
 
 class ReactivoBase(BaseModel):
+    codigo_barras: Optional[str] = None
     nombre: str
     formula_quimica: Optional[str] = None
     marca: Optional[str] = None
     pureza_pct: Optional[float] = None
+    concentracion_gl: Optional[float] = None
+    fecha_expiracion: Optional[date] = None
     unidad_medida: str = "g"
     peligrosidad: list[str] = []
     notas: Optional[str] = None
@@ -666,19 +693,39 @@ class ReactivoBase(BaseModel):
 class ReactivoCreate(ReactivoBase):
     pass
 
+class ReactivoUpdate(BaseModel):
+    codigo_barras: Optional[str] = None
+    nombre: Optional[str] = None
+    formula_quimica: Optional[str] = None
+    marca: Optional[str] = None
+    pureza_pct: Optional[float] = None
+    concentracion_gl: Optional[float] = None
+    fecha_expiracion: Optional[date] = None
+    unidad_medida: Optional[str] = None
+    peligrosidad: Optional[list[str]] = None
+    notas: Optional[str] = None
+
 class ReactivoOut(ReactivoBase):
     id: UUID
     created_at: datetime
     model_config = {"from_attributes": True}
 
 class ComponenteCreate(BaseModel):
-    reactivo_id: UUID
+    reactivo_id: Optional[UUID] = None
+    formulacion_ingrediente_id: Optional[UUID] = None
     cantidad_base: float
     notas_pesaje: Optional[str] = None
 
+class FormulacionIngredienteOut(BaseModel):
+    id: UUID
+    nombre: str
+    unidad_medida: str = "ml" # Virtual unit for stocks
+    model_config = {"from_attributes": True}
+
 class ComponenteOut(BaseModel):
     id: UUID
-    reactivo: ReactivoOut
+    reactivo: Optional[ReactivoOut] = None
+    formulacion_ingrediente: Optional[FormulacionIngredienteOut] = None
     cantidad_base: float
     notas_pesaje: Optional[str]
     model_config = {"from_attributes": True}

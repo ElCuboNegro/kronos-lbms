@@ -111,6 +111,7 @@ def crear_bulk(payload: schemas.EspecimenBulkRequest, db: Session = Depends(get_
             
             nuevo_esp = models.Especimen(
                 uid=uid,
+                contenedor_uid=payload.contenedor_uid,
                 especie=esp_obj.nombre_cientifico,
                 especie_id=payload.especie_id,
                 linea_id=payload.linea_id,
@@ -182,6 +183,33 @@ def por_uid(uid: str, db: Session = Depends(get_db), _=Depends(auth.get_current_
 @router.get("/{id}", response_model=schemas.EspecimenOut)
 def obtener(id: UUID, db: Session = Depends(get_db), _=Depends(auth.get_current_user)):
     return _get_full(id, db)
+
+
+@router.post("/contenedores/mover", status_code=200)
+def mover_a_contenedor(
+    payload: schemas.MoverContenedorRequest,
+    db: Session = Depends(get_db),
+    user=Depends(auth.get_current_user)
+):
+    especimenes = db.query(models.Especimen).filter(models.Especimen.id.in_(payload.especimen_ids)).all()
+    if not especimenes:
+        raise HTTPException(status_code=404, detail="No se encontraron especímenes")
+
+    now = datetime.now()
+    for esp in especimenes:
+        esp.contenedor_uid = payload.destino_contenedor_uid
+        # Log event
+        db.add(models.Evento(
+            tipo="transferencia",
+            descripcion=f"Movido al contenedor {payload.destino_contenedor_uid}",
+            especimen_id=esp.id,
+            usuario_id=user.id,
+            timestamp=now,
+            meta={"notas": payload.notas} if payload.notas else None
+        ))
+    
+    db.commit()
+    return {"status": "ok", "moved": len(especimenes), "destino": payload.destino_contenedor_uid}
 
 
 @router.patch("/{id}", response_model=schemas.EspecimenOut)
