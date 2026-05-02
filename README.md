@@ -1,6 +1,6 @@
-# Kronos BioLabs - LBMS (Laboratory Biological Management System)
+# Kronos Biolabs - LBMS (Laboratory Biological Management System)
 
-LBMS es un sistema integral de gestión de laboratorio diseñado para automatizar, trazar y controlar los procesos de micropropagación in vitro, formulación química y trazabilidad biológica de Kronos BioLabs.
+LBMS es un sistema integral de gestión de laboratorio diseñado para automatizar, trazar y controlar los procesos de micropropagación in vitro, formulación química y trazabilidad biológica de Kronos Biolabs.
 
 ## 🚀 Características Principales
 
@@ -48,4 +48,4 @@ El proyecto cuenta con un flujo de trabajo de GitHub Actions (`.github/workflows
 El tráfico en producción está orquestado detrás de un servidor **Caddy**. El frontend interno se expone en el puerto `8081` para que el proxy inverso lo encamine de forma segura mediante HTTPS.
 
 ---
-**Kronos Biotech S.A.S. - 2026**
+**Kronos Biolabs SAS - 2026**

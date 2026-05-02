@@ -13,7 +13,7 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from PIL import Image, ImageDraw, ImageFont
 
-app = FastAPI(title="Kronos BioLabs - GEZI Direct System")
+app = FastAPI(title="Kronos Biolabs - GEZI Direct System")
 
 # ── CONFIGURACIÓN DE HARDWARE ────────────────────────────────────────────────
 DPI = 203
@@ -67,7 +67,7 @@ class LabelEngine:
         
         if req.modo == 'reactivo':
             # ETIQUETA GRANDE (Toda la cara visible)
-            draw.text((x_base, y_cursor), "KRONOS BIOTECH", font=f_body, fill=0)
+            draw.text((x_base, y_cursor), "KRONOS BIOLABS", font=f_body, fill=0)
             lote_id = req.extra.get('preparador', '—')
             draw.text((self.width - 200, y_cursor), f"LOTE: {lote_id[:16]}", font=f_body, fill=0)
             
@@ -112,7 +112,7 @@ class LabelEngine:
             
         else:
             # ETIQUETA DOBLABLE (Especímenes)
-            draw.text((x_base, y_cursor), "KRONOS BIOTECH SAS", font=f_nano, fill=0)
+            draw.text((x_base, y_cursor), "KRONOS BIOLABS SAS", font=f_nano, fill=0)
             y = y_cursor + 20
             y = self.draw_text(draw, req.arg1, f_italic, x_base, y, max_chars=18)
             draw.text((x_base, self.fold_y - 40), f"ID: {req.arg2}", font=f_micro, fill=0)
