@@ -144,8 +144,21 @@ function ExpConfigForm({ exp, onSaved, onCancel }) {
   const [lineas, setLineas] = useState([])
   const [variegaciones, setVariegaciones] = useState([])
   
+  // Lista explícita de campos que manejamos en este formulario
+  const CONFIG_KEYS = ['temperatura_c', 'humedad_relativa_pct', 'ph_sustrato', 'luz_lux', 'npk', 'ppm']
+  
+  // Extraer valores conocidos del config, o dejar undefined
+  const initialConfig = {}
+  if (exp.config_estandar) {
+    for (const key of CONFIG_KEYS) {
+      if (exp.config_estandar[key] !== undefined) {
+        initialConfig[key] = exp.config_estandar[key]
+      }
+    }
+  }
+
   const [form, setForm] = useState({
-    ...exp.config_estandar,
+    ...initialConfig,
     especie_id: exp.especie_id || '',
     linea_id: exp.linea_id || '',
     variegacion_id: exp.variegacion_id || '',
@@ -176,12 +189,30 @@ function ExpConfigForm({ exp, onSaved, onCancel }) {
     e.preventDefault()
     setLoading(true)
     try {
-      const { especie_id, linea_id, variegacion_id, ...config } = form
+      const { especie_id, linea_id, variegacion_id } = form
+      
+      // Construir config estandar preservando lo que ya tenía el objeto original en DB
+      // y sobreescribiendo/añadiendo solo los campos manejados por este formulario.
+      const newConfig = { ...(exp.config_estandar || {}) }
+      
+      for (const key of CONFIG_KEYS) {
+        if (form[key] !== undefined && form[key] !== '') {
+          // Si el input es de tipo number, lo parseamos si aplica. NPK es string.
+          if (['temperatura_c', 'humedad_relativa_pct', 'ph_sustrato', 'luz_lux', 'ppm'].includes(key)) {
+             newConfig[key] = parseFloat(form[key])
+          } else {
+             newConfig[key] = form[key]
+          }
+        } else {
+           delete newConfig[key]
+        }
+      }
+
       await api.patch(`/experimentos/${exp.id}`, { 
         especie_id: especie_id || null,
         linea_id: linea_id || null,
         variegacion_id: variegacion_id || null,
-        config_estandar: config 
+        config_estandar: Object.keys(newConfig).length > 0 ? newConfig : null
       })
       onSaved()
     } finally { setLoading(false) }
