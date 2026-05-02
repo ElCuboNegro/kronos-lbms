@@ -44,7 +44,7 @@ def _linea_out(l: models.Linea) -> schemas.LineaOut:
 def _especie_out(e: models.Especie) -> schemas.EspecieOut:
     return schemas.EspecieOut(
         id=e.id,
-        codigo=e.codigo or "",
+        codigo=e.codigo,
         nombre_cientifico=e.nombre_cientifico,
         categoria=e.categoria,
         nombre_comun=e.nombre_comun,
@@ -95,7 +95,7 @@ def listar(db: Session = Depends(get_db), _=Depends(auth.get_current_user)):
     return [
         schemas.EspecieListItem(
             id=e.id,
-            codigo=e.codigo or "",
+            codigo=e.codigo,
             nombre_cientifico=e.nombre_cientifico,
             categoria=e.categoria,
             nombre_comun=e.nombre_comun,
