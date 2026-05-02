@@ -3,15 +3,14 @@
 ## Stack
 - **Frontend:** React 18 + Vite + React Router DOM 6, served via Nginx on port 80
 - **Backend:** Python FastAPI, port 8001 (proxied as `/api` by Nginx)
-- **DB:** PostgreSQL 16 (Docker), SQLAlchemy ORM, **no Alembic** — uses `create_all` at startup
+- **DB:** PostgreSQL 16 (Docker), SQLAlchemy ORM, Alembic para migraciones
 - **HTTP Client (backend):** `httpx` (async)
 - **Auth:** JWT Bearer tokens, `auth.get_current_user` dependency on all routes
 
 ## DB Migration Pattern
-`create_all` only creates new tables, it does NOT add columns to existing tables.
-For schema changes: write SQL in `backend/migrations/NNN_description.sql` and ask the user to run:
-```
-docker exec lbms-db-1 psql -U $POSTGRES_USER -d $POSTGRES_DB -f /path/to/migration.sql
+El proyecto usa Alembic. `create_all` está desactivado. Ver `agents.md` para el flujo completo.
+```bash
+docker compose exec backend alembic upgrade head   # aplicar migraciones pendientes
 ```
 
 ## Taxonomic Hierarchy
