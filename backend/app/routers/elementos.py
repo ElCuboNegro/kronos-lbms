@@ -1,5 +1,5 @@
 from uuid import UUID
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session, joinedload
 from app.database import get_db
 from app import models, schemas, auth
@@ -22,8 +22,13 @@ def _build_summary(eventos):
 
 
 @router.get("", response_model=list[schemas.ElementoListItem])
-def listar(db: Session = Depends(get_db), _=Depends(auth.get_current_user)):
-    return db.query(models.Elemento).order_by(models.Elemento.created_at.desc()).all()
+def listar(
+    skip: int = 0,
+    limit: int = Query(default=50, le=200),
+    db: Session = Depends(get_db),
+    _=Depends(auth.get_current_user)
+):
+    return db.query(models.Elemento).order_by(models.Elemento.created_at.desc()).offset(skip).limit(limit).all()
 
 
 @router.post("", response_model=schemas.ElementoOut, status_code=201)

@@ -1,7 +1,7 @@
 from uuid import UUID
 import httpx
 from datetime import datetime, timezone
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session, joinedload
 from sqlalchemy import distinct
 from app.database import get_db
@@ -82,7 +82,12 @@ def _load_especie(id: UUID, db: Session) -> models.Especie:
 # ── Especies ──────────────────────────────────────────────────────────────────
 
 @router.get("", response_model=list[schemas.EspecieListItem])
-def listar(db: Session = Depends(get_db), _=Depends(auth.get_current_user)):
+def listar(
+    skip: int = 0,
+    limit: int = Query(default=50, le=200),
+    db: Session = Depends(get_db),
+    _=Depends(auth.get_current_user)
+):
     especies = (
         db.query(models.Especie)
         .options(
@@ -90,6 +95,8 @@ def listar(db: Session = Depends(get_db), _=Depends(auth.get_current_user)):
             joinedload(models.Especie.especimenes),
         )
         .order_by(models.Especie.nombre_cientifico)
+        .offset(skip)
+        .limit(limit)
         .all()
     )
     return [

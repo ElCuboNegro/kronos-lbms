@@ -1,6 +1,6 @@
 from datetime import datetime
 from uuid import UUID
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session, joinedload
 from app.database import get_db
 from app import models, schemas, auth
@@ -23,14 +23,21 @@ def _build_summary(eventos):
 
 
 @router.get("", response_model=list[schemas.EspecimenListItem])
-def listar(db: Session = Depends(get_db), _=Depends(auth.get_current_user)):
+def listar(
+    skip: int = 0,
+    limit: int = Query(default=50, le=200),
+    db: Session = Depends(get_db),
+    _=Depends(auth.get_current_user)
+):
     especimenes = (
         db.query(models.Especimen)
         .options(
             joinedload(models.Especimen.linea_rel),
             joinedload(models.Especimen.variegacion_rel),
         )
-        .order_by(models.Especimen.created_at.desc())
+        .order_by(models.Especimen.fecha_ingreso.desc(), models.Especimen.uid.desc())
+        .offset(skip)
+        .limit(limit)
         .all()
     )
     return [

@@ -1,7 +1,7 @@
 import os
 import json
 from uuid import UUID
-from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
+from fastapi import APIRouter, Depends, HTTPException, Query, UploadFile, File
 from sqlalchemy.orm import Session, joinedload
 from app.database import get_db
 from app import models, schemas, auth
@@ -74,8 +74,13 @@ async def extraer_de_documento(
 
 
 @router.get("", response_model=list[schemas.ProtocoloListItem])
-def listar(db: Session = Depends(get_db), _=Depends(auth.get_current_user)):
-    return db.query(models.Protocolo).order_by(models.Protocolo.nombre).all()
+def listar(
+    skip: int = 0,
+    limit: int = Query(default=50, le=200),
+    db: Session = Depends(get_db),
+    _=Depends(auth.get_current_user)
+):
+    return db.query(models.Protocolo).order_by(models.Protocolo.nombre).offset(skip).limit(limit).all()
 
 
 @router.post("", response_model=schemas.ProtocoloOut, status_code=201)
