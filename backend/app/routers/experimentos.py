@@ -47,7 +47,15 @@ def _exp_out(exp: models.Experimento) -> schemas.ExperimentoOut:
 
 @router.get("", response_model=list[schemas.ExperimentoListItem])
 def listar(db: Session = Depends(get_db), _=Depends(auth.get_current_user)):
-    return db.query(models.Experimento).order_by(models.Experimento.fecha_inicio.desc()).all()
+    return (
+        db.query(models.Experimento)
+        .options(
+            joinedload(models.Experimento.director),
+            joinedload(models.Experimento.operador)
+        )
+        .order_by(models.Experimento.fecha_inicio.desc())
+        .all()
+    )
 
 
 @router.post("", response_model=schemas.ExperimentoOut, status_code=201)
