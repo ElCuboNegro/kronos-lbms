@@ -1,6 +1,6 @@
 from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from app.database import get_db
 from app import models, schemas, auth
 
@@ -8,6 +8,21 @@ router = APIRouter(prefix="/experimentos", tags=["experimentos"])
 
 
 def _exp_out(exp: models.Experimento) -> schemas.ExperimentoOut:
+    especimenes_list = []
+    for e in exp.especimenes:
+        especimenes_list.append(schemas.EspecimenListItem(
+            id=e.id,
+            uid=e.uid,
+            contenedor_uid=e.contenedor_uid,
+            especie=e.especie_rel.nombre_cientifico if e.especie_rel else e.especie,
+            especie_id=e.especie_id,
+            linea_id=e.linea_id,
+            linea_nombre=e.linea_rel.nombre if e.linea_rel else None,
+            variegacion_nombre=e.variegacion_rel.nombre if e.variegacion_rel else None,
+            estado=e.estado,
+            fecha_ingreso=e.fecha_ingreso
+        ))
+
     return schemas.ExperimentoOut(
         id=exp.id,
         nombre=exp.nombre,
@@ -26,6 +41,7 @@ def _exp_out(exp: models.Experimento) -> schemas.ExperimentoOut:
         config_estandar=exp.config_estandar,
         notas=exp.notas,
         created_at=exp.created_at,
+        especimenes=especimenes_list
     )
 
 
@@ -63,13 +79,23 @@ def crear(payload: schemas.ExperimentoCreate, db: Session = Depends(get_db),
             exp.elementos.append(el)
 
     db.commit()
-    db.refresh(exp)
+    exp = _query_exp(db).filter(models.Experimento.id == exp.id).first()
     return _exp_out(exp)
+
+
+def _query_exp(db: Session):
+    return db.query(models.Experimento).options(
+        joinedload(models.Experimento.director),
+        joinedload(models.Experimento.operador),
+        joinedload(models.Experimento.especimenes).joinedload(models.Especimen.especie_rel),
+        joinedload(models.Experimento.especimenes).joinedload(models.Especimen.linea_rel),
+        joinedload(models.Experimento.especimenes).joinedload(models.Especimen.variegacion_rel),
+    )
 
 
 @router.get("/{id}", response_model=schemas.ExperimentoOut)
 def obtener(id: UUID, db: Session = Depends(get_db), _=Depends(auth.get_current_user)):
-    exp = db.query(models.Experimento).filter(models.Experimento.id == id).first()
+    exp = _query_exp(db).filter(models.Experimento.id == id).first()
     if not exp:
         raise HTTPException(status_code=404, detail="Experimento no encontrado")
     return _exp_out(exp)
@@ -84,7 +110,7 @@ def actualizar(id: UUID, payload: schemas.ExperimentoUpdate,
     for k, v in payload.model_dump(exclude_none=True).items():
         setattr(exp, k, v)
     db.commit()
-    db.refresh(exp)
+    exp = _query_exp(db).filter(models.Experimento.id == id).first()
     return _exp_out(exp)
 
 
