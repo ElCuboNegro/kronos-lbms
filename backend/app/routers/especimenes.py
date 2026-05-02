@@ -105,13 +105,16 @@ def crear_bulk(payload: schemas.EspecimenBulkRequest, db: Session = Depends(get_
     # Get last index for the same second
     ultimo = db.query(models.Especimen).filter(
         models.Especimen.uid.like(f"{prefix}%")
-    ).order_by(models.Especimen.uid.desc()).first()
+    ).order_by(models.Especimen.indice.desc().nullslast(), models.Especimen.uid.desc()).first()
 
     if ultimo:
-        try:
-            idx = int(ultimo.uid.split("-")[-1])
-        except (ValueError, IndexError):
-            idx = 0
+        if ultimo.indice is not None:
+            idx = ultimo.indice
+        else:
+            try:
+                idx = int(ultimo.uid.split("-")[-1])
+            except (ValueError, IndexError):
+                idx = 0
     else:
         idx = 0
 
@@ -124,6 +127,7 @@ def crear_bulk(payload: schemas.EspecimenBulkRequest, db: Session = Depends(get_
 
             nuevo_esp = models.Especimen(
                 uid=uid,
+                indice=idx,
                 contenedor_uid=payload.contenedor_uid,
                 especie=esp_obj.nombre_cientifico,
                 especie_id=payload.especie_id,
