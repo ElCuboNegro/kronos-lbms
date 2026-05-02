@@ -113,10 +113,10 @@ class VariegacionOut(BaseModel):
     id: UUID
     linea_id: UUID
     nombre: str
-    codigo: Optional[str]
-    descripcion: Optional[str]
+    codigo: Optional[str] = None
+    descripcion: Optional[str] = None
     config_estandar: Optional[dict[str, Any]] = None
-    notas: Optional[str]
+    notas: Optional[str] = None
     created_at: datetime
     total_individuos: int = 0
     model_config = {"from_attributes": True}
@@ -138,7 +138,7 @@ class LineaOut(BaseModel):
 
 class EspecieOut(BaseModel):
     id: UUID
-    codigo: str
+    codigo: Optional[str] = None
     nombre_cientifico: str
     categoria: str
     nombre_comun: Optional[str]
@@ -156,7 +156,7 @@ class EspecieOut(BaseModel):
 
 class EspecieListItem(BaseModel):
     id: UUID
-    codigo: str
+    codigo: Optional[str] = None
     nombre_cientifico: str
     categoria: str
     nombre_comun: Optional[str]
