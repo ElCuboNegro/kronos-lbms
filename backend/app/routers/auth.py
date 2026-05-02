@@ -72,7 +72,11 @@ def subir_foto(
 ):
     if file.content_type not in ALLOWED_TYPES:
         raise HTTPException(status_code=415, detail="Solo se aceptan JPEG, PNG o WebP")
-    ext = file.filename.rsplit(".", 1)[-1] if "." in file.filename else "jpg"
+    
+    ext = file.filename.rsplit(".", 1)[-1].lower() if "." in file.filename else ""
+    if ext not in {"jpg", "jpeg", "png", "webp"}:
+        raise HTTPException(status_code=415, detail="Formato no permitido. Usa: jpg, jpeg, png, webp")
+        
     dest = FOTOS_DIR / f"{current_user.id}.{ext}"
     with dest.open("wb") as f:
         shutil.copyfileobj(file.file, f)

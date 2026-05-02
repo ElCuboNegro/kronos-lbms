@@ -148,6 +148,10 @@ def subir_foto_evolucion(
         raise HTTPException(status_code=422, detail=f"Ángulo inválido. Opciones: {ANGULOS}")
     if file.content_type not in ALLOWED:
         raise HTTPException(status_code=415, detail="Solo JPEG, PNG o WebP")
+        
+    ext = file.filename.rsplit(".", 1)[-1].lower() if "." in file.filename else ""
+    if ext not in {"jpg", "jpeg", "png", "webp"}:
+        raise HTTPException(status_code=415, detail="Formato no permitido. Usa: jpg, jpeg, png, webp")
 
     reg = db.query(models.RegistroEvolucion).filter(
         models.RegistroEvolucion.id == registro_id,
@@ -156,7 +160,6 @@ def subir_foto_evolucion(
     if not reg:
         raise HTTPException(status_code=404, detail="Registro no encontrado")
 
-    ext = file.filename.rsplit(".", 1)[-1] if "." in file.filename else "jpg"
     dest_dir = UPLOADS / str(especimen_id) / "evolucion"
     dest_dir.mkdir(parents=True, exist_ok=True)
     dest = dest_dir / f"{registro_id}_{angulo}.{ext}"
