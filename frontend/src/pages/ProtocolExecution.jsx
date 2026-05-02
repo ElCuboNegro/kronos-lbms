@@ -52,7 +52,10 @@ export default function ProtocolExecution() {
       </div>
       
       <div style={{ marginTop: '2rem' }}>
-        <button className="btn btn--secondary btn--block" onClick={() => navigate(-1)}>Finalizar Ejecución</button>
+        <button className="btn btn--secondary btn--block" onClick={() => {
+          if (window.history.state && window.history.state.idx > 0) navigate(-1)
+          else navigate('/protocolos', { replace: true })
+        }}>Finalizar Ejecución</button>
       </div>
     </div>
   )

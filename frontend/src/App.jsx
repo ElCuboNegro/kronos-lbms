@@ -36,6 +36,23 @@ function Layout({ children }) {
   const { theme, toggleTheme } = useTheme()
   const isHome = location.pathname === '/'
 
+  const handleBack = () => {
+    // Si el enrutador tiene historial previo en esta sesión, retrocede normal
+    if (window.history.state && window.history.state.idx > 0) {
+      navigate(-1)
+    } else {
+      // Deep link detectado sin historial, retroceder al padre lógico
+      const p = location.pathname
+      if (p.startsWith('/especimen/')) navigate('/especies', { replace: true })
+      else if (p.startsWith('/especies/')) navigate('/especies', { replace: true })
+      else if (p.startsWith('/elemento/')) navigate('/elementos', { replace: true })
+      else if (p.startsWith('/experimentos/')) navigate('/experimentos', { replace: true })
+      else if (p.startsWith('/reactivos') || p.startsWith('/formulaciones') || p.startsWith('/lotes')) navigate('/medios', { replace: true })
+      else if (p.startsWith('/protocolos/')) navigate('/protocolos', { replace: true })
+      else navigate('/', { replace: true })
+    }
+  }
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100dvh' }}>
       <header className="page-header" style={{ 
@@ -48,7 +65,7 @@ function Layout({ children }) {
         margin: 0
       }}>
         {!isHome
-          ? <button className="back-btn" onClick={() => navigate(-1)}>←</button>
+          ? <button className="back-btn" onClick={handleBack}>←</button>
           : <span style={{ width: 40 }} />
         }
         <span className="text-primary" style={{ fontWeight: 700, letterSpacing: 2, fontSize: '0.95rem' }}>Seymour-OS</span>
