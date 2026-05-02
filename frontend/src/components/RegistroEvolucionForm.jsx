@@ -121,20 +121,20 @@ export default function RegistroEvolucionForm({ especimenId, protocolos = [], on
           <div style={{display:'flex',flexDirection:'column',gap:'1.25rem'}}>
             <Section title="Morfología y Variegación">
               <Row2>
-                <Num label="Altura (cm)" value={form.altura_cm} onChange={v => set('altura_cm', v)} />
-                <Num label="Ø Tallo (mm)" value={form.diametro_tallo_mm} onChange={v => set('diametro_tallo_mm', v)} />
+                <Num label="Altura (cm)" value={form.altura_cm} onChange={v => set('altura_cm', v)} min="0" />
+                <Num label="Ø Tallo (mm)" value={form.diametro_tallo_mm} onChange={v => set('diametro_tallo_mm', v)} min="0" />
               </Row2>
               <Row2>
-                <Num label="Ancho hoja (cm)" value={form.ancho_hoja_max_cm} onChange={v => set('ancho_hoja_max_cm', v)} />
-                <Num label="Largo hoja (cm)" value={form.largo_hoja_max_cm} onChange={v => set('largo_hoja_max_cm', v)} />
+                <Num label="Ancho hoja (cm)" value={form.ancho_hoja_max_cm} onChange={v => set('ancho_hoja_max_cm', v)} min="0" />
+                <Num label="Largo hoja (cm)" value={form.largo_hoja_max_cm} onChange={v => set('largo_hoja_max_cm', v)} min="0" />
               </Row2>
               <Row3>
-                <Num label="Hojas" value={form.num_hojas} onChange={v => set('num_hojas', v)} />
-                <Num label="Brotes" value={form.num_brotes} onChange={v => set('num_brotes', v)} />
-                <Num label="Nodos" value={form.num_nodos} onChange={v => set('num_nodos', v)} />
+                <Num label="Hojas" value={form.num_hojas} onChange={v => set('num_hojas', v)} min="0" />
+                <Num label="Brotes" value={form.num_brotes} onChange={v => set('num_brotes', v)} min="0" />
+                <Num label="Nodos" value={form.num_nodos} onChange={v => set('num_nodos', v)} min="0" />
               </Row3>
               <Row3>
-                <Num label="% Varieg." value={form.porcentaje_variegacion} onChange={v => set('porcentaje_variegacion', v)} />
+                <Num label="% Varieg." value={form.porcentaje_variegacion} onChange={v => set('porcentaje_variegacion', v)} min="0" max="100" />
                 <Sel label="Patrón" value={form.patron_variegacion} onChange={v => set('patron_variegacion', v)} options={PATRONES} />
                 <Sel label="Color" value={form.color_variegacion} onChange={v => set('color_variegacion', v)} options={COLORES} />
               </Row3>
@@ -171,20 +171,20 @@ export default function RegistroEvolucionForm({ especimenId, protocolos = [], on
           <div style={{display:'flex',flexDirection:'column',gap:'1.25rem'}}>
             <Section title="Condiciones Ambientales">
               <Row2>
-                <Num label="Temp (°C)" value={form.temperatura_c} onChange={v => set('temperatura_c', v)} />
-                <Num label="Humedad Rel. (%)" value={form.humedad_relativa_pct} onChange={v => set('humedad_relativa_pct', v)} />
+                <Num label="Temp (°C)" value={form.temperatura_c} onChange={v => set('temperatura_c', v)} min="-20" max="60" />
+                <Num label="Humedad Rel. (%)" value={form.humedad_relativa_pct} onChange={v => set('humedad_relativa_pct', v)} min="0" max="100" />
               </Row2>
               <Row2>
-                <Num label="PH Sustrato" value={form.ph_sustrato} onChange={v => set('ph_sustrato', v)} />
-                <Num label="Hum. Sustrato (%)" value={form.humedad_sustrato_pct} onChange={v => set('humedad_sustrato_pct', v)} />
+                <Num label="PH Sustrato" value={form.ph_sustrato} onChange={v => set('ph_sustrato', v)} min="0" max="14" />
+                <Num label="Hum. Sustrato (%)" value={form.humedad_sustrato_pct} onChange={v => set('humedad_sustrato_pct', v)} min="0" max="100" />
               </Row2>
               <Row2>
-                <Num label="Luz (lux)" value={form.luz_lux} onChange={v => set('luz_lux', v)} />
-                <Num label="Conductividad EC" value={form.conductividad_ec} onChange={v => set('conductividad_ec', v)} />
+                <Num label="Luz (lux)" value={form.luz_lux} onChange={v => set('luz_lux', v)} min="0" />
+                <Num label="Conductividad EC" value={form.conductividad_ec} onChange={v => set('conductividad_ec', v)} min="0" />
               </Row2>
               <Row2>
                 <Txt label="NPK" value={form.npk} onChange={v => set('npk', v)} placeholder="20-20-20" />
-                <Num label="Nutrición (PPM)" value={form.ppm} onChange={v => set('ppm', v)} />
+                <Num label="Nutrición (PPM)" value={form.ppm} onChange={v => set('ppm', v)} min="0" />
               </Row2>
               <div style={{display:'flex',flexDirection:'column',gap:4,flex:1}}>
                 <label style={{color:'var(--theme-secondary)',fontSize:'0.75rem',fontWeight:600}}>Notas y observaciones</label>
@@ -246,11 +246,11 @@ function Section({ title, children }) {
 function Row2({ children }) { return <div className="grid-2">{children}</div> }
 function Row3({ children }) { return <div className="grid-2" style={{ gridTemplateColumns: '1fr 1fr 1fr' }}>{children}</div> }
 
-function Num({ label, value, onChange }) {
+function Num({ label, value, onChange, min, max }) {
   return (
     <div className="form-group" style={{ marginBottom: 0 }}>
       <label>{label}</label>
-      <input type="number" step="0.1" value={value} onChange={e => onChange(e.target.value)} placeholder="—" />
+      <input type="number" step="0.1" min={min} max={max} value={value} onChange={e => onChange(e.target.value)} placeholder="—" />
     </div>
   )
 }
