@@ -257,7 +257,10 @@ export default function ProtocoloEditor() {
           {error && <p className="text-danger" style={{ margin: 0 }}>{error}</p>}
           
           <div style={{ display: 'flex', gap: '1rem' }}>
-            <button type="button" className="btn btn--ghost" style={{ flex: 1 }} onClick={() => navigate(-1)}>Cancelar</button>
+            <button type="button" className="btn btn--ghost" style={{ flex: 1 }} onClick={() => {
+              if (window.history.state && window.history.state.idx > 0) navigate(-1)
+              else navigate('/protocolos', { replace: true })
+            }}>Cancelar</button>
             <button type="submit" className="btn btn--primary" style={{ flex: 1 }} disabled={loading}>{loading ? 'Guardando...' : 'Guardar Protocolo'}</button>
           </div>
         </form>
