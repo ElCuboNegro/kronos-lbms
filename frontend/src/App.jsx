@@ -22,6 +22,7 @@ import ProtocolosList from './pages/ProtocolosList'
 import ProtocolExecution from './pages/ProtocolExecution'
 import ProtocoloEditor from './pages/ProtocoloEditor'
 import ElementosList from './pages/ElementosList'
+import UpdateModal from './components/UpdateModal'
 
 function PrivateRoute({ children }) {
   const { user, loading } = useAuth()
@@ -128,6 +129,7 @@ export default function App() {
     <ThemeProvider>
       <AuthProvider>
         <TimerProvider>
+          <UpdateModal />
           <BrowserRouter>
             <Routes>
               <Route path="/login" element={<Login />} />

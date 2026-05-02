@@ -50,6 +50,16 @@ app.include_router(reactivos.router)
 def health():
     return {"status": "ok"}
 
+@app.get("/app/release-info")
+def release_info():
+    # En el futuro esto puede venir de una DB o archivo de configuración
+    return {
+        "version": "0.1.1",
+        "required": False,
+        "url": "https://github.com/ElCuboNegro/kronos-lbms/releases/latest",
+        "notes": "Mejoras en la navegación y corrección de errores críticos."
+    }
+
 @app.get("/stats")
 def stats(db: Session = Depends(get_db), _=Depends(auth.get_current_user)):
     return {
