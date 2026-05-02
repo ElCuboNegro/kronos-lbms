@@ -1,0 +1,54 @@
+name: Build Android APK
+
+on:
+  workflow_dispatch: # Allows manual trigger from GitHub UI
+  push:
+    branches:
+      - master
+    paths:
+      - 'frontend/**'
+      - '.github/workflows/android.yml'
+
+jobs:
+  build-android:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📦 Descargar código
+        uses: actions/checkout@v4
+
+      - name: 🟢 Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: ☕ Configurar Java (Android)
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - name: 🛠️ Instalar y compilar Web App
+        working-directory: ./frontend
+        run: |
+          npm install
+          npm run build
+        env:
+          # Aquí inyectamos la URL de producción del servidor backend al compilar el frontend.
+          VITE_API_URL: https://lbms.cronosb.com/api
+
+      - name: 📱 Sincronizar Capacitor
+        working-directory: ./frontend
+        run: npx cap sync android
+
+      - name: ⚙️ Compilar APK con Gradle
+        working-directory: ./frontend/android
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleDebug
+
+      - name: 🚀 Subir APK como Artefacto
+        uses: actions/upload-artifact@v4
+        with:
+          name: kronos-lbms-debug.apk
+          path: frontend/android/app/build/outputs/apk/debug/app-debug.apk
