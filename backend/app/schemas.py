@@ -440,6 +440,7 @@ class ExperimentoOut(BaseModel):
     config_estandar: Optional[dict[str, Any]] = None
     notas: Optional[str]
     created_at: datetime
+    especimenes: list[EspecimenListItem] = []
     model_config = {"from_attributes": True}
 
 
