@@ -666,6 +666,7 @@ class ImprimirRequest(BaseModel):
 class ScanContenedor(BaseModel):
     contenedor_uid: str
     especimenes: list[EspecimenOut]
+    model_config = {"from_attributes": True}
 
 class ScanResult(BaseModel):
     tipo: str  # "especimen" | "elemento" | "desconocido" | "lote" | "reactivo" | "sustrato" | "contenedor"
@@ -675,6 +676,7 @@ class ScanResult(BaseModel):
     reactivo: Optional['ReactivoOut'] = None
     sustrato: Optional['SustratoOut'] = None
     contenedor: Optional[ScanContenedor] = None
+    model_config = {"from_attributes": True}
 
 
 # ── Reactivos y Formulaciones ───────────────────────────────────────────────
