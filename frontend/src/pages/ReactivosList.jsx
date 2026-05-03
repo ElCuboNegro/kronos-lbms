@@ -225,7 +225,33 @@ export function ReactivoForm({ onSaved, onCancel }) {
               </div>
             </div>
 
-            <Field label="Nombre del reactivo *" value={form.nombre} onChange={v => set("nombre", v)} required />
+            <div className="form-group" style={{ marginBottom: 0 }}>
+              <label>Nombre del reactivo *</label>
+              <div style={{ display: "flex", gap: "0.5rem" }}>
+                <input style={{ flex: 1 }} value={form.nombre} onChange={e => set("nombre", e.target.value)} required />
+                <button type="button" className="btn btn--secondary" style={{ padding: "0 1rem", fontSize: "1.2rem" }} onClick={async () => {
+                  if (!form.nombre) return alert('Escribe el nombre del compuesto primero');
+                  try {
+                    const res = await fetch(`https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/${encodeURIComponent(form.nombre)}/property/MolecularFormula,MolecularWeight/JSON`);
+                    if (!res.ok) throw new Error('No encontrado en PubChem');
+                    const data = await res.json();
+                    const props = data?.PropertyTable?.Properties?.[0];
+                    if (props) {
+                      setForm(f => ({
+                        ...f,
+                        formula_quimica: props.MolecularFormula || f.formula_quimica,
+                        notas: f.notas ? `${f.notas}\nPubChem MW: ${props.MolecularWeight}` : `PubChem MW: ${props.MolecularWeight}`
+                      }));
+                      alert('¡Datos moleculares importados de PubChem!');
+                    }
+                  } catch (e) {
+                    alert('No se pudo autocompletar desde PubChem. Verifica el nombre o la conexión.');
+                  }
+                }} title="Autocompletar desde PubChem">
+                  🪄
+                </button>
+              </div>
+            </div>
 
             <div className="grid-2">
               <Field label="Fórmula Química" value={form.formula_quimica} onChange={v => set("formula_quimica", v)} />
