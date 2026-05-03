@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { api } from '../api/client'
 import QRScanner from '../components/QRScanner'
+import { ReactivoForm } from './ReactivosList'
 
 export default function Scanner() {
   const navigate = useNavigate()
@@ -33,11 +34,26 @@ export default function Scanner() {
   const isUnknownUid = error && error.toLowerCase().includes('no encontrado') && lastScan?.startsWith('UID:')
   const uidClean = isUnknownUid ? lastScan.substring(4) : ''
 
+  const isUnknownReactivo = error && error.toLowerCase().includes('no encontrado') && !lastScan?.startsWith('UID:') && !lastScan?.startsWith('CONT-') && !lastScan?.startsWith('SUST-') && !lastScan?.startsWith('REAC-')
+
+  const [showReactivoForm, setShowReactivoForm] = useState(false)
+
   const reset = () => {
     setScanResult(null)
     setError('')
     setScanning(true)
     setLastScan('')
+    setShowReactivoForm(false)
+  }
+
+  if (showReactivoForm) {
+    return (
+       <ReactivoForm
+          initialCode={lastScan}
+          onSaved={() => navigate('/reactivos')}
+          onCancel={reset}
+       />
+    )
   }
 
   return (
@@ -114,6 +130,15 @@ export default function Scanner() {
               onClick={() => navigate(`/nuevo-individuo?uid=${encodeURIComponent(uidClean)}`)}
             >
               Registrar este espécimen
+            </button>
+          )}
+
+          {isUnknownReactivo && (
+            <button
+              className="btn btn--secondary btn--block"
+              onClick={() => setShowReactivoForm(true)}
+            >
+              Registrar en Inventario de Reactivos
             </button>
           )}
 
