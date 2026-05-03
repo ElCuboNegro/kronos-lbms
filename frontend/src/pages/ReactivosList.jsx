@@ -110,10 +110,10 @@ export default function ReactivosList() {
   )
 }
 
-export function ReactivoForm({ onSaved, onCancel }) {
+export function ReactivoForm({ reactivo, initialCode, onSaved, onCancel }) {
   const navigate = useNavigate()
-  const [form, setForm] = useState({
-    codigo_barras: "",
+  const [form, setForm] = useState(reactivo || {
+    codigo_barras: initialCode || "",
     nombre: "",
     formula_quimica: "",
     marca: "",
@@ -162,13 +162,19 @@ export function ReactivoForm({ onSaved, onCancel }) {
     setLoading(true)
     try {
       const payload = { ...form,
-        codigo_barras: form.codigo_barras || undefined,
-        pureza_pct: form.pureza_pct ? parseFloat(form.pureza_pct) : undefined,
-        concentracion_gl: form.concentracion_gl ? parseFloat(form.concentracion_gl) : undefined,
-        fecha_expiracion: form.fecha_expiracion || undefined
+        codigo_barras: form.codigo_barras || null,
+        pureza_pct: form.pureza_pct ? parseFloat(form.pureza_pct) : null,
+        concentracion_gl: form.concentracion_gl ? parseFloat(form.concentracion_gl) : null,
+        fecha_expiracion: form.fecha_expiracion || null
       }
-      const nuevo = await api.post("/reactivos", payload)
-      onSaved(nuevo)
+
+      let res;
+      if (reactivo) {
+        res = await api.patch(`/reactivos/${reactivo.id}`, payload)
+      } else {
+        res = await api.post("/reactivos", payload)
+      }
+      onSaved(res)
     } catch (err) { setError(err.message) }
     finally { setLoading(false) }
   }
