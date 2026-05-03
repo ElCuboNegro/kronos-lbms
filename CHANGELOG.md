@@ -1,3 +1,10 @@
+# [1.3.0](https://github.com/ElCuboNegro/kronos-lbms/compare/v1.2.1...v1.3.0) (2026-05-03)
+
+
+### Features
+
+* optimizar opciones del escaner para especimenes incluyendo vista de ficha, registro evo y generacion de explantes, y mostrar condiciones optimas de crecimiento ([#65](https://github.com/ElCuboNegro/kronos-lbms/issues/65)) ([9e1a552](https://github.com/ElCuboNegro/kronos-lbms/commit/9e1a552f1f84a19dc87486119498d6072fac9753))
+
 # [1.2.0](https://github.com/ElCuboNegro/kronos-lbms/compare/v1.1.4...v1.2.0) (2026-05-03)
 
 
