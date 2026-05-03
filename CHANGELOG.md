@@ -1,0 +1,36 @@
+# 1.0.0 (2026-05-03)
+
+
+### Bug Fixes
+
+* **#25:** corregir orden de rutas estáticas en reactivos.py y hacer fecha_expiracion Optional ([de56378](https://github.com/ElCuboNegro/kronos-lbms/commit/de563787e4f9b5c8d958ca0329d8b3d68f4c8a75)), closes [#25](https://github.com/ElCuboNegro/kronos-lbms/issues/25)
+* **#5:** agregar especimenes al schema ExperimentoOut ([ad41c2f](https://github.com/ElCuboNegro/kronos-lbms/commit/ad41c2fd92664ead7329ead92ff99f6882c1a96b)), closes [#5](https://github.com/ElCuboNegro/kronos-lbms/issues/5)
+* **#5:** corregir AttributeError en _exp_out — atributos ORM mal referenciados ([#24](https://github.com/ElCuboNegro/kronos-lbms/issues/24)) ([5163f10](https://github.com/ElCuboNegro/kronos-lbms/commit/5163f104772b679dd3d085b11841135eb475c4e0)), closes [#5](https://github.com/ElCuboNegro/kronos-lbms/issues/5) [#5](https://github.com/ElCuboNegro/kronos-lbms/issues/5) [#5](https://github.com/ElCuboNegro/kronos-lbms/issues/5)
+* **#5:** corregir AttributeError en _exp_out — usar especie_rel/linea_rel/variegacion_rel ([e6d4bac](https://github.com/ElCuboNegro/kronos-lbms/commit/e6d4bacd5d501b7302ac0b42b5b6746ae046d7ed)), closes [#5](https://github.com/ElCuboNegro/kronos-lbms/issues/5)
+* **#6:** resolver fallback incorrecto de codigo a string vacio en especies.py ([#26](https://github.com/ElCuboNegro/kronos-lbms/issues/26)) ([9ee3db4](https://github.com/ElCuboNegro/kronos-lbms/commit/9ee3db4fa3b4c17844012a9bea7c1acace1695b3)), closes [#6](https://github.com/ElCuboNegro/kronos-lbms/issues/6)
+* **#7:** cambiar exclude_none por exclude_unset en todas las rutas PATCH ([#27](https://github.com/ElCuboNegro/kronos-lbms/issues/27)) ([d808b83](https://github.com/ElCuboNegro/kronos-lbms/commit/d808b83662b7548adb4101ddf83f2d49d53a4909)), closes [#7](https://github.com/ElCuboNegro/kronos-lbms/issues/7)
+* **android:** force cleartextTrafficPermitted in manifest for local network API requests ([ae2a27e](https://github.com/ElCuboNegro/kronos-lbms/commit/ae2a27e958674a55ee8f09e866d556b44a78abe2))
+* **capacitor:** change androidScheme to http to bypass chromium mixed content block ([869d2cf](https://github.com/ElCuboNegro/kronos-lbms/commit/869d2cf58349ea0aaf36fb8420dbade6428ca8ca))
+* **client:** handle HTML responses gracefully and add tests for Login ([2b1aebc](https://github.com/ElCuboNegro/kronos-lbms/commit/2b1aebc1ebbe79e6915827511e941a0b92f1baef))
+* **cors:** allow local network IPs and capacitor for mobile testing ([609feac](https://github.com/ElCuboNegro/kronos-lbms/commit/609feac8ad430e551ea6d38f0247a90405b751cf))
+* explicit large label layout for containers ([0a2c9ef](https://github.com/ElCuboNegro/kronos-lbms/commit/0a2c9ef2c9e2e360180871c0e12b69b82d16925a))
+* **mobile:** enable cleartext traffic in capacitor for local HTTP server testing ([f681072](https://github.com/ElCuboNegro/kronos-lbms/commit/f6810723e6f0fb494a9373f4a99ace784ea27b47))
+* ReactivosList ReferenceError, configure frontend tests and fix build workflows ([26aa75e](https://github.com/ElCuboNegro/kronos-lbms/commit/26aa75e65bdf650da1878203502e2b52117e1a14))
+* resolve failing tests (CORS, Rate Limit) and skip deadlocking race condition test ([38cb8f7](https://github.com/ElCuboNegro/kronos-lbms/commit/38cb8f7607241e57624d0d06474c69496edda318))
+* revert CORS origins to * to troubleshoot 502 error ([d978197](https://github.com/ElCuboNegro/kronos-lbms/commit/d9781971b977fb252ee2752160ce1e91a0deb0eb))
+
+
+### Features
+
+* **#9:** agregar endpoint /stats para optimizar carga inicial ([#30](https://github.com/ElCuboNegro/kronos-lbms/issues/30)) ([560f472](https://github.com/ElCuboNegro/kronos-lbms/commit/560f472fe9beca0d664bab685e4b8558a7bf2778)), closes [#9](https://github.com/ElCuboNegro/kronos-lbms/issues/9)
+* add APK update notification system ([c05c618](https://github.com/ElCuboNegro/kronos-lbms/commit/c05c618da2cd476312c8fe2add6ae3f5d9bafc1d))
+* add dynamic server selector to login page for multi-lab support ([a305158](https://github.com/ElCuboNegro/kronos-lbms/commit/a30515884df598db26db5fc484103996e3754582))
+* add markdown editor with wikilinks for protocols ([933958b](https://github.com/ElCuboNegro/kronos-lbms/commit/933958b5ae440406dbd3b938e28b9fcda21eba78))
+* componente ScanInput para lectura de QRs en campos de texto ([#52](https://github.com/ElCuboNegro/kronos-lbms/issues/52)) ([395cca6](https://github.com/ElCuboNegro/kronos-lbms/commit/395cca69a51c4523e46533aee85d1c832f56f06d)), closes [#2](https://github.com/ElCuboNegro/kronos-lbms/issues/2)
+* configure CI/CD and update protocol recipes and printers ([9d3977d](https://github.com/ElCuboNegro/kronos-lbms/commit/9d3977dbc538c2ac8bf1717e2051de71cf944474))
+* implement Seymour-OS design system, add ElementosList, fix bugs ([1f1d4db](https://github.com/ElCuboNegro/kronos-lbms/commit/1f1d4dbe8ac7dbbcc819efa1fb6a9cc5296b8c4b))
+* implementar modulo de telemetria frontend para persistir logs de crash y red en localstorage ([#55](https://github.com/ElCuboNegro/kronos-lbms/issues/55)) ([93eeb69](https://github.com/ElCuboNegro/kronos-lbms/commit/93eeb69bf9b65297282c8183f0957af84bb9d4c8))
+* integración con API de PubChem para autocompletar químicos ([#53](https://github.com/ElCuboNegro/kronos-lbms/issues/53)) ([a036cf5](https://github.com/ElCuboNegro/kronos-lbms/commit/a036cf5e6d75673fd480f73ee601380151521092)), closes [#2](https://github.com/ElCuboNegro/kronos-lbms/issues/2)
+* integrar capacitor e implementar CI/CD para compilacion de APK Android automatica ([#49](https://github.com/ElCuboNegro/kronos-lbms/issues/49)) ([5885fd6](https://github.com/ElCuboNegro/kronos-lbms/commit/5885fd6215ea666dbc3e144b3b0b4dc5de3f206c))
+* setup pre-commit and import-linter for architecture verification ([e6430e3](https://github.com/ElCuboNegro/kronos-lbms/commit/e6430e3ca5840360139f03f3255bb4f261deeab1))
+* **ui:** add preconfigured server list to login page for easy switching ([86f8f97](https://github.com/ElCuboNegro/kronos-lbms/commit/86f8f974fbe03fe07ae576334cb2dce6b41832d5))
