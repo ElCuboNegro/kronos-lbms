@@ -1,3 +1,11 @@
+# [1.2.0](https://github.com/ElCuboNegro/kronos-lbms/compare/v1.1.4...v1.2.0) (2026-05-03)
+
+
+### Features
+
+* endpoint de backend /app/telemetry y boton en UI para sincronizar crashes del frontend con el VPS ([#64](https://github.com/ElCuboNegro/kronos-lbms/issues/64)) ([b9d1ce5](https://github.com/ElCuboNegro/kronos-lbms/commit/b9d1ce5567c3d12e6bb94f96d085c969bfcecae9))
+* Telemetría Remota ([#63](https://github.com/ElCuboNegro/kronos-lbms/issues/63)) ([48ed7b2](https://github.com/ElCuboNegro/kronos-lbms/commit/48ed7b2fd9a48d148aeb16ffbe5036f1fca21b07)), closes [#61](https://github.com/ElCuboNegro/kronos-lbms/issues/61)
+
 ## [1.1.3](https://github.com/ElCuboNegro/kronos-lbms/compare/v1.1.2...v1.1.3) (2026-05-03)
 
 
