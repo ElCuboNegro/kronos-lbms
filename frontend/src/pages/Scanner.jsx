@@ -110,14 +110,19 @@ export default function Scanner() {
               Ver Inventario / Ficha
             </button>
             {scanResult.tipo === 'especimen' && (
-              <>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10, width: '100%' }}>
                 <button className="btn btn--accent btn--block" onClick={() => navigate(`/especimen/${scanResult.especimen.id}?quick=foto`)}>
                   📸 Añadir Foto / Evo
                 </button>
-                <button className="btn btn--secondary btn--block" onClick={() => navigate(`/nuevo-lote?madre=${scanResult.especimen.id}&especie=${scanResult.especimen.especie_id}`)}>
-                  🌱 Generar Explante
-                </button>
-              </>
+                <div style={{ display: 'flex', gap: 8 }}>
+                  <button className="btn btn--secondary" style={{ flex: 1 }} onClick={() => navigate(`/nuevo-individuo?madre=${scanResult.especimen.id}&especie=${scanResult.especimen.especie_id}`)}>
+                    🌱 Nuevo Explante
+                  </button>
+                  <button className="btn btn--secondary" style={{ flex: 1, fontSize: '0.8rem' }} onClick={() => navigate(`/nuevo-lote?madre=${scanResult.especimen.id}&especie=${scanResult.especimen.especie_id}`)}>
+                    🧬 Clonación Masiva
+                  </button>
+                </div>
+              </div>
             )}
           </div>
 

@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import { api } from '../api/client'
 import EspecieForm from '../components/EspecieForm'
 import MapPicker from '../components/MapPicker'
+import EspecimenSearch from '../components/EspecimenSearch'
 
 const ESTADOS = ['activo', 'en_experimento', 'archivado', 'contaminado']
 
@@ -326,56 +327,6 @@ function Select({ label, value, onChange, options, placeholder, noMargin }) {
         {placeholder && <option value="">{placeholder}</option>}
         {options.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
       </select>
-    </div>
-  )
-}
-
-function EspecimenSearch({ label, value, onChange, noMargin }) {
-  const [query, setQuery] = useState('')
-  const [results, setResults] = useState([])
-  const [selectedUid, setSelectedUid] = useState('')
-
-  useEffect(() => {
-    if (value === '') {
-      setSelectedUid('')
-      setQuery('')
-    }
-  }, [value])
-
-  const search = async (q) => {
-    setQuery(q)
-    if (q.length < 2) { setResults([]); return }
-    try {
-      const data = await api.get('/especimenes')
-      const filtered = data.filter(e => e.uid.toLowerCase().includes(q.toLowerCase())).slice(0, 5)
-      setResults(filtered)
-    } catch { setResults([]) }
-  }
-
-  const select = (e) => {
-    onChange(e.id)
-    setSelectedUid(e.uid)
-    setResults([])
-    setQuery(e.uid)
-  }
-
-  return (
-    <div className="form-group" style={{ position: 'relative', ...(noMargin ? { marginBottom: 0 } : {}) }}>
-      <label>{label}</label>
-      <input value={query} onChange={e => search(e.target.value)} placeholder="Buscar UID..." />
-      {results.length > 0 && (
-        <div style={{ position: 'absolute', top: '100%', left: 0, right: 0, background: 'var(--theme-surface)', border: '1px solid var(--theme-border)', borderRadius: 'var(--radius-base)', zIndex: 10, marginTop: '4px', boxShadow: '0 4px 12px rgba(0,0,0,0.2)' }}>
-          {results.map(r => (
-            <div key={r.id} style={{ padding: '0.6rem 0.8rem', cursor: 'pointer', borderBottom: '1px solid var(--theme-border)', fontSize: '0.9rem' }} onClick={() => select(r)}>
-              <span style={{ fontWeight: 'bold' }}>{r.uid}</span>
-              <span className="text-muted" style={{ fontSize: '0.7rem', marginLeft: '6px' }}>{r.especie}</span>
-            </div>
-          ))}
-        </div>
-      )}
-      {selectedUid && query === selectedUid && (
-        <button type="button" style={{ position: 'absolute', right: '8px', top: '32px', background: 'none', border: 'none', color: 'var(--error)', cursor: 'pointer', fontSize: '1.1rem' }} onClick={() => { onChange(''); setQuery(''); setSelectedUid(''); }}>✕</button>
-      )}
     </div>
   )
 }
