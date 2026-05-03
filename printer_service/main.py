@@ -181,6 +181,7 @@ class LabelEngine:
             qr.make(fit=True)
             qr_img = qr.make_image(fill_color="black", back_color="white").convert('L')
 
+<<<<<<< HEAD
             # Margen en Y=12px (1.5mm margen seguro de corte), X=16px
             qr_px = self.fold_y - 24
             qr_res = qr_img.resize((qr_px, qr_px))
@@ -188,6 +189,15 @@ class LabelEngine:
 
             # Texto en la derecha
             x_text = qr_px + 24
+=======
+            # Margen seguro en Y=12px, X=20px (desplazado a la derecha)
+            qr_px = self.fold_y - 24
+            qr_res = qr_img.resize((qr_px, qr_px))
+            img.paste(qr_res, (20, 12))
+
+            # Texto en la derecha
+            x_text = qr_px + 28
+>>>>>>> develop
             y = 12
             draw.text((x_text, y), "KRONOS BIOLABS SAS", font=f_nano, fill=0)
             y += 16
@@ -220,7 +230,10 @@ class LabelEngine:
 
             info_lines = [line_1, line_2, line_3]
 
+<<<<<<< HEAD
             # Margen Y=12px en el reverso para evitar el margen de corte
+=======
+>>>>>>> develop
             y_back = 12
             for line_txt in info_lines:
                 y_back = self.draw_text(back_draw, line_txt, f_body, 4, y_back, max_chars=40, spacing=2)

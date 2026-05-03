@@ -63,6 +63,13 @@ export default function IndividuoCreate() {
     generarUID(form.especie_id)
   }, [form.especie_id])
 
+  // Sugerir origen si hay madre
+  useEffect(() => {
+    if (form.madre_id && !form.origen) {
+      set('origen', 'Explante / Propagación')
+    }
+  }, [form.madre_id])
+
   // Cargar variegaciones cuando cambia línea
   useEffect(() => {
     if (!form.linea_id) { setVariegaciones([]); set('variegacion_id', ''); return }
@@ -343,11 +350,18 @@ function EspecimenSearch({ label, value, onChange, noMargin }) {
   const [selectedUid, setSelectedUid] = useState('')
 
   useEffect(() => {
+    if (value && value !== '' && selectedUid === '') {
+      // Fetch specifically this specimen to get the UID
+      api.get(`/especimenes/${value}`).then(e => {
+        setSelectedUid(e.uid)
+        setQuery(e.uid)
+      }).catch(() => {})
+    }
     if (value === '') {
       setSelectedUid('')
       setQuery('')
     }
-  }, [value])
+  }, [value, selectedUid])
 
   const search = async (q) => {
     setQuery(q)

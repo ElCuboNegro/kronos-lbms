@@ -91,6 +91,9 @@ export default function EspecimenDetail() {
             <button className="btn btn--ghost" style={{ padding: '0.5rem' }} onClick={imprimir} disabled={printing} title="Reimprimir etiqueta">
               {printing ? '…' : '🖨'}
             </button>
+            <button className="btn btn--primary" style={{ padding: '0.5rem 1rem', fontSize: '0.8rem' }} onClick={() => navigate(`/nuevo-individuo?madre=${esp.id}&especie=${esp.especie_id}`)} title="Generar Explante">
+              🌱 Propagar
+            </button>
             <button className="btn btn--ghost" style={{ padding: '0.5rem' }} onClick={() => setShowEdit(true)} title="Editar">✏️</button>
           </div>
         </div>
