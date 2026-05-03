@@ -102,17 +102,20 @@ class LabelEngine:
                 y += 20
                 f_date = req.extra.get('formulado', '—')
                 v_date = req.extra.get('vencimiento', req.arg3 or '—')
-                draw.text((x_base, y), f"FABRICADO: {f_date}", font=f_body, fill=0)
+                draw.text((x_base, y), f"FABR: {f_date}", font=f_body, fill=0)
                 y += 20
-                draw.text((x_base, y), f"VENCIMIENTO: {v_date}", font=f_title, fill=0)
+                draw.text((x_base, y), f"VENCE: {v_date}", font=f_body, fill=0)
 
                 y += 26
                 comps = req.extra.get('componentes', '—')
-                y = self.draw_text(draw, f"COMP: {comps}", f_micro, x_base, y, max_chars=40)
+                y = self.draw_text(draw, f"COMP: {comps}", f_micro, x_base, y, max_chars=28)
 
                 peligros = req.extra.get('peligros', [])
                 if peligros:
-                    draw.text((x_base, y + 5), "PELIGRO: " + " ".join([p.upper() for p in peligros]), font=f_micro, fill=0)
+                    y += 4
+                    p_map = {'inflamable':'🔥', 'corrosivo':'🧪', 'toxico':'💀', 'irritante':'⚠️', 'oxidante':'💥'}
+                    p_text = " ".join([f"{p_map.get(p.lower(), '')} {p.upper()}".strip() for p in peligros])
+                    y = self.draw_text(draw, "RIESGO: " + p_text, f_micro, x_base, y, max_chars=26)
             else:
                 # Layout para contenedor
                 especie = req.extra.get('especie', '—')

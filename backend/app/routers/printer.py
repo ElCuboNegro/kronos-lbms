@@ -114,11 +114,13 @@ async def imprimir_reactivo(
         "arg2": f"STOCK-{reactivo.id}",
         "arg3": reactivo.fecha_expiracion.isoformat() if reactivo.fecha_expiracion else "N/A",
         "extra": {
-            "preparador": "Stock Puro",
+            "preparador": f"STK-{str(reactivo.id)[:8].upper()}",
             "marca": reactivo.marca or "S/M",
             "componentes": reactivo.formula_quimica or "N/A",
             "conc. (%)": f"{reactivo.pureza_pct}%" if reactivo.pureza_pct else "N/A",
-            "peligros": reactivo.peligrosidad or []
+            "peligros": reactivo.peligrosidad or [],
+            "formulado": reactivo.created_at.strftime("%Y-%m-%d") if reactivo.created_at else "N/A",
+            "volumen": "Polvo/Bruto"
         }
     }
 
