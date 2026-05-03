@@ -1,3 +1,10 @@
+# [1.11.0](https://github.com/ElCuboNegro/kronos-lbms/compare/v1.10.3...v1.11.0) (2026-05-03)
+
+
+### Features
+
+* **ui:** animacion de auto-zoom e interpolacion de vuelo al capturar o clickear coordenadas en el MapPicker ([#70](https://github.com/ElCuboNegro/kronos-lbms/issues/70)) ([e6e4bd7](https://github.com/ElCuboNegro/kronos-lbms/commit/e6e4bd79f091c65f4ede84bf8de1e87c43364814))
+
 ## [1.10.3](https://github.com/ElCuboNegro/kronos-lbms/compare/v1.10.2...v1.10.3) (2026-05-03)
 
 
