@@ -1,4 +1,8 @@
-const BASE = import.meta.env.VITE_API_URL || '/api'
+export function getBaseUrl() {
+  const saved = localStorage.getItem('server_url')
+  if (saved) return saved
+  return import.meta.env.VITE_API_URL || '/api'
+}
 
 function getToken() {
   return localStorage.getItem('token')
@@ -9,9 +13,10 @@ async function request(method, path, body) {
   const token = getToken()
   if (token) headers['Authorization'] = `Bearer ${token}`
 
+  const base = getBaseUrl()
   let res;
   try {
-    res = await fetch(`${BASE}${path}`, {
+    res = await fetch(`${base}${path}`, {
       method,
       headers,
       body: body !== undefined ? JSON.stringify(body) : undefined,
@@ -44,9 +49,10 @@ export const api = {
 
   login: async (email, password) => {
     const form = new URLSearchParams({ username: email, password })
+    const base = getBaseUrl()
     let res;
     try {
-      res = await fetch(`${BASE}/auth/login`, {
+      res = await fetch(`${base}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: form,
