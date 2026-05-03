@@ -22,6 +22,7 @@ import ProtocolosList from './pages/ProtocolosList'
 import ProtocolExecution from './pages/ProtocolExecution'
 import ProtocoloEditor from './pages/ProtocoloEditor'
 import ElementosList from './pages/ElementosList'
+import Logs from './pages/Logs'
 import UpdateModal from './components/UpdateModal'
 
 function PrivateRoute({ children }) {
@@ -157,6 +158,7 @@ export default function App() {
                       <Route path="/formulaciones" element={<FormulacionesList />} />
                       <Route path="/lotes" element={<LotesPreparadosList />} />
                       <Route path="/calculadoras" element={<Calculators />} />
+                      <Route path="/logs" element={<Logs />} />
                       <Route path="*" element={<ComingSoon />} />
                     </Routes>
                   </Layout>
