@@ -1,3 +1,10 @@
+## [1.10.2](https://github.com/ElCuboNegro/kronos-lbms/compare/v1.10.1...v1.10.2) (2026-05-03)
+
+
+### Bug Fixes
+
+* **ui:** añadir permisos gps nativos y soporte capacitor geolocation ([#69](https://github.com/ElCuboNegro/kronos-lbms/issues/69)) ([da535ce](https://github.com/ElCuboNegro/kronos-lbms/commit/da535cec0b0b0cf37fc3a805d1f1afaf81269d27))
+
 ## [1.10.1](https://github.com/ElCuboNegro/kronos-lbms/compare/v1.10.0...v1.10.1) (2026-05-03)
 
 
