@@ -62,6 +62,11 @@ app.include_router(reactivos.router)
 def health():
     return {"status": "ok"}
 
+import os
+import json
+from pathlib import Path
+from datetime import datetime
+
 @app.get("/app/release-info")
 def release_info():
     # En el futuro esto puede venir de una DB o archivo de configuración
@@ -71,6 +76,24 @@ def release_info():
         "url": "https://github.com/ElCuboNegro/kronos-lbms/releases/latest",
         "notes": "Actualización Mayor 1.1.0: Seymour OS, Telemetría, UI Consolidada, Lector Reactivos (PubChem) y App Nativa."
     }
+
+@app.post("/app/telemetry")
+def receive_telemetry(payload: dict):
+    logs = payload.get("logs", [])
+    if not logs:
+        return {"status": "empty"}
+
+    UPLOAD_BASE = Path(os.environ.get("UPLOAD_DIR", "/app/uploads"))
+    TELEMETRY_DIR = UPLOAD_BASE / "telemetry"
+    TELEMETRY_DIR.mkdir(parents=True, exist_ok=True)
+
+    log_file = TELEMETRY_DIR / "frontend_crashes.jsonl"
+    with log_file.open("a", encoding="utf-8") as f:
+        for log in logs:
+            log["received_at"] = datetime.utcnow().isoformat()
+            f.write(json.dumps(log) + "\n")
+
+    return {"status": "ok", "saved": len(logs)}
 
 @app.get("/stats")
 def stats(db: Session = Depends(get_db), _=Depends(auth.get_current_user)):
