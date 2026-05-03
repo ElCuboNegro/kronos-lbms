@@ -1,3 +1,10 @@
+## [1.0.3](https://github.com/ElCuboNegro/kronos-lbms/compare/v1.0.2...v1.0.3) (2026-05-03)
+
+
+### Bug Fixes
+
+* explicit pydantic validation in scan router to prevent orm serialization errors ([a10391b](https://github.com/ElCuboNegro/kronos-lbms/commit/a10391b8d88af099730ff60c3222fac39d8074d1))
+
 ## [1.0.2](https://github.com/ElCuboNegro/kronos-lbms/compare/v1.0.1...v1.0.2) (2026-05-03)
 
 
