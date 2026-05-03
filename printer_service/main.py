@@ -49,113 +49,102 @@ class LabelEngine:
             curr_y += font.size + spacing
         return curr_y
 
+
+
+
+
     def create_label_image(self, req: LabelRequest) -> Image:
+        # Lienzo base blanco (399x239)
         img = Image.new('L', (self.width, self.height), color=255)
         draw = ImageDraw.Draw(img)
 
         try:
-            f_title = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 22)
-            f_italic = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Oblique.ttf", 20)
-            f_body = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 15)
-            f_micro = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 13)
+            f_title = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 20)
+            f_italic = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Oblique.ttf", 18)
+            f_body = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 14)
+            f_micro = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 12)
             f_nano = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 10)
         except:
             f_title = f_italic = f_body = f_micro = f_nano = ImageFont.load_default()
 
-        y_cursor = SAFE_Y_START + 4
-        x_base = OFFSET_X_PX + 4
-
         if req.modo in ['reactivo', 'contenedor']:
-            # ETIQUETA GRANDE (Toda la cara visible)
-            draw.text((x_base, y_cursor), "KRONOS BIOLABS", font=f_body, fill=0)
-
-            if req.modo == 'reactivo':
-                lote_id = req.extra.get('preparador', '—')
-                draw.text((self.width - 200, y_cursor), f"LOTE: {lote_id[:16]}", font=f_body, fill=0)
-            else:
-                draw.text((self.width - 150, y_cursor), "CONTENEDOR", font=f_body, fill=0)
-
-            y = y_cursor + 24
-            y = self.draw_text(draw, req.arg1, f_title, x_base, y, max_chars=22)
-
-            # Dibujar un QR grande a la derecha
-            qr = qrcode.QRCode(box_size=4, border=0)
+            # --- DISEÑO REACTIVO ---
+            qr_px = 100
+            qr = qrcode.QRCode(box_size=4, border=1)
             qr.add_data(req.arg2)
             qr.make(fit=True)
             qr_img = qr.make_image(fill_color="black", back_color="white").convert('L')
-            qr_px = int(22 * MM_TO_PX)
             qr_res = qr_img.resize((qr_px, qr_px))
-            img.paste(qr_res, (self.width - qr_px - OFFSET_X_PX - 10, y))
 
-            # Bloque de Información Técnica
-            y += 10
+            # Físicamente queremos QR a la IZQUIERDA.
+            # En la imagen pre-rotación, lo ponemos a la DERECHA.
+            # Margen físico: 24px (~3mm). 400 - 24 - 100 = 276.
+            img.paste(qr_res, (276, 54))
 
-            if req.modo == 'reactivo':
-                conc_pct = req.extra.get('conc. (%)', '—')
-                conc_gl = req.extra.get('conc. (g/L)', '—')
-                vol = req.extra.get('volumen', '—')
+            # Físicamente queremos TEXTO a la DERECHA.
+            # En la imagen pre-rotación, lo ponemos a la IZQUIERDA.
+            # Columna segura: x=20 hasta x=250.
+            x_col = 20
+            y = 19
 
-                draw.text((x_base, y), f"VOL: {vol}", font=f_body, fill=0)
-                y += 20
-                draw.text((x_base, y), f"CONC: {conc_pct} | {conc_gl}", font=f_body, fill=0)
+            draw.text((x_col, y), "KRONOS BIOLABS", font=f_nano, fill=0)
+            y += 15
 
-                y += 20
-                f_date = req.extra.get('formulado', '—')
-                v_date = req.extra.get('vencimiento', req.arg3 or '—')
-                draw.text((x_base, y), f"FABR: {f_date}", font=f_body, fill=0)
-                y += 20
-                draw.text((x_base, y), f"VENCE: {v_date}", font=f_body, fill=0)
+            lote = req.extra.get('preparador', '—')
+            draw.text((x_col, y), f"LOTE: {lote[:15]}", font=f_micro, fill=0)
+            y += 24
 
-                y += 26
-                comps = req.extra.get('componentes', '—')
-                y = self.draw_text(draw, f"COMP: {comps}", f_micro, x_base, y, max_chars=28)
+            # Título (max_chars=18 para evitar solape central)
+            y = self.draw_text(draw, req.arg1, f_title, x_col, y, max_chars=18)
+            y += 8
 
-                peligros = req.extra.get('peligros', [])
-                if peligros:
-                    y += 4
-                    p_map = {'inflamable':'🔥', 'corrosivo':'🧪', 'toxico':'💀', 'irritante':'⚠️', 'oxidante':'💥'}
-                    p_text = " ".join([f"{p_map.get(p.lower(), '')} {p.upper()}".strip() for p in peligros])
-                    y = self.draw_text(draw, "RIESGO: " + p_text, f_micro, x_base, y, max_chars=26)
-            else:
-                # Layout para contenedor
-                especie = req.extra.get('especie', '—')
-                cantidad = req.arg3
-                fecha_ingreso = req.extra.get('fecha_ingreso', '—')
+            ex = req.extra or {}
+            self.draw_text(draw, f"VOL: {ex.get('volumen','—')}", f_body, x_col, y, max_chars=20)
+            y += 18
+            self.draw_text(draw, f"CONC: {ex.get('conc. (%)','—')}", f_body, x_col, y, max_chars=20)
+            y += 18
 
-                draw.text((x_base, y), f"ESPECIE: {especie}", font=f_body, fill=0)
-                y += 20
-                draw.text((x_base, y), f"CANTIDAD: {cantidad}", font=f_body, fill=0)
-                y += 20
-                draw.text((x_base, y), f"F. INGRESO: {fecha_ingreso}", font=f_body, fill=0)
+            self.draw_text(draw, f"FABR: {ex.get('formulado','—')}", f_micro, x_col, y, max_chars=22)
+            y += 15
+            self.draw_text(draw, f"VENCE: {req.arg3 or '—'}", f_body, x_col, y, max_chars=22)
+            y += 20
 
-                y += 30
-                comps = req.extra.get('componentes', '—')
-                y = self.draw_text(draw, f"CONTENIDO: {comps}", f_micro, x_base, y, max_chars=40)
+            comps = ex.get('componentes', '—')
+            y = self.draw_text(draw, f"COMP: {comps}", f_nano, x_col, y, max_chars=32)
 
-            return img.rotate(180)
+            peligros = ex.get('peligros', [])
+            if peligros:
+                # Usar etiquetas de texto para evitar fallos de renderizado de Emojis
+                p_labels = []
+                for p in peligros:
+                    p_up = p.upper()
+                    if 'TOX' in p_up: p_labels.append("[TOX]")
+                    elif 'IRR' in p_up: p_labels.append("[IRR]")
+                    elif 'INF' in p_up: p_labels.append("[INF]")
+                    elif 'COR' in p_up: p_labels.append("[COR]")
+                    elif 'OXI' in p_up: p_labels.append("[OXI]")
+                    else: p_labels.append(f"[{p_up}]")
+
+                self.draw_text(draw, "RIESGO: " + " ".join(p_labels), f_nano, x_col, y + 4, max_chars=32)
+
+            return img.transpose(Image.ROTATE_180)
 
         else:
-            # ETIQUETA DOBLABLE (Especímenes)
-
-            # --- MITAD SUPERIOR (FRENTE) ---
-            # QR en la izquierda
-            qr = qrcode.QRCode(box_size=5, border=1)
+            # --- ETIQUETA DOBLABLE (ESPECÍMENES) ---
+            qr = qrcode.QRCode(box_size=5, border=0)
             qr.add_data(f"UID:{req.arg2}")
             qr.make(fit=True)
             qr_img = qr.make_image(fill_color="black", back_color="white").convert('L')
 
-            # Margen interno restaurado (border=1), posicionado en X=3, Y=8
-            qr_px = self.fold_y - 16
+            qr_px = self.fold_y - 24
             qr_res = qr_img.resize((qr_px, qr_px))
-            img.paste(qr_res, (16, 8))
+            img.paste(qr_res, (20, 12))
 
-            # Texto en la derecha
-            x_text = qr_px + 24
-            y = 8
+            x_text = qr_px + 28
+            y = 12
             draw.text((x_text, y), "KRONOS BIOLABS SAS", font=f_nano, fill=0)
             y += 16
 
-            # Especie (Wrap si es muy larga)
             especie_lines = textwrap.wrap(req.arg1, width=20)
             for line in especie_lines:
                 draw.text((x_text, y), line, font=f_italic, fill=0)
@@ -166,21 +155,14 @@ class LabelEngine:
             y += f_micro.size + 4
             draw.text((x_text, y), f"F: {req.arg3 or date.today().isoformat()}", font=f_micro, fill=0)
 
-            # ── LÍNEA DE DOBLADO ──
             draw.rectangle([0, self.fold_y - 2, self.width, self.fold_y + 2], fill=0)
 
-            # ── MITAD INFERIOR (REVERSO) ──
             back_img = Image.new('L', (self.width, self.fold_y), color=255)
             back_draw = ImageDraw.Draw(back_img)
-
-            # Texto reverso a ancho completo
             ex = req.extra or {}
-
-            # Combine fields efficiently
             line_1 = f"R:{ex.get('riego','—')} | H:{ex.get('humedad','—')}"
             line_2 = f"T:{ex.get('temp','—')} | pH:{ex.get('ph','—')} | NPK:{ex.get('npk','—')}"
             line_3 = f"L:{ex.get('luz','—')}"
-
             info_lines = [line_1, line_2, line_3]
 
             y_back = 12
@@ -190,7 +172,6 @@ class LabelEngine:
             back_img = back_img.transpose(Image.ROTATE_180)
             img.paste(back_img, (0, self.fold_y + 2))
 
-            # Rotación final para la GEZI
             return img.transpose(Image.ROTATE_180)
 
 engine = LabelEngine()
