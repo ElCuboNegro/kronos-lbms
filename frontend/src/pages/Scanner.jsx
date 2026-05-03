@@ -110,9 +110,14 @@ export default function Scanner() {
               Ver Inventario / Ficha
             </button>
             {scanResult.tipo === 'especimen' && (
-              <button className="btn btn--accent btn--block" onClick={() => navigate(`/especimen/${scanResult.especimen.id}?quick=foto`)}>
-                📸 Añadir Foto / Evo
-              </button>
+              <>
+                <button className="btn btn--accent btn--block" onClick={() => navigate(`/especimen/${scanResult.especimen.id}?quick=foto`)}>
+                  📸 Añadir Foto / Evo
+                </button>
+                <button className="btn btn--secondary btn--block" onClick={() => navigate(`/nuevo-lote?madre=${scanResult.especimen.id}&especie=${scanResult.especimen.especie_id}`)}>
+                  🌱 Generar Explante
+                </button>
+              </>
             )}
           </div>
 

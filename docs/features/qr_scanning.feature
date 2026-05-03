@@ -11,14 +11,15 @@ Feature: QR and UID Label Scanning
     When I scan a QR code with the data "UID:12345"
     And the specimen exists in the system
     Then I should see a result box with the specimen's species and UID
-    And I should see a primary action button "Ver Ficha"
+    And I should see a primary action button "Ver Inventario / Ficha"
     And I should see an accent action button "📸 Añadir Foto / Evo"
+    And I should see a secondary action button "🌱 Generar Explante"
 
   Scenario: Successfully identify a known Element (Reagent/Equipment)
     When I scan a QR code with the data "ID:REACT-001"
     And the element exists in the system
     Then I should see a result box with the element's description and ID
-    And I should see a primary action button "Ver Ficha"
+    And I should see a primary action button "Ver Inventario / Ficha"
     But I should not see the "Añadir Foto / Evo" button
 
   Scenario: Scan an unknown Specimen UID
