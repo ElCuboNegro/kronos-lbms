@@ -1,3 +1,10 @@
+# [1.13.0](https://github.com/ElCuboNegro/kronos-lbms/compare/v1.12.9...v1.13.0) (2026-05-03)
+
+
+### Features
+
+* **mcp:** añadir herramienta lbms_get_technical_advice para analisis heuristico de bioprocesos ([be2ea9a](https://github.com/ElCuboNegro/kronos-lbms/commit/be2ea9aba616bec0db98bb496558e3a887a56363))
+
 ## [1.12.9](https://github.com/ElCuboNegro/kronos-lbms/compare/v1.12.8...v1.12.9) (2026-05-03)
 
 
