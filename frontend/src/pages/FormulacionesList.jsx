@@ -17,6 +17,11 @@ export default function FormulacionesList() {
 
   useEffect(() => { fetchItems() }, [])
 
+  const handlePrepare = (f) => {
+    console.log("Preparing formulation:", f.nombre);
+    setActiveFormulacion(f);
+  }
+
   return (
     <div className="page-container">
       <div className="page-header">
@@ -46,7 +51,7 @@ export default function FormulacionesList() {
                     })}
                   </ul>
                 </div>
-                <button className="btn btn--primary btn--block" style={{ marginTop: '0.8rem' }} onClick={() => setActiveFormulacion(f)}>
+                <button className="btn btn--primary btn--block" style={{ marginTop: '0.8rem' }} onClick={() => handlePrepare(f)}>
                   🧪 Preparar este medio
                 </button>
               </div>

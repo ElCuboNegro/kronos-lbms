@@ -92,13 +92,6 @@ const StepAccordion: React.FC<StepAccordionProps> = ({
               </div>
             </div>
           )}
-
-          <div className="mt-6 flex justify-end">
-            <button className="bg-emerald-500 text-white font-bold py-3 px-6 rounded-xl shadow-sm hover:bg-emerald-600 active:scale-95 transition-transform flex items-center gap-2">
-              <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/></svg>
-              Completar Paso
-            </button>
-          </div>
         </div>
       )}
     </div>
