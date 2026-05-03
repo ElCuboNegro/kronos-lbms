@@ -34,7 +34,7 @@ jobs:
       - name: 🛠️ Instalar y compilar Web App
         working-directory: ./frontend
         run: |
-          npm install
+          npm install --legacy-peer-deps
           npm run build
         env:
           # Aquí inyectamos la URL de producción del servidor backend al compilar el frontend.
