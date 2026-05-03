@@ -1,6 +1,20 @@
 # [1.2.0](https://github.com/ElCuboNegro/kronos-lbms/compare/v1.1.4...v1.2.0) (2026-05-03)
 
 
+### Bug Fixes
+
+* **ci:** add --allow-same-version to npm version in semantic-release ([58a92ef](https://github.com/ElCuboNegro/kronos-lbms/commit/58a92ef9f6094985588a85ed7d9edac3e661485a))
+
+
+### Features
+
+* **auth:** implement remember password via capacitor preferences ([c9ae6a4](https://github.com/ElCuboNegro/kronos-lbms/commit/c9ae6a4958615988db62fed4368edd6c18094ee6))
+* endpoint de backend /app/telemetry y boton en UI para sincronizar crashes del frontend con el VPS ([#64](https://github.com/ElCuboNegro/kronos-lbms/issues/64)) ([b9d1ce5](https://github.com/ElCuboNegro/kronos-lbms/commit/b9d1ce5567c3d12e6bb94f96d085c969bfcecae9))
+* Telemetría Remota ([#63](https://github.com/ElCuboNegro/kronos-lbms/issues/63)) ([48ed7b2](https://github.com/ElCuboNegro/kronos-lbms/commit/48ed7b2fd9a48d148aeb16ffbe5036f1fca21b07)), closes [#61](https://github.com/ElCuboNegro/kronos-lbms/issues/61)
+
+# [1.2.0](https://github.com/ElCuboNegro/kronos-lbms/compare/v1.1.4...v1.2.0) (2026-05-03)
+
+
 ### Features
 
 * endpoint de backend /app/telemetry y boton en UI para sincronizar crashes del frontend con el VPS ([#64](https://github.com/ElCuboNegro/kronos-lbms/issues/64)) ([b9d1ce5](https://github.com/ElCuboNegro/kronos-lbms/commit/b9d1ce5567c3d12e6bb94f96d085c969bfcecae9))
