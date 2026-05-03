@@ -4,10 +4,10 @@ from datetime import date, datetime
 from typing import Optional, List, Dict, Any
 import httpx
 from pydantic import BaseModel, Field, ConfigDict
-from mcp.server.fastmcp import Fastmcp
+from mcp.server.fastmcp import FastMCP
 
 # Configuración del servidor MCP
-mcp = Fastmcp("Seymour OS Controller")
+mcp = FastMCP("Seymour OS Controller")
 
 # Configuración de entorno
 LBMS_BASE_URL = os.environ.get("LBMS_BASE_URL", "http://localhost:8001")
@@ -310,7 +310,7 @@ async def lbms_imprimir_especimen(params: IdInput) -> str:
         }
 
         # 3. Enviar al hardware LOCAL
-        result = await _local_print("/imprimir/especimen", payload)
+        result = await _local_print("/imprimir", payload)
         return json.dumps({"status": "success", "local_result": result, "entity": payload["uid"]}, indent=2)
     except Exception as e:
         return _err(e)
@@ -325,15 +325,19 @@ async def lbms_imprimir_reactivo(params: IdInput) -> str:
     try:
         reac = await _api("GET", f"/reactivos/{params.id}")
         payload = {
-            "nombre": reac["nombre"],
-            "uid": f"STOCK-{reac['id']}",
-            "marca": reac.get("marca") or "S/M",
-            "formula": reac.get("formula_quimica") or "N/A",
-            "pureza": f"{reac['pureza_pct']}%" if reac.get("pureza_pct") else "N/A",
-            "vencimiento": reac.get("fecha_expiracion") or "N/A",
-            "peligros": reac.get("peligrosidad") or []
+            "modo": "reactivo",
+            "arg1": reac["nombre"],
+            "arg2": f"STOCK-{reac['id']}",
+            "arg3": reac.get("fecha_expiracion") or "N/A",
+            "extra": {
+                "preparador": "Stock Puro",
+                "marca": reac.get("marca") or "S/M",
+                "componentes": reac.get("formula_quimica") or "N/A",
+                "conc. (%)": f"{reac['pureza_pct']}%" if reac.get("pureza_pct") else "N/A",
+                "peligros": reac.get("peligrosidad") or []
+            }
         }
-        result = await _local_print("/imprimir/reactivo", payload)
+        result = await _local_print("/imprimir", payload)
         return json.dumps({"status": "success", "local_result": result}, indent=2)
     except Exception as e:
         return _err(e)
@@ -355,7 +359,7 @@ async def lbms_imprimir_sustrato(params: IdInput) -> str:
             "ec_teorica": str(sustrato.get("conductividad_teorica", "N/A")),
             "notas": sustrato.get("descripcion", "")
         }
-        result = await _local_print("/imprimir/sustrato", payload)
+        result = await _local_print("/imprimir", payload)
         return json.dumps({"status": "success", "local_result": result}, indent=2)
     except Exception as e:
         return _err(e)
@@ -379,7 +383,7 @@ async def lbms_imprimir_lote(params: IdInput) -> str:
             "componentes": "Consultar en Seymour OS",
             "peligros": []
         }
-        result = await _local_print("/imprimir/lote", payload)
+        result = await _local_print("/imprimir", payload)
         return json.dumps({"status": "success", "local_result": result}, indent=2)
     except Exception as e:
         return _err(e)
@@ -399,7 +403,7 @@ async def lbms_imprimir_contenedor(params: ImprimirContenedorInput) -> str:
             "fecha_ingreso": date.today().isoformat(),
             "componentes": "Inventario dinámico"
         }
-        result = await _local_print("/imprimir/contenedor", payload)
+        result = await _local_print("/imprimir", payload)
         return json.dumps({"status": "success", "local_result": result}, indent=2)
     except Exception as e:
         return _err(e)
