@@ -1,3 +1,10 @@
+# [1.8.0](https://github.com/ElCuboNegro/kronos-lbms/compare/v1.7.0...v1.8.0) (2026-05-03)
+
+
+### Features
+
+* **telemetry:** include app and backend versions in error reports ([93954d8](https://github.com/ElCuboNegro/kronos-lbms/commit/93954d8ce003f4bbcf2e4265cc6057d1ec68002e))
+
 # [1.7.0](https://github.com/ElCuboNegro/kronos-lbms/compare/v1.6.0...v1.7.0) (2026-05-03)
 
 
