@@ -9,7 +9,8 @@ on:
       - 'frontend/**'
       - '.github/workflows/android.yml'
 
-
+permissions:
+  contents: write
 
 jobs:
   build-android:
