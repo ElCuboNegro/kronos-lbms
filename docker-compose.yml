@@ -38,6 +38,17 @@ services:
     depends_on:
       - backend
 
+  printer:
+    build: ./printer_service
+    restart: unless-stopped
+    privileged: true
+    volumes:
+      - /dev/bus/usb:/dev/bus/usb
+    environment:
+      - PYTHONUNBUFFERED=1
+    ports:
+      - "8000:8000"
+
 volumes:
   postgres_data:
   uploads_data:

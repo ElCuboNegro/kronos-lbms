@@ -115,3 +115,14 @@ Para conectar a la base de datos real en la nube:
 - `lbms_get_frontend_logs`: Trae los últimos crashes y errores reportados por las apps cliente (vía Telemetría).
 - `lbms_imprimir_*`: Comandos directos de impresión física de etiquetas.
 - `lbms_scan_qr`: Resolución instantánea de códigos de barras.
+
+## Printer Service (GEZI Direct)
+El servicio de impresión es un microservicio independiente (`printer_service/`) que corre en un contenedor privilegiado para acceder al USB. Proporciona una API normalizada para que cada entidad (Especimen, Reactivo, etc.) genere su etiqueta con el diseño correcto.
+
+### Endpoints del Servicio de Impresión
+- `POST /imprimir/especimen`: Etiqueta biológica (UID, Requerimientos).
+- `POST /imprimir/reactivo`: Etiqueta química (Pictogramas, pureza).
+- `POST /imprimir/sustrato`: Etiqueta de insumos (pH, EC).
+- `POST /imprimir/lote`: Etiqueta de medio preparado (Receta escalada).
+- `POST /imprimir/contenedor`: Etiqueta de inventario múltiple.
+- `POST /imprimir-etiqueta-libre`: Flexibilidad total.

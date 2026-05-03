@@ -81,15 +81,14 @@ async def imprimir_etiqueta(
     }
 
     payload = {
-        "modo": "planta",
-        "arg1": esp.especie,
-        "arg2": esp.uid,
-        "arg3": esp.fecha_ingreso.isoformat() if esp.fecha_ingreso else date.today().isoformat(),
-        "extra": extra
+        "nombre_cientifico": esp.especie,
+        "uid": esp.uid,
+        "fecha": esp.fecha_ingreso.isoformat() if esp.fecha_ingreso else date.today().isoformat(),
+        "requerimientos": extra
     }
     try:
         async with httpx.AsyncClient(timeout=15) as client:
-            r = await client.post(f"{PRINTER_URL}/imprimir", json=payload)
+            r = await client.post(f"{PRINTER_URL}/imprimir/especimen", json=payload)
         if r.status_code != 200:
             raise HTTPException(status_code=502, detail=f"Error de impresora: {r.text}")
         return {"status": "impreso", "uid": esp.uid}
@@ -109,25 +108,18 @@ async def imprimir_reactivo(
         raise HTTPException(status_code=404, detail="Reactivo no encontrado")
 
     payload = {
-        "modo": "reactivo",
-        "arg1": reactivo.nombre,
-        "arg2": f"STOCK-{reactivo.id}",
-        "arg3": reactivo.marca or "S/M",
-        "extra": {
-            "preparador": "Stock Puro",
-            "volumen": "N/A",
-            "vencimiento": reactivo.fecha_expiracion.isoformat() if reactivo.fecha_expiracion else "N/A",
-            "conc. (%)": f"{reactivo.pureza_pct}%" if reactivo.pureza_pct else "N/A",
-            "conc. (g/L)": f"{reactivo.concentracion_gl}" if reactivo.concentracion_gl else "N/A",
-            "componentes": reactivo.formula_quimica or "N/A",
-            "peligros": reactivo.peligrosidad or [],
-            "notas": reactivo.notas or ""
-        }
+        "nombre": reactivo.nombre,
+        "uid": f"STOCK-{reactivo.id}",
+        "marca": reactivo.marca or "S/M",
+        "formula": reactivo.formula_quimica or "N/A",
+        "pureza": f"{reactivo.pureza_pct}%" if reactivo.pureza_pct else "N/A",
+        "vencimiento": reactivo.fecha_expiracion.isoformat() if reactivo.fecha_expiracion else "N/A",
+        "peligros": reactivo.peligrosidad or []
     }
 
     try:
         async with httpx.AsyncClient(timeout=15) as client:
-            r = await client.post(f"{PRINTER_URL}/imprimir", json=payload)
+            r = await client.post(f"{PRINTER_URL}/imprimir/reactivo", json=payload)
         if r.status_code != 200:
             raise HTTPException(status_code=502, detail=f"Error de impresora: {r.text}")
         return {"status": "impreso", "uid": f"STOCK-{reactivo.id}"}
@@ -146,20 +138,17 @@ async def imprimir_sustrato(
         raise HTTPException(status_code=404, detail="Sustrato no encontrado")
 
     payload = {
-        "modo": "reactivo",
-        "arg1": sustrato.nombre,
-        "arg2": f"SUST-{sustrato.codigo_formulacion}",
-        "arg3": sustrato.tipo.upper(),
-        "extra": {
-            "pH Teórico": str(sustrato.ph_teorico) if sustrato.ph_teorico else "N/A",
-            "EC Teórica": str(sustrato.conductividad_teorica) if sustrato.conductividad_teorica else "N/A",
-            "notas": sustrato.notas or ""
-        }
+        "nombre": sustrato.nombre,
+        "uid": f"SUST-{sustrato.codigo_formulacion}",
+        "tipo": sustrato.tipo.upper(),
+        "ph_teorico": str(sustrato.ph_teorico) if sustrato.ph_teorico else "N/A",
+        "ec_teorica": str(sustrato.conductividad_teorica) if sustrato.conductividad_teorica else "N/A",
+        "notas": sustrato.notes or ""
     }
 
     try:
         async with httpx.AsyncClient(timeout=15) as client:
-            r = await client.post(f"{PRINTER_URL}/imprimir", json=payload)
+            r = await client.post(f"{PRINTER_URL}/imprimir/sustrato", json=payload)
         if r.status_code != 200:
             raise HTTPException(status_code=502, detail=f"Error de impresora: {r.text}")
         return {"status": "impreso", "uid": f"SUST-{sustrato.codigo_formulacion}"}
@@ -185,20 +174,16 @@ async def imprimir_contenedor(
         resumen_componentes += f" (+{len(tipos_origen)-4} más)"
 
     payload = {
-        "modo": "contenedor",
-        "arg1": "Contenedor Múltiple",
-        "arg2": contenedor_uid,
-        "arg3": f"{len(especimenes)} Especímenes",
-        "extra": {
-            "especie": especimenes[0].especie,
-            "componentes": resumen_componentes,
-            "fecha_ingreso": especimenes[0].fecha_ingreso.isoformat() if especimenes[0].fecha_ingreso else "N/A"
-        }
+        "uid": contenedor_uid,
+        "especie": especimenes[0].especie,
+        "cantidad": f"{len(especimenes)} Especímenes",
+        "fecha_ingreso": especimenes[0].fecha_ingreso.isoformat() if especimenes[0].fecha_ingreso else "N/A",
+        "componentes": resumen_componentes
     }
 
     try:
         async with httpx.AsyncClient(timeout=15) as client:
-            r = await client.post(f"{PRINTER_URL}/imprimir", json=payload)
+            r = await client.post(f"{PRINTER_URL}/imprimir/contenedor", json=payload)
         if r.status_code != 200:
             raise HTTPException(status_code=502, detail=f"Error de impresora: {r.text}")
         return {"status": "impreso", "uid": contenedor_uid}
@@ -237,22 +222,19 @@ async def imprimir_lote(
             peligros.update(c.reactivo.peligrosidad)
 
     payload = {
-        "modo": "reactivo",
-        "arg1": lote.formulacion.nombre,
-        "arg2": lote.uid,
-        "arg3": lote.fecha_expiracion.strftime("%Y-%m-%d") if lote.fecha_expiracion else "N/A",
-        "extra": {
-            "preparador": lote.preparado_por.nombre,
-            "volumen": f"{lote.volumen_l}L",
-            "concentracion": f"{lote.concentracion_x}x",
-            "componentes": ", ".join(comps),
-            "peligros": list(peligros)
-        }
+        "nombre": lote.formulacion.nombre,
+        "uid": lote.uid,
+        "vencimiento": lote.fecha_expiracion.strftime("%Y-%m-%d") if lote.fecha_expiracion else "N/A",
+        "preparador": lote.preparado_por.nombre,
+        "volumen": f"{lote.volumen_l}L",
+        "concentracion": f"{lote.concentracion_x}x",
+        "componentes": ", ".join(comps),
+        "peligros": list(peligros)
     }
 
     try:
         async with httpx.AsyncClient(timeout=15) as client:
-            r = await client.post(f"{PRINTER_URL}/imprimir", json=payload)
+            r = await client.post(f"{PRINTER_URL}/imprimir/lote", json=payload)
         if r.status_code != 200:
             raise HTTPException(status_code=502, detail=f"Error de impresora: {r.text}")
         return {"status": "impreso", "uid": lote.uid}

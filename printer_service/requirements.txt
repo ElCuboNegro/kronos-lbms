@@ -2,3 +2,6 @@ fastapi
 uvicorn
 pydantic
 Pillow
+pyusb
+qrcode
+httpx

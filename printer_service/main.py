@@ -35,6 +35,46 @@ class LabelRequest(BaseModel):
     arg3: Optional[str] = None
     extra: Optional[Dict[str, Any]] = None
 
+class SpecimenPrintRequest(BaseModel):
+    nombre_cientifico: str
+    uid: str
+    fecha: str
+    requerimientos: Dict[str, str]
+
+class ReagentPrintRequest(BaseModel):
+    nombre: str
+    uid: str
+    marca: str
+    formula: str
+    pureza: str
+    vencimiento: str
+    peligros: list
+
+class SubstratePrintRequest(BaseModel):
+    nombre: str
+    uid: str
+    tipo: str
+    ph_teorico: str
+    ec_teorica: str
+    notas: str
+
+class BatchPrintRequest(BaseModel):
+    nombre: str
+    uid: str
+    vencimiento: str
+    preparador: str
+    volumen: str
+    concentracion: str
+    componentes: str
+    peligros: list
+
+class ContainerPrintRequest(BaseModel):
+    uid: str
+    especie: str
+    cantidad: str
+    fecha_ingreso: str
+    componentes: str
+
 class LabelEngine:
     def __init__(self):
         self.width = int(PAPER_W_MM * MM_TO_PX) # ~400
@@ -141,13 +181,13 @@ class LabelEngine:
             qr.make(fit=True)
             qr_img = qr.make_image(fill_color="black", back_color="white").convert('L')
 
-            # Margen en Y=8px, X=3px
+            # Margen en Y=8px, X=16px (2mm para evitar el margen no imprimible del rodillo)
             qr_px = self.fold_y - 16
             qr_res = qr_img.resize((qr_px, qr_px))
-            img.paste(qr_res, (3, 8))
+            img.paste(qr_res, (16, 8))
 
             # Texto en la derecha
-            x_text = qr_px + 10
+            x_text = qr_px + 24
             y = 8
             draw.text((x_text, y), "KRONOS BIOLABS SAS", font=f_nano, fill=0)
             y += 16
@@ -184,11 +224,11 @@ class LabelEngine:
             for line_txt in info_lines:
                 y_back = self.draw_text(back_draw, line_txt, f_body, 4, y_back, max_chars=40, spacing=2)
 
-            back_img = back_img.rotate(180, fillcolor=255)
+            back_img = back_img.transpose(Image.ROTATE_180)
             img.paste(back_img, (0, self.fold_y + 2))
 
             # Rotación final para la GEZI
-            return img.rotate(180, fillcolor=255)
+            return img.transpose(Image.ROTATE_180)
 
 engine = LabelEngine()
 
@@ -205,14 +245,12 @@ def send_to_printer(img: Image):
 
     dev.set_configuration()
 
-    # Obtener el endpoint de salida
     cfg = dev.get_active_configuration()
     intf = cfg[(0,0)]
     ep = usb.util.find_descriptor(
         intf,
         custom_match = lambda e: usb.util.endpoint_direction(e.bEndpointAddress) == usb.util.ENDPOINT_OUT
     )
-
     if ep is None:
         raise Exception("No se encontró el endpoint de salida USB")
 
@@ -221,6 +259,7 @@ def send_to_printer(img: Image):
     # Cada byte = 8 píxeles. En esta GEZI, 1 es BLANCO y 0 es NEGRO.
     # Nuestra imagen original es 255 (blanco), 0 (negro).
     bw_img = img.point(lambda x: 1 if x > 128 else 0, mode='1')
+    raw_data = bw_img.tobytes()
     raw_data = bw_img.tobytes()
 
     width_bytes = (img.width + 7) // 8
@@ -233,12 +272,106 @@ def send_to_printer(img: Image):
 
 @app.post("/imprimir")
 async def imprimir_api(req: LabelRequest):
+    """Acceso genérico legado (mantener compatibilidad)."""
     try:
         img = engine.create_label_image(req)
         send_to_printer(img)
         return {"status": "success"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/imprimir/especimen")
+async def imprimir_especimen(req: SpecimenPrintRequest):
+    """Acceso normalizado para especímenes biológicos."""
+    legacy_req = LabelRequest(
+        modo="planta",
+        arg1=req.nombre_cientifico,
+        arg2=req.uid,
+        arg3=req.fecha,
+        extra=req.requerimientos
+    )
+    return await imprimir_api(legacy_req)
+
+@app.post("/imprimir/reactivo")
+async def imprimir_reactivo(req: ReagentPrintRequest):
+    """Acceso normalizado para reactivos químicos."""
+    legacy_req = LabelRequest(
+        modo="reactivo",
+        arg1=req.nombre,
+        arg2=req.uid,
+        arg3=req.vencimiento,
+        extra={
+            "preparador": "Stock Puro",
+            "marca": req.marca,
+            "componentes": req.formula,
+            "conc. (%)": req.pureza,
+            "peligros": req.peligros
+        }
+    )
+    return await imprimir_api(legacy_req)
+
+@app.post("/imprimir/sustrato")
+async def imprimir_sustrato(req: SubstratePrintRequest):
+    """Acceso normalizado para sustratos."""
+    legacy_req = LabelRequest(
+        modo="reactivo",
+        arg1=req.nombre,
+        arg2=req.uid,
+        arg3=req.tipo,
+        extra={
+            "pH Teórico": req.ph_teorico,
+            "EC Teórica": req.ec_teorica,
+            "notas": req.notas
+        }
+    )
+    return await imprimir_api(legacy_req)
+
+@app.post("/imprimir/lote")
+async def imprimir_lote(req: BatchPrintRequest):
+    """Acceso normalizado para lotes preparados."""
+    legacy_req = LabelRequest(
+        modo="reactivo",
+        arg1=req.nombre,
+        arg2=req.uid,
+        arg3=req.vencimiento,
+        extra={
+            "preparador": req.preparador,
+            "volumen": req.volumen,
+            "concentracion": req.concentracion,
+            "componentes": req.componentes,
+            "peligros": req.peligros
+        }
+    )
+    return await imprimir_api(legacy_req)
+
+@app.post("/imprimir/contenedor")
+async def imprimir_contenedor(req: ContainerPrintRequest):
+    """Acceso normalizado para contenedores."""
+    legacy_req = LabelRequest(
+        modo="contenedor",
+        arg1="Contenedor Múltiple",
+        arg2=req.uid,
+        arg3=req.cantidad,
+        extra={
+            "especie": req.especie,
+            "componentes": req.componentes,
+            "fecha_ingreso": req.fecha_ingreso
+        }
+    )
+    return await imprimir_api(legacy_req)
+
+@app.get("/health")
+async def health():
+    return {"status": "ok", "service": "printer", "timestamp": datetime.now().isoformat()}
+
+@app.get("/info")
+async def info():
+    return {
+        "name": "Seymour OS Printer Service",
+        "version": "1.0.0",
+        "supported_modes": ["especimen", "reactivo", "sustrato", "lote", "contenedor", "libre"],
+        "hardware": "Jadens GEZI (USB)"
+    }
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
