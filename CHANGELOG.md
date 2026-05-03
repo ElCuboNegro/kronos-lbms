@@ -1,3 +1,10 @@
+## [1.10.3](https://github.com/ElCuboNegro/kronos-lbms/compare/v1.10.2...v1.10.3) (2026-05-03)
+
+
+### Bug Fixes
+
+* **printer:** add data normalization layer to prevent blank labels ([96eac93](https://github.com/ElCuboNegro/kronos-lbms/commit/96eac93c1270b2d93d65f3c1943a3209ea3cb12e))
+
 ## [1.10.2](https://github.com/ElCuboNegro/kronos-lbms/compare/v1.10.1...v1.10.2) (2026-05-03)
 
 
