@@ -1,3 +1,10 @@
+# [1.7.0](https://github.com/ElCuboNegro/kronos-lbms/compare/v1.6.0...v1.7.0) (2026-05-03)
+
+
+### Features
+
+* **printer:** improve label metadata mapping and layout ([9995258](https://github.com/ElCuboNegro/kronos-lbms/commit/99952583577ee894fc053f28a0b183773523b484))
+
 # [1.6.0](https://github.com/ElCuboNegro/kronos-lbms/compare/v1.5.0...v1.6.0) (2026-05-03)
 
 
