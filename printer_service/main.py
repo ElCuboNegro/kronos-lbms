@@ -133,11 +133,35 @@ class LabelEngine:
 
         else:
             # ETIQUETA DOBLABLE (Especímenes)
-            draw.text((x_base, y_cursor), "KRONOS BIOLABS SAS", font=f_nano, fill=0)
-            y = y_cursor + 20
-            y = self.draw_text(draw, req.arg1, f_italic, x_base, y, max_chars=18)
-            draw.text((x_base, self.fold_y - 40), f"ID: {req.arg2}", font=f_micro, fill=0)
-            draw.text((x_base, self.fold_y - 22), f"F: {req.arg3 or date.today().isoformat()}", font=f_micro, fill=0)
+
+            # --- MITAD SUPERIOR (FRENTE) ---
+            # QR en la izquierda
+            qr = qrcode.QRCode(box_size=5, border=0)
+            qr.add_data(f"UID:{req.arg2}")
+            qr.make(fit=True)
+            qr_img = qr.make_image(fill_color="black", back_color="white").convert('L')
+
+            # Margen en Y=8px, X=3px
+            qr_px = self.fold_y - 16
+            qr_res = qr_img.resize((qr_px, qr_px))
+            img.paste(qr_res, (3, 8))
+
+            # Texto en la derecha
+            x_text = qr_px + 10
+            y = 8
+            draw.text((x_text, y), "KRONOS BIOLABS SAS", font=f_nano, fill=0)
+            y += 16
+
+            # Especie (Wrap si es muy larga)
+            especie_lines = textwrap.wrap(req.arg1, width=20)
+            for line in especie_lines:
+                draw.text((x_text, y), line, font=f_italic, fill=0)
+                y += f_italic.size + 2
+
+            y += 4
+            draw.text((x_text, y), f"ID: {req.arg2}", font=f_micro, fill=0)
+            y += f_micro.size + 4
+            draw.text((x_text, y), f"F: {req.arg3 or date.today().isoformat()}", font=f_micro, fill=0)
 
             # ── LÍNEA DE DOBLADO ──
             draw.rectangle([0, self.fold_y - 2, self.width, self.fold_y + 2], fill=0)
@@ -146,35 +170,25 @@ class LabelEngine:
             back_img = Image.new('L', (self.width, self.fold_y), color=255)
             back_draw = ImageDraw.Draw(back_img)
 
-            # QR
-            qr = qrcode.QRCode(box_size=3, border=0)
-            qr.add_data(f"UID:{req.arg2}")
-            qr.make(fit=True)
-            qr_img = qr.make_image(fill_color="black", back_color="white").convert('L')
-            qr_px = int(10 * MM_TO_PX)
-            qr_res = qr_img.resize((qr_px, qr_px))
-            back_img.paste(qr_res, (self.width - qr_px - 10, (self.fold_y - qr_px) // 2))
-
-            # Texto reverso
+            # Texto reverso a ancho completo
             ex = req.extra or {}
 
-            # Combine short fields
+            # Combine fields efficiently
             line_1 = f"R:{ex.get('riego','—')} | H:{ex.get('humedad','—')}"
-            line_2 = f"T:{ex.get('temp','—')} | pH:{ex.get('ph','—')}"
-            line_3 = f"NPK:{ex.get('npk','—')}"
-            line_4 = f"L:{ex.get('luz','—')}"
+            line_2 = f"T:{ex.get('temp','—')} | pH:{ex.get('ph','—')} | NPK:{ex.get('npk','—')}"
+            line_3 = f"L:{ex.get('luz','—')}"
 
-            info_lines = [line_1, line_2, line_3, line_4]
+            info_lines = [line_1, line_2, line_3]
 
             y_back = 4
             for line_txt in info_lines:
-                y_back = self.draw_text(back_draw, line_txt, f_body, x_base, y_back, max_chars=32, spacing=0)
+                y_back = self.draw_text(back_draw, line_txt, f_body, 4, y_back, max_chars=40, spacing=2)
 
-            back_img = back_img.rotate(180)
+            back_img = back_img.rotate(180, fillcolor=255)
             img.paste(back_img, (0, self.fold_y + 2))
 
             # Rotación final para la GEZI
-            return img.rotate(180)
+            return img.rotate(180, fillcolor=255)
 
 engine = LabelEngine()
 
@@ -204,10 +218,9 @@ def send_to_printer(img: Image):
 
     # Preparar comandos TSPL
     # El comando BITMAP requiere los datos en formato bit-stream
-    # Cada byte = 8 píxeles. 1 es negro, 0 es blanco.
-    # Invertimos la imagen (L) porque en TSPL BITMAP 1 es negro.
+    # Cada byte = 8 píxeles. En esta GEZI, 1 es BLANCO y 0 es NEGRO.
     # Nuestra imagen original es 255 (blanco), 0 (negro).
-    bw_img = img.point(lambda x: 0 if x > 128 else 1, mode='1')
+    bw_img = img.point(lambda x: 1 if x > 128 else 0, mode='1')
     raw_data = bw_img.tobytes()
 
     width_bytes = (img.width + 7) // 8

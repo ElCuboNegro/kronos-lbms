@@ -1,3 +1,5 @@
+import pkg from '../../package.json';
+
 const LOG_KEY = 'kronos_telemetry_logs';
 const MAX_LOGS = 100;
 
@@ -8,6 +10,7 @@ export const Telemetry = {
       const newLog = {
         timestamp: new Date().toISOString(),
         level,
+        version: pkg.version,
         message: message ? message.toString() : 'Unknown error',
         details: details ? JSON.stringify(details, Object.getOwnPropertyNames(details)) : null
       };
