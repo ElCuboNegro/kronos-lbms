@@ -79,7 +79,7 @@ describe('Login Component', () => {
 
     // Verify server config UI is present
     expect(screen.getByText('URL del Servidor')).toBeInTheDocument();
-    expect(screen.getByPlaceholderText('https://api.ejemplo.com')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('URL Personalizada (ej. https://api.ejemplo.com)')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /guardar/i })).toBeInTheDocument();
 
     // Switch back to login form

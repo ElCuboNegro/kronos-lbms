@@ -3,6 +3,11 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { getBaseUrl } from '../api/client'
 
+const PRECONFIGURED_SERVERS = [
+  { label: 'Producción (Nube)', url: 'https://lbms.kronosb.com/api' },
+  { label: 'Desarrollo (Red Local)', url: 'http://192.168.80.185:8001' }
+];
+
 export default function Login() {
   const { login } = useAuth()
   const navigate = useNavigate()
@@ -86,26 +91,42 @@ export default function Login() {
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             <h3 style={{ fontSize: '1rem', margin: '0 0 0.5rem', color: 'var(--theme-text)' }}>URL del Servidor</h3>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 8 }}>
+              {PRECONFIGURED_SERVERS.map((server) => (
+                <button
+                  key={server.url}
+                  type="button"
+                  className="btn"
+                  style={{
+                    fontSize: '0.85rem',
+                    textAlign: 'left',
+                    background: serverUrl === server.url ? 'var(--theme-primary)' : 'var(--theme-background)',
+                    color: serverUrl === server.url ? '#000' : 'var(--theme-text)'
+                  }}
+                  onClick={() => setServerUrl(server.url)}
+                >
+                  <strong>{server.label}</strong><br/>
+                  <span style={{ fontSize: '0.7rem', opacity: 0.8 }}>{server.url}</span>
+                </button>
+              ))}
+            </div>
+
             <input
               type="url"
-              placeholder="https://api.ejemplo.com"
+              placeholder="URL Personalizada (ej. https://api.ejemplo.com)"
               value={serverUrl}
               onChange={e => setServerUrl(e.target.value)}
             />
+
             <p style={{ fontSize: '0.7rem', color: 'var(--theme-text-muted)', margin: 0 }}>
               Actual: <code style={{ color: 'var(--theme-primary)' }}>{getBaseUrl()}</code>
             </p>
+
             <div style={{ display: 'flex', gap: 8, marginTop: '1rem' }}>
               <button className="btn btn--primary" style={{ flex: 1 }} onClick={handleSaveServer}>Guardar</button>
               <button className="btn" style={{ flex: 1 }} onClick={() => setShowServerConfig(false)}>Cancelar</button>
             </div>
-            <button
-              className="btn"
-              style={{ fontSize: '0.75rem', marginTop: '0.5rem', background: '#331111' }}
-              onClick={() => { setServerUrl(''); localStorage.removeItem('server_url'); window.location.reload(); }}
-            >
-              Restablecer Predeterminado
-            </button>
           </div>
         )}
       </div>
