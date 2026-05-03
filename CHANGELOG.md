@@ -1,3 +1,15 @@
+# [1.10.0](https://github.com/ElCuboNegro/kronos-lbms/compare/v1.9.2...v1.10.0) (2026-05-03)
+
+
+### Bug Fixes
+
+* **printer:** fix rotate bug and qr code crop margins ([#68](https://github.com/ElCuboNegro/kronos-lbms/issues/68)) ([6ee4e4e](https://github.com/ElCuboNegro/kronos-lbms/commit/6ee4e4e2ff468d88fe348f0637cbefc099710941))
+
+
+### Features
+
+* **ux:** implement seamless explant generation flow with automatic lineage ([81e61dc](https://github.com/ElCuboNegro/kronos-lbms/commit/81e61dc0443ab3bb7323fcd49ebabfb14f0d3fa6))
+
 ## [1.9.2](https://github.com/ElCuboNegro/kronos-lbms/compare/v1.9.1...v1.9.2) (2026-05-03)
 
 
