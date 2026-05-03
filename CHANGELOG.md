@@ -1,3 +1,10 @@
+## [1.11.1](https://github.com/ElCuboNegro/kronos-lbms/compare/v1.11.0...v1.11.1) (2026-05-03)
+
+
+### Bug Fixes
+
+* **ui:** refactor LotePreparacionForm to use native CSS and fix blank screen issue ([a753917](https://github.com/ElCuboNegro/kronos-lbms/commit/a753917d18bfe0da86fd2092bb28161d2216776b))
+
 # [1.11.0](https://github.com/ElCuboNegro/kronos-lbms/compare/v1.10.3...v1.11.0) (2026-05-03)
 
 
