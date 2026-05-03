@@ -1,3 +1,10 @@
+## [1.12.9](https://github.com/ElCuboNegro/kronos-lbms/compare/v1.12.8...v1.12.9) (2026-05-03)
+
+
+### Bug Fixes
+
+* **printer:** incluir UID faltante en etiquetas grandes para lotes y reactivos ([873ceeb](https://github.com/ElCuboNegro/kronos-lbms/commit/873ceebb7547f5a93093d10cc952647a4af838d6))
+
 ## [1.12.8](https://github.com/ElCuboNegro/kronos-lbms/compare/v1.12.7...v1.12.8) (2026-05-03)
 
 
