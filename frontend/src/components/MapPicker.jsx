@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
 import L from 'leaflet'
+import { Geolocation } from '@capacitor/geolocation'
 
 // Fix default Leaflet icon paths in Vite
 delete L.Icon.Default.prototype._getIconUrl
@@ -28,24 +29,27 @@ export default function MapPicker({ value, onChange }) {
   const [locating, setLocating] = useState(false)
   const defaultCenter = [19.4326, -99.1332] // CDMX fallback
 
-  const handleGetLocation = () => {
-    if (!navigator.geolocation) {
-      alert("Geolocalización no soportada por el navegador")
-      return
+  const handleGetLocation = async () => {
+    try {
+      setLocating(true)
+      const permissions = await Geolocation.checkPermissions();
+      if (permissions.location !== 'granted') {
+        const req = await Geolocation.requestPermissions();
+        if (req.location !== 'granted') {
+          alert("Se requiere permiso de ubicación para esta función.")
+          setLocating(false)
+          return
+        }
+      }
+
+      const pos = await Geolocation.getCurrentPosition({ enableHighAccuracy: true })
+      onChange({ lat: pos.coords.latitude, lng: pos.coords.longitude })
+    } catch (err) {
+      console.warn("Error al obtener ubicación:", err)
+      alert("No se pudo obtener la ubicación. Verifica si el GPS está activado.")
+    } finally {
+      setLocating(false)
     }
-    setLocating(true)
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        onChange({ lat: pos.coords.latitude, lng: pos.coords.longitude })
-        setLocating(false)
-      },
-      (err) => {
-        console.warn("Error al obtener ubicación:", err)
-        alert("No se pudo obtener la ubicación.")
-        setLocating(false)
-      },
-      { enableHighAccuracy: true }
-    )
   }
 
   const center = value ? [value.lat, value.lng] : defaultCenter
