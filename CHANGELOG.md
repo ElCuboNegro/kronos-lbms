@@ -1,3 +1,10 @@
+## [1.12.5](https://github.com/ElCuboNegro/kronos-lbms/compare/v1.12.4...v1.12.5) (2026-05-03)
+
+
+### Bug Fixes
+
+* **mcp:** enable Bridge Mode for local printing using cloud data ([fa7fdea](https://github.com/ElCuboNegro/kronos-lbms/commit/fa7fdead305c8fb077fe6520b7ed967a0ae515fb))
+
 ## [1.12.4](https://github.com/ElCuboNegro/kronos-lbms/compare/v1.12.3...v1.12.4) (2026-05-03)
 
 
