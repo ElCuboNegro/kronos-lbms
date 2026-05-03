@@ -1,3 +1,10 @@
+# [1.5.0](https://github.com/ElCuboNegro/kronos-lbms/compare/v1.4.1...v1.5.0) (2026-05-03)
+
+
+### Features
+
+* **backend:** add free label printing endpoint for characterizations ([b5e9c1d](https://github.com/ElCuboNegro/kronos-lbms/commit/b5e9c1dff3c275c2d2cf7b8dcd2a544c034d7092))
+
 ## [1.4.1](https://github.com/ElCuboNegro/kronos-lbms/compare/v1.4.0...v1.4.1) (2026-05-03)
 
 
