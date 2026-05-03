@@ -1,3 +1,10 @@
+# [1.4.0](https://github.com/ElCuboNegro/kronos-lbms/compare/v1.3.1...v1.4.0) (2026-05-03)
+
+
+### Features
+
+* **lab:** add characterization protocol for peat pH measurement ([2975ef7](https://github.com/ElCuboNegro/kronos-lbms/commit/2975ef7d5596fe6b1f46e4eb1d6f878ba8197c96))
+
 ## [1.3.1](https://github.com/ElCuboNegro/kronos-lbms/compare/v1.3.0...v1.3.1) (2026-05-03)
 
 
