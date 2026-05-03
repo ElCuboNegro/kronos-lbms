@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react'
 import { Telemetry } from '../utils/telemetry'
+import { api } from '../api/client'
 
 export default function Logs() {
   const [logs, setLogs] = useState([])
+  const [sending, setSending] = useState(false)
 
   useEffect(() => {
     setLogs(Telemetry.getLogs())
@@ -15,12 +17,18 @@ export default function Logs() {
     }
   }
 
-  const exportLogs = () => {
-    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(logs, null, 2))
-    const dlAnchorElem = document.createElement('a')
-    dlAnchorElem.setAttribute("href", dataStr)
-    dlAnchorElem.setAttribute("download", "kronos_telemetry.json")
-    dlAnchorElem.click()
+  const sendToServer = async () => {
+    try {
+      setSending(true)
+      await api.post('/app/telemetry', { logs })
+      alert('Logs enviados exitosamente al servidor para análisis.')
+      Telemetry.clearLogs()
+      setLogs([])
+    } catch (e) {
+      alert('Error enviando logs al servidor: ' + e.message)
+    } finally {
+      setSending(false)
+    }
   }
 
   return (
@@ -28,8 +36,10 @@ export default function Logs() {
       <div className="page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 0 }}>
         <h2 className="page-title text-primary" style={{ margin: 0 }}>Telemetría Local</h2>
         <div style={{ display: 'flex', gap: '0.5rem' }}>
-          <button className="btn btn--secondary" onClick={exportLogs} disabled={logs.length === 0}>Descargar JSON</button>
-          <button className="btn btn--danger" onClick={handleClear} disabled={logs.length === 0}>Borrar</button>
+          <button className="btn btn--secondary" onClick={sendToServer} disabled={logs.length === 0 || sending}>
+            {sending ? 'Enviando...' : 'Enviar al Servidor'}
+          </button>
+          <button className="btn btn--danger" onClick={handleClear} disabled={logs.length === 0 || sending}>Borrar</button>
         </div>
       </div>
 
