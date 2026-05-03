@@ -1,3 +1,10 @@
+## [1.0.1](https://github.com/ElCuboNegro/kronos-lbms/compare/v1.0.0...v1.0.1) (2026-05-03)
+
+
+### Bug Fixes
+
+* **ci:** evitar permission error en pytest proviendo UPLOAD_DIR dinamico y secrets ([#60](https://github.com/ElCuboNegro/kronos-lbms/issues/60)) ([3151189](https://github.com/ElCuboNegro/kronos-lbms/commit/3151189fb18ee58a61ecd6c380d3373a822f730b))
+
 # 1.0.0 (2026-05-03)
 
 
