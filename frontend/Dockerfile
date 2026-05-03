@@ -1,9 +1,9 @@
 FROM node:20-alpine AS build
 WORKDIR /app
 COPY package.json .
-RUN npm install
+RUN rm -rf node_modules package-lock.json && npm install --legacy-peer-deps --os=linux --cpu=x64 --libc=musl
 COPY . .
-RUN npm run build
+RUN npm install @rollup/rollup-linux-x64-musl --save-optional --legacy-peer-deps && npm run build
 
 FROM nginx:alpine
 COPY --from=build /app/dist /usr/share/nginx/html

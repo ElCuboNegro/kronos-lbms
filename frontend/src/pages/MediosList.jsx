@@ -9,46 +9,18 @@ const TIPOS = [
   { val: 'otro', label: 'Otro' }
 ]
 
-export default function LaboratorioDashboard() {
-  const navigate = useNavigate()
+export default function MediosList() {
   const [showForm, setShowForm] = useState(false)
   const [refreshCount, setRefreshCount] = useState(0)
 
   return (
     <div className="page-container" style={{display:'flex',flexDirection:'column',gap:'1rem'}}>
-      <h2 className="page-title" style={{color:'var(--theme-primary)',margin:0,fontSize:'1.4rem'}}>Gestión de Laboratorio</h2>
-      <p style={{color:'var(--theme-secondary)',fontSize:'0.85rem',margin:'-0.5rem 0 1rem'}}>Inventario químico, formulaciones y trazabilidad de medios.</p>
-
-      <div style={{display:'flex',flexDirection:'column',gap:12,marginBottom:'1.5rem'}}>
-        <MenuCard
-          title="Reactivos"
-          desc="Catálogo de químicos, hormonas y sales puras."
-          icon="🧪"
-          onClick={() => navigate('/reactivos')}
-        />
-        <MenuCard
-          title="Recetario"
-          desc="Define formulaciones y composiciones estándar."
-          icon="📖"
-          onClick={() => navigate('/formulaciones')}
-        />
-        <MenuCard
-          title="Lotes Preparados"
-          desc="Historial de medios listos y trazabilidad."
-          icon="📦"
-          onClick={() => navigate('/lotes')}
-        />
-        <MenuCard
-          title="Micro-Herramientas"
-          desc="Diluciones, molaridad y contadores biológicos."
-          icon="🧮"
-          onClick={() => navigate('/calculadoras')}
-        />
-      </div>
-
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-        <h3 style={{color:'var(--theme-primary)',fontSize:'0.9rem',fontWeight:700,textTransform:'uppercase',letterSpacing:1, margin: 0}}>Formulaciones de Medios / Sustratos</h3>
-        <button className="btn btn--primary" style={{ padding: '0.4rem 0.8rem', fontSize: '0.85rem' }} onClick={() => setShowForm(true)}>+ Nuevo Medio</button>
+        <div>
+           <h2 className="page-title" style={{color:'var(--theme-primary)',margin:0,fontSize:'1.4rem'}}>Catálogo de Sustratos</h2>
+           <p style={{color:'var(--theme-secondary)',fontSize:'0.85rem',margin:0}}>Agares, medios y mezclas registrados.</p>
+        </div>
+        <button className="btn btn--primary" style={{ borderRadius: '50%', width: 40, height: 40, padding: 0 }} onClick={() => setShowForm(true)}>+</button>
       </div>
 
       <MediosSubList refreshCounter={refreshCount} />
@@ -63,17 +35,7 @@ export default function LaboratorioDashboard() {
   )
 }
 
-function MenuCard({ title, desc, icon, onClick }) {
-  return (
-    <div style={{background:'var(--theme-surface)',border:'1px solid var(--theme-border)',borderRadius:12,padding:'1.25rem',display:'flex',gap:15,alignItems:'center',cursor:'pointer'}} onClick={onClick}>
-      <span style={{fontSize:'2rem'}}>{icon}</span>
-      <div>
-        <h4 style={{color:'var(--theme-text)',margin:0,fontSize:'1.05rem'}}>{title}</h4>
-        <p style={{color:'var(--theme-secondary)',margin:'2px 0 0',fontSize:'0.82rem',lineHeight:1.3}}>{desc}</p>
-      </div>
-    </div>
-  )
-}
+
 
 function MediosSubList({ refreshCounter }) {
   const [medios, setMedios] = useState([])

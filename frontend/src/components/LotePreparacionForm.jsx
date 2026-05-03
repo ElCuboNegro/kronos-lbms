@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { api } from '../api/client'
+import ScanInput from './ScanInput'
 
 export default function LotePreparacionForm({ formulacion, onSaved, onCancel }) {
   const [volumen, setVolumen] = useState(formulacion.volumen_base_l)
@@ -78,12 +79,12 @@ export default function LotePreparacionForm({ formulacion, onSaved, onCancel }) 
                     </span>
                   </div>
                   <div className="form-group" style={{ margin: 0 }}>
-                    <input
+                    <ScanInput
                       type="text"
                       placeholder={esReactivo ? "Escanear Lote Proveedor (Ej. Sigma-123)" : "Escanear Lote Interno (Ej. REAC-240501-001)"}
                       value={trazabilidad[itemId] || ''}
-                      onChange={e => setTrazabilidad(prev => ({ ...prev, [itemId]: e.target.value }))}
-                      style={{ fontSize: '0.85rem', padding: '0.5rem' }}
+                      onChange={val => setTrazabilidad(prev => ({ ...prev, [itemId]: val }))}
+                      style={{ fontSize: '0.85rem', padding: '0.5rem', background: 'var(--theme-background)', border: '1px solid var(--theme-border)', borderRadius: '8px', color: 'var(--theme-text)', outline: 'none' }}
                     />
                   </div>
                 </div>

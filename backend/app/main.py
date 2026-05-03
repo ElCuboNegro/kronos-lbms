@@ -26,14 +26,22 @@ app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 import os
 
-ALLOWED_ORIGINS = os.environ.get("ALLOWED_ORIGINS", "http://localhost,http://127.0.0.1").split(",")
+ALLOWED_ORIGINS = [
+    "http://localhost",
+    "http://127.0.0.1",
+    "http://localhost:8081",
+    "http://localhost:5173",
+    "https://lbms.kronosb.com",
+    "http://lbms.kronosb.com",
+]
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=ALLOWED_ORIGINS,
+    allow_origin_regex=r"^https?://(localhost|127\.0\.0\.1|192\.168\.\d+\.\d+|10\.\d+\.\d+|172\.(1[6-9]|2[0-9]|3[0-1])\.\d+\.\d+)(:\d+)?$|^capacitor://localhost$",
     allow_credentials=True,
-    allow_methods=["GET", "POST", "PATCH", "DELETE", "OPTIONS", "PUT"],
-    allow_headers=["Authorization", "Content-Type"],
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 app.include_router(auth_router.router)
@@ -53,6 +61,16 @@ app.include_router(reactivos.router)
 @app.get("/health")
 def health():
     return {"status": "ok"}
+
+@app.get("/app/release-info")
+def release_info():
+    # En el futuro esto puede venir de una DB o archivo de configuración
+    return {
+        "version": "0.1.1",
+        "required": False,
+        "url": "https://github.com/ElCuboNegro/kronos-lbms/releases/latest",
+        "notes": "Mejoras en la navegación y corrección de errores críticos."
+    }
 
 @app.get("/stats")
 def stats(db: Session = Depends(get_db), _=Depends(auth.get_current_user)):

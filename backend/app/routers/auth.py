@@ -17,7 +17,7 @@ ALLOWED_TYPES = {"image/jpeg", "image/png", "image/webp"}
 
 
 @router.post("/login", response_model=schemas.Token)
-@limiter.limit("10/minute")
+@limiter.limit("25/minute")
 def login(request: Request, form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
     user = db.query(models.Usuario).filter(models.Usuario.email == form_data.username).first()
     if not user or not auth.verify_password(form_data.password, user.hashed_password):
