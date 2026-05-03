@@ -1,3 +1,10 @@
+# [1.6.0](https://github.com/ElCuboNegro/kronos-lbms/compare/v1.5.0...v1.6.0) (2026-05-03)
+
+
+### Features
+
+* **mcp:** expand universal controller with hardware, inventory tools and telemetry ([8b1239a](https://github.com/ElCuboNegro/kronos-lbms/commit/8b1239abec66be7fd9905b340c820854975f4257))
+
 # [1.5.0](https://github.com/ElCuboNegro/kronos-lbms/compare/v1.4.1...v1.5.0) (2026-05-03)
 
 
