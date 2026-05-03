@@ -1,3 +1,10 @@
+## [1.12.4](https://github.com/ElCuboNegro/kronos-lbms/compare/v1.12.3...v1.12.4) (2026-05-03)
+
+
+### Bug Fixes
+
+* **printer:** correctly shift qr code to the right by 16px to evade hardware dead zone ([8f9a79d](https://github.com/ElCuboNegro/kronos-lbms/commit/8f9a79d91cce0a9f5d0274d7b1bfdb75a63f600c))
+
 ## [1.12.3](https://github.com/ElCuboNegro/kronos-lbms/compare/v1.12.2...v1.12.3) (2026-05-03)
 
 
