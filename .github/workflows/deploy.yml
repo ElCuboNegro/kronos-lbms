@@ -64,6 +64,7 @@ jobs:
           DATABASE_URL: postgresql://test_user:test_password@localhost:5432/test_db
           SECRET_KEY: test_secret_key
           JWT_SECRET: test_jwt_secret
+          UPLOAD_DIR: ./uploads
         run: python -m pytest tests/ -v
 
   deploy:

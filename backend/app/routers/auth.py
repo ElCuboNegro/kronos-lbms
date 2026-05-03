@@ -11,7 +11,8 @@ from app.limiter import limiter
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
-FOTOS_DIR = Path("/app/uploads/fotos")
+UPLOAD_BASE = Path(os.environ.get("UPLOAD_DIR", "/app/uploads"))
+FOTOS_DIR = UPLOAD_BASE / "fotos"
 FOTOS_DIR.mkdir(parents=True, exist_ok=True)
 ALLOWED_TYPES = {"image/jpeg", "image/png", "image/webp"}
 

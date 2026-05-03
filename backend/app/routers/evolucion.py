@@ -11,7 +11,8 @@ from app.models import ANGULOS
 
 router = APIRouter(prefix="/especimenes", tags=["evolucion"])
 
-UPLOADS = Path("/app/uploads/especimenes")
+UPLOAD_BASE = Path(os.environ.get("UPLOAD_DIR", "/app/uploads"))
+UPLOADS = UPLOAD_BASE / "especimenes"
 ALLOWED = {"image/jpeg", "image/png", "image/webp"}
 def _reg_out(r: models.RegistroEvolucion) -> schemas.RegistroEvolucionOut:
     return schemas.RegistroEvolucionOut(
