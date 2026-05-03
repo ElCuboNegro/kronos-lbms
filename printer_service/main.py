@@ -92,22 +92,25 @@ class LabelEngine:
 
             lote = req.extra.get('preparador', '—')
             draw.text((x_col, y), f"LOTE: {lote[:15]}", font=f_micro, fill=0)
-            y += 24
+            y += 15
+
+            draw.text((x_col, y), f"ID: {req.arg2}", font=f_micro, fill=0)
+            y += 20
 
             # Título (max_chars=18 para evitar solape central)
             y = self.draw_text(draw, req.arg1, f_title, x_col, y, max_chars=18)
-            y += 8
+            y += 6
 
             ex = req.extra or {}
             self.draw_text(draw, f"VOL: {ex.get('volumen','—')}", f_body, x_col, y, max_chars=20)
-            y += 18
+            y += 16
             self.draw_text(draw, f"CONC: {ex.get('conc. (%)','—')}", f_body, x_col, y, max_chars=20)
-            y += 18
+            y += 16
 
             self.draw_text(draw, f"FABR: {ex.get('formulado','—')}", f_micro, x_col, y, max_chars=22)
-            y += 15
+            y += 14
             self.draw_text(draw, f"VENCE: {req.arg3 or '—'}", f_body, x_col, y, max_chars=22)
-            y += 20
+            y += 18
 
             comps = ex.get('componentes', '—')
             y = self.draw_text(draw, f"COMP: {comps}", f_nano, x_col, y, max_chars=32)
