@@ -37,7 +37,7 @@ jobs:
           npm run build
         env:
           # Aquí inyectamos la URL de producción del servidor backend al compilar el frontend.
-          VITE_API_URL: https://lbms.cronosb.com/api
+          VITE_API_URL: https://lbms.kronosb.com/api
 
       - name: 📱 Sincronizar Capacitor
         working-directory: ./frontend
