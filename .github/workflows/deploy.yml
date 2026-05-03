@@ -6,15 +6,13 @@ on:
       - main
       - master # Por si usas master en lugar de main
 
-env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
   test:
     runs-on: ubuntu-latest
     steps:
       - name: 📦 Descargar código del repositorio
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: 🐍 Configurar Python
         uses: actions/setup-python@v5
@@ -22,7 +20,7 @@ jobs:
           python-version: '3.11'
 
       - name: 🟢 Configurar Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: '20'
 
@@ -69,7 +67,7 @@ jobs:
 
     steps:
       - name: 📦 Descargar código del repositorio
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: 🔑 Configurar llave SSH
         uses: webfactory/ssh-agent@v0.9.0
