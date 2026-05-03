@@ -1,3 +1,10 @@
+## [1.12.3](https://github.com/ElCuboNegro/kronos-lbms/compare/v1.12.2...v1.12.3) (2026-05-03)
+
+
+### Bug Fixes
+
+* **printer:** fix color inversion reverting error correctly this time ([adaa97a](https://github.com/ElCuboNegro/kronos-lbms/commit/adaa97aaf53bee18ecf4f27baa85338330bf9110))
+
 ## [1.12.2](https://github.com/ElCuboNegro/kronos-lbms/compare/v1.12.1...v1.12.2) (2026-05-03)
 
 
