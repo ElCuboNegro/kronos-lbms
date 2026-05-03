@@ -4,6 +4,7 @@ import { api } from '../api/client'
 import EventoForm from '../components/EventoForm'
 import RegistroEvolucionForm from '../components/RegistroEvolucionForm'
 import MapPicker from '../components/MapPicker'
+import AuthImg from '../components/AuthImg'
 
 const ESTADO_BADGE = {
   activo: 'badge--success', en_experimento: 'badge--warning',
@@ -271,11 +272,11 @@ function FotosRow({ fotos }) {
     <div style={{ display: 'flex', gap: '0.8rem', overflowX: 'auto', paddingBottom: '0.5rem' }}>
       {Object.entries(fotos).map(([angulo, url]) => (
         <div key={angulo} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.3rem', flexShrink: 0 }}>
-          <img
-            src={`/api${url}?t=${Date.now()}`}
+          <AuthImg
+            url={`${url}?t=${Date.now()}`}
             style={{ width: 80, height: 80, objectFit: 'cover', borderRadius: '10px', border: '1px solid var(--theme-border)' }}
             alt={angulo}
-            onError={e => { e.target.style.display = 'none' }}
+            fallback={<div style={{ display: 'none' }} />}
           />
           <span className="badge badge--outline" style={{ fontSize: '0.6rem' }}>{ANGULO_LABEL[angulo] || angulo}</span>
         </div>
