@@ -1,3 +1,10 @@
+## [1.10.1](https://github.com/ElCuboNegro/kronos-lbms/compare/v1.10.0...v1.10.1) (2026-05-03)
+
+
+### Bug Fixes
+
+* **ux:** fix mother plant UID bug and add QR scanner to parent fields ([034258f](https://github.com/ElCuboNegro/kronos-lbms/commit/034258f9c8ed321e2cf021c815ad55fd565aadc1))
+
 # [1.10.0](https://github.com/ElCuboNegro/kronos-lbms/compare/v1.9.2...v1.10.0) (2026-05-03)
 
 
