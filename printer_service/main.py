@@ -112,23 +112,7 @@ class LabelEngine:
             comps = ex.get('componentes', '—')
             y = self.draw_text(draw, f"COMP: {comps}", f_nano, x_col, y, max_chars=32)
 
-            peligros = ex.get('peligros', [])
-            if peligros:
-                # Usar etiquetas de texto para evitar fallos de renderizado de Emojis
-                p_labels = []
-                for p in peligros:
-                    p_up = p.upper()
-                    if 'TOX' in p_up: p_labels.append("[TOX]")
-                    elif 'IRR' in p_up: p_labels.append("[IRR]")
-                    elif 'INF' in p_up: p_labels.append("[INF]")
-                    elif 'COR' in p_up: p_labels.append("[COR]")
-                    elif 'OXI' in p_up: p_labels.append("[OXI]")
-                    else: p_labels.append(f"[{p_up}]")
-
-                self.draw_text(draw, "RIESGO: " + " ".join(p_labels), f_nano, x_col, y + 4, max_chars=32)
-
             return img.transpose(Image.ROTATE_180)
-
         else:
             # --- ETIQUETA DOBLABLE (ESPECÍMENES) ---
             qr = qrcode.QRCode(box_size=5, border=0)
