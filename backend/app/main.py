@@ -66,10 +66,10 @@ def health():
 def release_info():
     # En el futuro esto puede venir de una DB o archivo de configuración
     return {
-        "version": "0.1.1",
+        "version": "0.2.0",
         "required": False,
         "url": "https://github.com/ElCuboNegro/kronos-lbms/releases/latest",
-        "notes": "Mejoras en la navegación y corrección de errores críticos."
+        "notes": "Actualización Mayor 0.2.0: Telemetría, UI Consolidada, Lector Reactivos (PubChem) y App Nativa."
     }
 
 @app.get("/stats")
