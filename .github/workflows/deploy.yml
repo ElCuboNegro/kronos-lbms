@@ -1,15 +1,18 @@
 name: LBMS Continuous Delivery
 
 on:
-  push:
-    branches:
-      - main
-      - master # Por si usas master en lugar de main
+  workflow_run:
+    workflows: ["Semantic Release"]
+    types:
+      - completed
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
   test:
     runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     steps:
       - name: 📦 Descargar código del repositorio
         uses: actions/checkout@v5
@@ -64,6 +67,7 @@ jobs:
   deploy:
     needs: test
     runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
 
     steps:
       - name: 📦 Descargar código del repositorio
