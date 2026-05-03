@@ -9,7 +9,6 @@ const SUSTRATOS_BASE = ['vitro', 'sphagnum', 'akadama', 'perlita', 'mezcla', 'ti
 const CONTENEDORES = ['frasco_vitro', 'maceta', 'bolsa', 'bandeja', 'otro']
 
 export default function RegistroEvolucionForm({ especimenId, protocolos = [], onSaved, onCancel, initialStep = 0 }) {
-  const [step, setStep] = useState(initialStep)
   const [sustratos, setSustratos] = useState([])
   const [form, setForm] = useState({
     protocolo_clonacion_id: '',
@@ -76,7 +75,6 @@ export default function RegistroEvolucionForm({ especimenId, protocolos = [], on
       }
       const reg = await api.post(`/especimenes/${especimenId}/evolucion`, payload)
       setRegistroId(reg.id)
-      setStep(2)
     } catch (err) { setError(err.message) }
     finally { setLoading(false) }
   }
@@ -110,15 +108,15 @@ export default function RegistroEvolucionForm({ especimenId, protocolos = [], on
   }
 
   return (
-    <div style={{position:'fixed',inset:0,background:'#000c',display:'flex',alignItems:'flex-end',zIndex:100}}>
+    <div style={{position:'fixed',inset:0,background:'#000c',display:'flex',alignItems:'flex-end',zIndex:2000}}>
       <div style={{background:'var(--theme-surface)',borderRadius:'16px 16px 0 0',padding:'1.5rem',width:'100%',maxHeight:'90dvh',overflowY:'auto',display:'flex',flexDirection:'column'}}>
         <div className="page-header" style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'1.25rem'}}>
-          <h3 className="page-title" style={{color:'var(--theme-primary)',margin:0,fontSize:'1.1rem'}}>Nuevo registro de evolución</h3>
-          <button style={{background:'none',border:'none',color:'var(--theme-secondary)',fontSize:'1.2rem',cursor:'pointer'}} onClick={onCancel}>✕</button>
+          <h3 className="page-title" style={{color:'var(--theme-primary)',margin:0,fontSize:'1.1rem'}}>{!registroId ? 'Nuevo registro de evolución' : 'Añadir Fotografías'}</h3>
+          <button style={{background:'none',border:'none',color:'var(--theme-secondary)',fontSize:'1.2rem',cursor:'pointer'}} onClick={!registroId ? onCancel : onSaved}>✕</button>
         </div>
 
-        {step === 0 && (
-          <div style={{display:'flex',flexDirection:'column',gap:'1.25rem'}}>
+        {!registroId ? (
+          <div style={{display:'flex',flexDirection:'column',gap:'1.25rem', paddingBottom: '2rem'}}>
             <Section title="Morfología y Variegación">
               <Row2>
                 <Num label="Altura (cm)" value={form.altura_cm} onChange={v => set('altura_cm', v)} min="0" />
@@ -140,35 +138,6 @@ export default function RegistroEvolucionForm({ especimenId, protocolos = [], on
               </Row3>
             </Section>
 
-            <Section title="Contenedor y Protocolo">
-              <div style={{display:'flex',flexDirection:'column',gap:4,flex:1}}>
-                <label style={{color:'var(--theme-secondary)',fontSize:'0.75rem',fontWeight:600}}>Formulación de Sustrato</label>
-                <select style={{background:'var(--theme-background)',border:'1px solid var(--theme-border)',borderRadius:8,padding:'0.65rem 0.8rem',color:'var(--theme-text)',fontSize:'0.95rem',outline:'none',width:'100%',boxSizing:'border-box'}} value={form.sustrato_id} onChange={e => set('sustrato_id', e.target.value)}>
-                  <option value="">— Seleccionar formulación —</option>
-                  {sustratos.map(su => <option key={su.id} value={su.id}>{su.codigo_formulacion} - {su.nombre}</option>)}
-                </select>
-              </div>
-              <Row2>
-                <Sel label="Tipo Sustrato" value={form.sustrato} onChange={v => set('sustrato', v)} options={SUSTRATOS_BASE} />
-                <Sel label="Contenedor" value={form.tipo_contenedor} onChange={v => set('tipo_contenedor', v)} options={CONTENEDORES} />
-              </Row2>
-              <div style={{display:'flex',flexDirection:'column',gap:4,flex:1}}>
-                <label style={{color:'var(--theme-secondary)',fontSize:'0.75rem',fontWeight:600}}>Protocolo aplicado</label>
-                <select style={{background:'var(--theme-background)',border:'1px solid var(--theme-border)',borderRadius:8,padding:'0.65rem 0.8rem',color:'var(--theme-text)',fontSize:'0.95rem',outline:'none',width:'100%',boxSizing:'border-box'}} value={form.protocolo_clonacion_id} onChange={e => set('protocolo_clonacion_id', e.target.value)}>
-                  <option value="">Ninguno / Observación</option>
-                  {protocolos.map(p => <option key={p.id} value={p.id}>{p.nombre} (v{p.version})</option>)}
-                </select>
-              </div>
-            </Section>
-
-            <div style={{display:'flex',gap:10,marginTop:10}}>
-              <button type="button" style={{flex:2,background:'var(--theme-primary)',border:'none',borderRadius:10,color:'#fff',padding:'0.8rem',fontSize:'0.95rem',fontWeight:600,cursor:'pointer'}} onClick={() => setStep(1)}>Siguiente: Ambiente →</button>
-            </div>
-          </div>
-        )}
-
-        {step === 1 && (
-          <div style={{display:'flex',flexDirection:'column',gap:'1.25rem'}}>
             <Section title="Condiciones Ambientales">
               <Row2>
                 <Num label="Temp (°C)" value={form.temperatura_c} onChange={v => set('temperatura_c', v)} min="-20" max="60" />
@@ -192,20 +161,38 @@ export default function RegistroEvolucionForm({ especimenId, protocolos = [], on
               </div>
             </Section>
 
+            <Section title="Contenedor y Protocolo">
+              <div style={{display:'flex',flexDirection:'column',gap:4,flex:1}}>
+                <label style={{color:'var(--theme-secondary)',fontSize:'0.75rem',fontWeight:600}}>Formulación de Sustrato</label>
+                <select style={{background:'var(--theme-background)',border:'1px solid var(--theme-border)',borderRadius:8,padding:'0.65rem 0.8rem',color:'var(--theme-text)',fontSize:'0.95rem',outline:'none',width:'100%',boxSizing:'border-box'}} value={form.sustrato_id} onChange={e => set('sustrato_id', e.target.value)}>
+                  <option value="">— Seleccionar formulación —</option>
+                  {sustratos.map(su => <option key={su.id} value={su.id}>{su.codigo_formulacion} - {su.nombre}</option>)}
+                </select>
+              </div>
+              <Row2>
+                <Sel label="Tipo Sustrato" value={form.sustrato} onChange={v => set('sustrato', v)} options={SUSTRATOS_BASE} />
+                <Sel label="Contenedor" value={form.tipo_contenedor} onChange={v => set('tipo_contenedor', v)} options={CONTENEDORES} />
+              </Row2>
+              <div style={{display:'flex',flexDirection:'column',gap:4,flex:1}}>
+                <label style={{color:'var(--theme-secondary)',fontSize:'0.75rem',fontWeight:600}}>Protocolo aplicado</label>
+                <select style={{background:'var(--theme-background)',border:'1px solid var(--theme-border)',borderRadius:8,padding:'0.65rem 0.8rem',color:'var(--theme-text)',fontSize:'0.95rem',outline:'none',width:'100%',boxSizing:'border-box'}} value={form.protocolo_clonacion_id} onChange={e => set('protocolo_clonacion_id', e.target.value)}>
+                  <option value="">Ninguno / Observación</option>
+                  {protocolos.map(p => <option key={p.id} value={p.id}>{p.nombre} (v{p.version})</option>)}
+                </select>
+              </div>
+            </Section>
+
             {error && <p style={{color:'var(--error)',fontSize:'0.85rem',margin:0}}>{error}</p>}
 
             <div style={{display:'flex',gap:10,marginTop:10}}>
-              <button type="button" style={{flex:1,background:'none',border:'1px solid var(--theme-border)',borderRadius:10,color:'var(--theme-primary)',padding:'0.8rem',fontSize:'0.95rem',cursor:'pointer'}} onClick={() => setStep(0)}>← Atrás</button>
-              <button type="button" style={{flex:2,background:'var(--theme-primary)',border:'none',borderRadius:10,color:'#fff',padding:'0.8rem',fontSize:'0.95rem',fontWeight:600,cursor:'pointer'}} onClick={guardarMedidas} disabled={loading}>
-                {loading ? 'Guardando…' : 'Guardar y fotografiar →'}
+              <button type="button" style={{flex:1,background:'var(--theme-primary)',border:'none',borderRadius:10,color:'#fff',padding:'1rem',fontSize:'1rem',fontWeight:700,cursor:'pointer'}} onClick={guardarMedidas} disabled={loading}>
+                {loading ? 'Guardando…' : 'Guardar y Continuar a Fotos'}
               </button>
             </div>
           </div>
-        )}
-
-        {step === 2 && (
-          <div style={{display:'flex',flexDirection:'column',gap:'1.25rem'}}>
-            <Section title="Fotografías">
+        ) : (
+          <div style={{display:'flex',flexDirection:'column',gap:'1.25rem', paddingBottom: '2rem'}}>
+            <Section title="Fotografías (Opcional)">
               <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10}}>
                 {ANGULOS.map(ang => (
                   <div key={ang} style={{aspectRatio:'1',background:'var(--theme-background)',borderRadius:12,border:'1px dashed var(--theme-border)',overflow:'hidden',cursor:'pointer'}} onClick={() => !uploadingAngulo && triggerCamera(ang)}>
