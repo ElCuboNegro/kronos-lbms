@@ -1,3 +1,10 @@
+## [1.12.1](https://github.com/ElCuboNegro/kronos-lbms/compare/v1.12.0...v1.12.1) (2026-05-03)
+
+
+### Bug Fixes
+
+* **backend:** adapt print endpoints payload to golden version printer service ([03173a8](https://github.com/ElCuboNegro/kronos-lbms/commit/03173a82cfef65b45482fbbe48073a19274d9196))
+
 # [1.12.0](https://github.com/ElCuboNegro/kronos-lbms/compare/v1.11.1...v1.12.0) (2026-05-03)
 
 
