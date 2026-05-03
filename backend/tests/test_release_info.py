@@ -12,4 +12,4 @@ def test_release_info_public_endpoint():
     assert "url" in data
     assert "required" in data
     assert isinstance(data["version"], str)
-    assert data["version"] == "1.12.7"
+    assert data["version"] == "1.12.8"

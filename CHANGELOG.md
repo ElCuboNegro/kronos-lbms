@@ -1,3 +1,10 @@
+## [1.12.8](https://github.com/ElCuboNegro/kronos-lbms/compare/v1.12.7...v1.12.8) (2026-05-03)
+
+
+### Bug Fixes
+
+* **printer:** remove risk section from reagent labels to prevent QR code overlap ([f81f877](https://github.com/ElCuboNegro/kronos-lbms/commit/f81f8772a8305b3ae2f38a663441edccaa5c4fcc))
+
 ## [1.12.7](https://github.com/ElCuboNegro/kronos-lbms/compare/v1.12.6...v1.12.7) (2026-05-03)
 
 
