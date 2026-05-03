@@ -1,3 +1,12 @@
+## [1.0.2](https://github.com/ElCuboNegro/kronos-lbms/compare/v1.0.1...v1.0.2) (2026-05-03)
+
+
+### Bug Fixes
+
+* add from_attributes to ScanResult schemas to fix serialization error ([310d0a4](https://github.com/ElCuboNegro/kronos-lbms/commit/310d0a417459730388b7d957598e2ef4faeeb100))
+* **scanner:** show 'Add Reactivo' button for unknown generic barcodes ([5d5cbc5](https://github.com/ElCuboNegro/kronos-lbms/commit/5d5cbc5c17ecbc951ee5427ce476e1d19301207a))
+* serialización de ORM en ScanResult ([#61](https://github.com/ElCuboNegro/kronos-lbms/issues/61)) ([5b066f6](https://github.com/ElCuboNegro/kronos-lbms/commit/5b066f6aff54b85079bbebb7d3b532544483703a))
+
 ## [1.0.1](https://github.com/ElCuboNegro/kronos-lbms/compare/v1.0.0...v1.0.1) (2026-05-03)
 
 
