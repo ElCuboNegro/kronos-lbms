@@ -19,6 +19,7 @@ export default function Home() {
     { label: 'Lotes Prep.', icon: '📦', path: '/lotes', desc: 'Historial de medios' },
     { label: 'Sustratos', icon: '🪨', path: '/lab', desc: 'Catálogo de agares' },
     { label: 'Herramientas', icon: '🧮', path: '/calculadoras', desc: 'Diluciones y molaridad' },
+    { label: 'Telemetría', icon: '🐞', path: '/logs', desc: 'Historial de errores locales' },
   ]
 
   return (
