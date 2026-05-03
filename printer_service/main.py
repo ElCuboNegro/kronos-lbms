@@ -144,10 +144,10 @@ class LabelEngine:
             # Margen interno restaurado (border=1), posicionado en X=3, Y=8
             qr_px = self.fold_y - 16
             qr_res = qr_img.resize((qr_px, qr_px))
-            img.paste(qr_res, (3, 8))
+            img.paste(qr_res, (16, 8))
 
             # Texto en la derecha
-            x_text = qr_px + 10
+            x_text = qr_px + 24
             y = 8
             draw.text((x_text, y), "KRONOS BIOLABS SAS", font=f_nano, fill=0)
             y += 16
