@@ -14,6 +14,9 @@ interface StepAccordionProps {
   description?: string;
   timers?: TimerDef[];
   isInitialExpanded?: boolean;
+  expanded?: boolean;
+  onToggle?: (expanded: boolean) => void;
+  children?: React.ReactNode;
 }
 
 const StepAccordion: React.FC<StepAccordionProps> = ({
@@ -22,18 +25,28 @@ const StepAccordion: React.FC<StepAccordionProps> = ({
   title,
   description,
   timers = [],
-  isInitialExpanded = false
+  isInitialExpanded = false,
+  expanded,
+  onToggle,
+  children
 }) => {
-  const [isExpanded, setIsExpanded] = useState(isInitialExpanded);
-  // We use refs to trigger all internal TimerRows, or we can lift the state up if needed.
-  // For this prototype, we'll assume a simplistic prop-drilling or Context if we want global "Play All",
-  // but to keep it self-contained, we can render the list here.
+  const [internalExpanded, setInternalExpanded] = useState(isInitialExpanded);
+
+  const isExpanded = expanded !== undefined ? expanded : internalExpanded;
+
+  const handleToggle = () => {
+    if (onToggle) {
+      onToggle(!isExpanded);
+    } else {
+      setInternalExpanded(!isExpanded);
+    }
+  };
 
   return (
     <div className="bg-white border-2 border-gray-100 rounded-2xl mb-4 overflow-hidden shadow-sm">
       {/* Header / Toggle */}
       <button
-        onClick={() => setIsExpanded(!isExpanded)}
+        onClick={handleToggle}
         className="w-full flex items-center p-4 text-left active:bg-gray-50 transition-colors"
       >
         <span className="text-2xl mr-3" aria-hidden="true">{icon}</span>
@@ -56,6 +69,12 @@ const StepAccordion: React.FC<StepAccordionProps> = ({
             <p className="text-gray-600 text-base leading-relaxed mb-5 mt-4">
               {description}
             </p>
+          )}
+
+          {children && (
+            <div className="mt-4">
+              {children}
+            </div>
           )}
 
           {timers.length > 0 && (
@@ -85,5 +104,4 @@ const StepAccordion: React.FC<StepAccordionProps> = ({
     </div>
   );
 };
-
 export default StepAccordion;

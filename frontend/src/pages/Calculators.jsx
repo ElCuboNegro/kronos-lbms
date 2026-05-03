@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import PeatPHProtocol from '../components/Characterization/PeatPHProtocol'
 
 export default function Calculators() {
   const [tab, setTab] = useState('c1v1')
@@ -14,6 +15,7 @@ export default function Calculators() {
         <TabButton active={tab === 'molaridad'} onClick={() => setTab('molaridad')}>Molaridad</TabButton>
         <TabButton active={tab === 'viabilidad'} onClick={() => setTab('viabilidad')}>Viabilidad Celular</TabButton>
         <TabButton active={tab === 'cfu'} onClick={() => setTab('cfu')}>Contador UFC</TabButton>
+        <TabButton active={tab === 'caracterizacion'} onClick={() => setTab('caracterizacion')}>Caracterización</TabButton>
       </div>
 
       <div style={{ flex: 1 }}>
@@ -21,6 +23,7 @@ export default function Calculators() {
         {tab === 'molaridad' && <MolarityCalculator />}
         {tab === 'viabilidad' && <CellViabilityCounter />}
         {tab === 'cfu' && <ColonyCounter />}
+        {tab === 'caracterizacion' && <PeatPHProtocol />}
       </div>
     </div>
   )
