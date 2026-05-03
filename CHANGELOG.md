@@ -1,3 +1,10 @@
+## [1.12.7](https://github.com/ElCuboNegro/kronos-lbms/compare/v1.12.6...v1.12.7) (2026-05-03)
+
+
+### Bug Fixes
+
+* **printer:** adjust layout y-offset down by 2mm for reactant labels ([6deeed1](https://github.com/ElCuboNegro/kronos-lbms/commit/6deeed1ad6610969dadca3330391bd995b539571))
+
 ## [1.12.6](https://github.com/ElCuboNegro/kronos-lbms/compare/v1.12.5...v1.12.6) (2026-05-03)
 
 
