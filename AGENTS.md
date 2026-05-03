@@ -118,6 +118,20 @@ Para acelerar el desarrollo, se permite la ejecución de múltiples agentes en p
 
 ---
 
+## Herramientas de IA (MCP)
+
+Para evitar la exploración manual excesiva (consumo de tokens) y obtener datos en tiempo real, los agentes **DEBEN** priorizar el uso del servidor MCP integrado.
+
+### Cuándo usar el MCP
+- **Consultas de Inventario:** Usa `lbms_list_reactivos` o `lbms_list_sustratos` antes de proponer cambios que dependan de stock.
+- **Depuración de Errores en Vivo:** Antes de preguntar al usuario, usa `lbms_get_frontend_logs` para ver si hay reportes de crash recientes en las apps móviles/web.
+- **Gestión de Hardware:** Usa `lbms_imprimir_etiqueta_libre` o `lbms_scan_qr` para interactuar con la infraestructura física del laboratorio.
+
+### Desarrollo del MCP
+Si una nueva funcionalidad del backend requiere exposición a la IA, actualiza `/mcp/server.py` añadiendo la herramienta correspondiente bajo el decorador `@mcp.tool`.
+
+---
+
 ## Convenciones de código Python
 
 ### Arquitectura y Capas (Import Linter)

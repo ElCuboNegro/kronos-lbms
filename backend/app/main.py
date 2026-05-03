@@ -93,7 +93,25 @@ def receive_telemetry(payload: dict):
             log["received_at"] = datetime.utcnow().isoformat()
             f.write(json.dumps(log) + "\n")
 
-    return {"status": "ok", "saved": len(logs)}
+    return {"status": "ok", "count": len(logs)}
+
+@app.get("/app/telemetry")
+def get_telemetry(limit: int = 50):
+    """Retorna los últimos logs de error recibidos desde el frontend."""
+    UPLOAD_BASE = Path(os.environ.get("UPLOAD_DIR", "/app/uploads"))
+    log_file = UPLOAD_BASE / "telemetry" / "frontend_crashes.jsonl"
+
+    if not log_file.exists():
+        return []
+
+    logs = []
+    with log_file.open("r", encoding="utf-8") as f:
+        for line in f:
+            if line.strip():
+                logs.append(json.loads(line))
+
+    # Retornar los últimos N
+    return logs[-limit:]
 
 @app.get("/stats")
 def stats(db: Session = Depends(get_db), _=Depends(auth.get_current_user)):

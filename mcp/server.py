@@ -134,6 +134,40 @@ class ListProtocolosInput(BaseModel):
     tipo: Optional[str] = Field(default=None, description="Tipo: extraccion_meristema, propagacion_in_vitro, desinfeccion, subcultivo, enraizamiento, aclimatacion, otro")
 
 
+class ListLogsInput(BaseModel):
+    model_config = ConfigDict(str_strip_whitespace=True)
+    limit: Optional[int] = Field(default=50, description="Número máximo de logs a retornar")
+
+
+class IdInput(BaseModel):
+    model_config = ConfigDict(str_strip_whitespace=True)
+    id: str = Field(..., description="UUID del recurso")
+
+
+class BarcodeInput(BaseModel):
+    model_config = ConfigDict(str_strip_whitespace=True)
+    barcode: str = Field(..., description="Código de barras o UID a escanear")
+
+
+class ImprimirIdInput(BaseModel):
+    model_config = ConfigDict(str_strip_whitespace=True)
+    id: str = Field(..., description="UUID del registro (especimen, reactivo, sustrato o lote)")
+
+
+class ImprimirContenedorInput(BaseModel):
+    model_config = ConfigDict(str_strip_whitespace=True)
+    uid: str = Field(..., description="UID del contenedor a etiquetar")
+
+
+class ImprimirEtiquetaInput(BaseModel):
+    model_config = ConfigDict(str_strip_whitespace=True)
+    titulo: str = Field(..., description="Título principal de la etiqueta")
+    subtitulo: Optional[str] = Field(default="", description="Subtítulo o Lote")
+    info: Optional[str] = Field(default="", description="Información técnica (ej: pH, Conc)")
+    extra: Optional[str] = Field(default="", description="Notas adicionales o método")
+    qr: Optional[str] = Field(default="", description="Contenido del código QR")
+
+
 # ── Tools: Especies ───────────────────────────────────────────────────────────
 
 @mcp.tool(
@@ -395,6 +429,240 @@ async def lbms_list_protocolos(params: ListProtocolosInput) -> str:
         if params.tipo:
             data = [p for p in data if p.get("tipo") == params.tipo]
         return json.dumps(data, indent=2, ensure_ascii=False, default=str)
+    except Exception as e:
+        return _err(e)
+
+
+@mcp.tool(
+    name="lbms_get_protocolo",
+    annotations={"title": "Obtener detalle de protocolo", "readOnlyHint": True, "destructiveHint": False}
+)
+async def lbms_get_protocolo(params: IdInput) -> str:
+    """Obtiene el detalle completo de un protocolo, incluyendo sus pasos (Run Mode)
+    y materiales requeridos.
+    """
+    try:
+        return json.dumps(await _api("GET", f"/protocolos/{params.id}"),
+                          indent=2, ensure_ascii=False, default=str)
+    except Exception as e:
+        return _err(e)
+
+
+@mcp.tool(
+    name="lbms_get_experimento",
+    annotations={"title": "Obtener detalle de experimento", "readOnlyHint": True, "destructiveHint": False}
+)
+async def lbms_get_experimento(params: IdInput) -> str:
+    """Obtiene el detalle completo de un experimento: estado, especímenes asignados,
+    y lista de resultados (mediciones, observaciones).
+    """
+    try:
+        return json.dumps(await _api("GET", f"/experimentos/{params.id}"),
+                          indent=2, ensure_ascii=False, default=str)
+    except Exception as e:
+        return _err(e)
+
+
+# ── Tools: Inventario & Reactivos ─────────────────────────────────────────────
+
+@mcp.tool(
+    name="lbms_list_reactivos",
+    annotations={"title": "Listar reactivos químicos", "readOnlyHint": True, "destructiveHint": False}
+)
+async def lbms_list_reactivos() -> str:
+    """Lista el catálogo de reactivos químicos disponibles, su stock y pureza."""
+    try:
+        return json.dumps(await _api("GET", "/reactivos"),
+                          indent=2, ensure_ascii=False, default=str)
+    except Exception as e:
+        return _err(e)
+
+
+@mcp.tool(
+    name="lbms_list_formulaciones",
+    annotations={"title": "Listar recetario de medios", "readOnlyHint": True, "destructiveHint": False}
+)
+async def lbms_list_formulaciones() -> str:
+    """Lista las formulaciones de medios y buffers registradas en el recetario."""
+    try:
+        return json.dumps(await _api("GET", "/formulaciones"),
+                          indent=2, ensure_ascii=False, default=str)
+    except Exception as e:
+        return _err(e)
+
+
+@mcp.tool(
+    name="lbms_get_formulacion",
+    annotations={"title": "Obtener receta de medio", "readOnlyHint": True, "destructiveHint": False}
+)
+async def lbms_get_formulacion(params: IdInput) -> str:
+    """Obtiene la receta detallada (mise en place) de una formulación específica."""
+    try:
+        return json.dumps(await _api("GET", f"/formulaciones/{params.id}"),
+                          indent=2, ensure_ascii=False, default=str)
+    except Exception as e:
+        return _err(e)
+
+
+@mcp.tool(
+    name="lbms_list_lotes",
+    annotations={"title": "Listar lotes preparados", "readOnlyHint": True, "destructiveHint": False}
+)
+async def lbms_list_lotes() -> str:
+    """Lista los lotes de medios o buffers ya preparados y disponibles para usar."""
+    try:
+        return json.dumps(await _api("GET", "/reactivos/lotes"),
+                          indent=2, ensure_ascii=False, default=str)
+    except Exception as e:
+        return _err(e)
+
+
+# ── Tools: Físico & Sustratos ─────────────────────────────────────────────────
+
+@mcp.tool(
+    name="lbms_list_sustratos",
+    annotations={"title": "Listar sustratos", "readOnlyHint": True, "destructiveHint": False}
+)
+async def lbms_list_sustratos() -> str:
+    """Lista los sustratos (orgánicos e inorgánicos) y sus propiedades teóricas."""
+    try:
+        return json.dumps(await _api("GET", "/sustratos"),
+                          indent=2, ensure_ascii=False, default=str)
+    except Exception as e:
+        return _err(e)
+
+
+@mcp.tool(
+    name="lbms_list_elementos",
+    annotations={"title": "Listar equipamiento", "readOnlyHint": True, "destructiveHint": False}
+)
+async def lbms_list_elementos() -> str:
+    """Lista el equipamiento y elementos físicos del laboratorio."""
+    try:
+        return json.dumps(await _api("GET", "/elementos"),
+                          indent=2, ensure_ascii=False, default=str)
+    except Exception as e:
+        return _err(e)
+
+
+# ── Tools: Hardware & Printing ────────────────────────────────────────────────
+
+@mcp.tool(
+    name="lbms_scan_qr",
+    annotations={"title": "Escanear código", "readOnlyHint": True, "destructiveHint": False}
+)
+async def lbms_scan_qr(params: BarcodeInput) -> str:
+    """Resuelve un código de barras o UID para identificar qué entidad es (especimen, reactivo, etc)."""
+    try:
+        return json.dumps(await _api("GET", f"/scan/{params.barcode}"),
+                          indent=2, ensure_ascii=False, default=str)
+    except Exception as e:
+        return _err(e)
+
+
+@mcp.tool(
+    name="lbms_imprimir_especimen",
+    annotations={"title": "Imprimir etiqueta de espécimen", "readOnlyHint": False, "destructiveHint": False}
+)
+async def lbms_imprimir_especimen(params: ImprimirIdInput) -> str:
+    """Imprime una etiqueta normalizada para un espécimen biológico, incluyendo su
+    especie, UID y requerimientos de cultivo automáticos.
+    """
+    try:
+        return json.dumps(await _api("POST", f"/printer/imprimir/{params.id}"),
+                          indent=2, ensure_ascii=False, default=str)
+    except Exception as e:
+        return _err(e)
+
+
+@mcp.tool(
+    name="lbms_imprimir_reactivo",
+    annotations={"title": "Imprimir etiqueta de reactivo", "readOnlyHint": False, "destructiveHint": False}
+)
+async def lbms_imprimir_reactivo(params: ImprimirIdInput) -> str:
+    """Imprime una etiqueta para un frasco de reactivo puro (Stock), incluyendo
+    pureza, fórmula química y pictogramas de peligrosidad.
+    """
+    try:
+        return json.dumps(await _api("POST", f"/printer/imprimir-reactivo/{params.id}"),
+                          indent=2, ensure_ascii=False, default=str)
+    except Exception as e:
+        return _err(e)
+
+
+@mcp.tool(
+    name="lbms_imprimir_sustrato",
+    annotations={"title": "Imprimir etiqueta de sustrato", "readOnlyHint": False, "destructiveHint": False}
+)
+async def lbms_imprimir_sustrato(params: ImprimirIdInput) -> str:
+    """Imprime una etiqueta para un contenedor de sustrato (ej. Sphagnum, Turba),
+    incluyendo pH y conductividad teórica.
+    """
+    try:
+        return json.dumps(await _api("POST", f"/printer/imprimir-sustrato/{params.id}"),
+                          indent=2, ensure_ascii=False, default=str)
+    except Exception as e:
+        return _err(e)
+
+
+@mcp.tool(
+    name="lbms_imprimir_lote",
+    annotations={"title": "Imprimir etiqueta de lote preparado", "readOnlyHint": False, "destructiveHint": False}
+)
+async def lbms_imprimir_lote(params: ImprimirIdInput) -> str:
+    """Imprime una etiqueta para un medio o buffer preparado, con desglose de
+    componentes calculados, fecha de vencimiento y preparador.
+    """
+    try:
+        return json.dumps(await _api("POST", f"/printer/imprimir-lote/{params.id}"),
+                          indent=2, ensure_ascii=False, default=str)
+    except Exception as e:
+        return _err(e)
+
+
+@mcp.tool(
+    name="lbms_imprimir_contenedor",
+    annotations={"title": "Imprimir etiqueta de contenedor", "readOnlyHint": False, "destructiveHint": False}
+)
+async def lbms_imprimir_contenedor(params: ImprimirContenedorInput) -> str:
+    """Imprime una etiqueta resumen para un contenedor que agrupa múltiples especímenes."""
+    try:
+        return json.dumps(await _api("POST", f"/printer/imprimir-contenedor/{params.uid}"),
+                          indent=2, ensure_ascii=False, default=str)
+    except Exception as e:
+        return _err(e)
+
+
+@mcp.tool(
+    name="lbms_imprimir_etiqueta_libre",
+    annotations={"title": "Imprimir etiqueta libre", "readOnlyHint": False, "destructiveHint": False}
+)
+async def lbms_imprimir_etiqueta_libre(params: ImprimirEtiquetaInput) -> str:
+    """Envía una orden de impresión con campos libres a la impresora Jadens."""
+    try:
+        payload = {
+            "titulo": params.titulo,
+            "subtitulo": params.subtitulo,
+            "info": params.info,
+            "extra": params.extra,
+            "qr": params.qr
+        }
+        return json.dumps(await _api("POST", "/printer/imprimir-etiqueta-libre", json=payload),
+                          indent=2, ensure_ascii=False, default=str)
+    except Exception as e:
+        return _err(e)
+
+
+@mcp.tool(
+    name="lbms_get_frontend_logs",
+    annotations={"title": "Obtener logs del frontend", "readOnlyHint": True, "destructiveHint": False}
+)
+async def lbms_get_frontend_logs(params: ListLogsInput) -> str:
+    """Retorna los últimos reportes de errores y crashes capturados por la telemetría de las apps cliente."""
+    try:
+        query = {"limit": params.limit}
+        return json.dumps(await _api("GET", "/app/telemetry", params=query),
+                          indent=2, ensure_ascii=False, default=str)
     except Exception as e:
         return _err(e)
 

@@ -78,3 +78,40 @@ docker compose logs -f backend  # tail backend logs
 ```
 Backend has hot-reload (volume mount of ./backend/app).
 Frontend requires rebuild (`docker compose build frontend`) after code changes.
+
+## Seymour OS MCP Server
+El proyecto incluye un servidor MCP (`mcp/server.py`) que actúa como controlador universal para agentes de IA. Proporciona acceso directo a la base de datos (Especies, Inventario, Experimentos) y hardware (Impresora, Escáner).
+
+### Configuración (Local)
+Para conectar un agente a Seymour OS en desarrollo:
+```json
+"lbms_mcp": {
+  "command": "python3",
+  "args": ["/home/elcubonegro/lbms/mcp/server.py"],
+  "env": {
+    "LBMS_BASE_URL": "http://localhost:8001",
+    "LBMS_EMAIL": "tu_usuario@kronos.lab",
+    "LBMS_PASSWORD": "tu_password"
+  }
+}
+```
+
+### Configuración (Producción)
+Para conectar a la base de datos real en la nube:
+```json
+"seymour_os_prod": {
+  "command": "python3",
+  "args": ["/home/elcubonegro/lbms/mcp/server.py"],
+  "env": {
+    "LBMS_BASE_URL": "https://lbms.kronosb.com/api",
+    "LBMS_EMAIL": "tu_usuario@kronos.lab",
+    "LBMS_PASSWORD": "tu_password"
+  }
+}
+```
+
+### Herramientas Destacadas
+- `lbms_list_reactivos`: Consulta de inventario químico.
+- `lbms_get_frontend_logs`: Trae los últimos crashes y errores reportados por las apps cliente (vía Telemetría).
+- `lbms_imprimir_*`: Comandos directos de impresión física de etiquetas.
+- `lbms_scan_qr`: Resolución instantánea de códigos de barras.
