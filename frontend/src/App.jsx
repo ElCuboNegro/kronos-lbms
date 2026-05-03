@@ -55,6 +55,26 @@ function Layout({ children }) {
     }
   }
 
+  const getPageTitle = () => {
+    const p = location.pathname
+    if (p === '/') return 'Seymour-OS'
+    if (p.startsWith('/scan')) return 'Escáner'
+    if (p.startsWith('/especies')) return 'Genealogía'
+    if (p.startsWith('/especimen/')) return 'Ficha Especímen'
+    if (p.startsWith('/nuevo-individuo')) return 'Nuevo Individuo'
+    if (p.startsWith('/contenedores')) return 'Contenedores'
+    if (p.startsWith('/protocolos')) return 'Protocolos'
+    if (p.startsWith('/elementos')) return 'Elementos'
+    if (p.startsWith('/reactivos')) return 'Reactivos'
+    if (p.startsWith('/formulaciones')) return 'Recetario'
+    if (p.startsWith('/lotes')) return 'Lotes Preparados'
+    if (p.startsWith('/lab')) return 'Sustratos'
+    if (p.startsWith('/calculadoras')) return 'Micro-Herramientas'
+    if (p.startsWith('/experimentos')) return 'Experimento'
+    if (p.startsWith('/logs')) return 'Telemetría'
+    return 'Seymour-OS'
+  }
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100dvh' }}>
       <header className="page-header" style={{
@@ -70,7 +90,7 @@ function Layout({ children }) {
           ? <button className="back-btn" onClick={handleBack}>←</button>
           : <span style={{ width: 40 }} />
         }
-        <span className="text-primary" style={{ fontWeight: 700, letterSpacing: 2, fontSize: '0.95rem' }}>Seymour-OS</span>
+        <span className="text-primary" style={{ fontWeight: 700, letterSpacing: 1, fontSize: '0.95rem' }}>{getPageTitle()}</span>
         <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
           <button style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.2rem', padding: 0 }} onClick={toggleTheme} title="Cambiar diseño">
             {theme === 'dark' ? '☀️' : '🌙'}
