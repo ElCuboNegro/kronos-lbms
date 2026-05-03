@@ -1,3 +1,10 @@
+## [1.12.2](https://github.com/ElCuboNegro/kronos-lbms/compare/v1.12.1...v1.12.2) (2026-05-03)
+
+
+### Bug Fixes
+
+* **printer:** restaurar margen interno silencioso del QR code para evadir limites de corte ([6b0722c](https://github.com/ElCuboNegro/kronos-lbms/commit/6b0722c590063d6bec4c795bebc9d30f815e7d0c))
+
 ## [1.12.1](https://github.com/ElCuboNegro/kronos-lbms/compare/v1.12.0...v1.12.1) (2026-05-03)
 
 
