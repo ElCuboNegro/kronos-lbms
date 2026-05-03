@@ -1,3 +1,10 @@
+# [1.9.0](https://github.com/ElCuboNegro/kronos-lbms/compare/v1.8.0...v1.9.0) (2026-05-03)
+
+
+### Features
+
+* **printer:** modularize printer service and containerize for independence ([b4bb6a8](https://github.com/ElCuboNegro/kronos-lbms/commit/b4bb6a8e7fd585174a355736289d1fdf4ef6ee95))
+
 # [1.8.0](https://github.com/ElCuboNegro/kronos-lbms/compare/v1.7.0...v1.8.0) (2026-05-03)
 
 
