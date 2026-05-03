@@ -26,10 +26,14 @@ export default function EspecimenDetail() {
   const [showEdit, setShowEdit] = useState(false)
   const [printing, setPrinting] = useState(false)
   const [loading, setLoading] = useState(!esp)
+  const [especieData, setEspecieData] = useState(null)
 
   async function fetchEsp() {
     setLoading(true)
-    try { setEsp(await api.get(`/especimenes/${id}`)) }
+    try {
+      const data = await api.get(`/especimenes/${id}`)
+      setEsp(data)
+    }
     finally { setLoading(false) }
   }
 
@@ -39,7 +43,11 @@ export default function EspecimenDetail() {
   }
 
   useEffect(() => {
-    if (!esp) fetchEsp()
+    if (!esp) {
+       fetchEsp()
+    } else if (esp.especie_id && !especieData) {
+       api.get(`/especies/${esp.especie_id}`).then(setEspecieData).catch(() => {})
+    }
     fetchRegistros()
     api.get('/protocolos').then(setProtocolos).catch(() => {})
 
@@ -47,7 +55,7 @@ export default function EspecimenDetail() {
       setEvolutionStep(2)
       setShowEvolucion(true)
     }
-  }, [id, params])
+  }, [id, params, esp])
 
   async function imprimir() {
     setPrinting(true)
@@ -128,6 +136,17 @@ export default function EspecimenDetail() {
             )}
             {esp.notas && <InfoRow label="Notas" value={esp.notas} isLast />}
           </div>
+
+          {especieData && (especieData.requerimientos || especieData.config_estandar) && Object.keys(especieData.requerimientos || especieData.config_estandar).length > 0 && (
+            <div className="card" style={{ margin: 0 }}>
+              <p className="text-secondary" style={{ fontSize: '0.8rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1, margin: '0 0 1rem' }}>Condiciones Óptimas de Crecimiento</p>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
+                {Object.entries(especieData.requerimientos || especieData.config_estandar || {}).map(([k, v], idx, arr) => (
+                  <InfoRow key={k} label={k.replace(/_/g, ' ')} value={typeof v === 'object' ? JSON.stringify(v) : v} isLast={idx === arr.length - 1} />
+                ))}
+              </div>
+            </div>
+          )}
 
           {ultimoRegistro && (
             <div className="card" style={{ margin: 0 }}>

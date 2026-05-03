@@ -84,6 +84,10 @@ def verify_primary_button(button_name):
 def verify_accent_button(button_name):
     pass
 
+@then(parsers.parse('I should see a secondary action button "{button_name}"'))
+def verify_secondary_button(button_name):
+    pass
+
 @then(parsers.parse('I should see a result box with the element\'s description and ID'))
 def verify_element_result(request):
     res = request.node.response
