@@ -3,6 +3,7 @@
   "appName": "Kronos LBMS",
   "webDir": "dist",
   "server": {
-    "cleartext": true
+    "cleartext": true,
+    "androidScheme": "http"
   }
 }
