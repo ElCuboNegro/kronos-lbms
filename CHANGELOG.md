@@ -1,3 +1,10 @@
+## [1.3.1](https://github.com/ElCuboNegro/kronos-lbms/compare/v1.3.0...v1.3.1) (2026-05-03)
+
+
+### Bug Fixes
+
+* **ux:** consolidar formulario de evolucion en un solo paso y solucionar boton oculto ([#66](https://github.com/ElCuboNegro/kronos-lbms/issues/66)) ([d82b7db](https://github.com/ElCuboNegro/kronos-lbms/commit/d82b7db589338ff5253d26692a7b5941e436b22c))
+
 # [1.3.0](https://github.com/ElCuboNegro/kronos-lbms/compare/v1.2.1...v1.3.0) (2026-05-03)
 
 
