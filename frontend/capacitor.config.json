@@ -1,6 +1,6 @@
 {
   "appId": "com.kronosb.lbms",
-  "appName": "Kronos LBMS",
+  "appName": "Seymour OS",
   "webDir": "dist",
   "server": {
     "cleartext": true,

@@ -671,9 +671,9 @@ class ScanResult(BaseModel):
     tipo: str  # "especimen" | "elemento" | "desconocido" | "lote" | "reactivo" | "sustrato" | "contenedor"
     especimen: Optional[EspecimenOut] = None
     elemento: Optional[ElementoOut] = None
-    lote: Optional[Any] = None
-    reactivo: Optional[Any] = None
-    sustrato: Optional[Any] = None
+    lote: Optional['LotePreparadoOut'] = None
+    reactivo: Optional['ReactivoOut'] = None
+    sustrato: Optional['SustratoOut'] = None
     contenedor: Optional[ScanContenedor] = None
 
 

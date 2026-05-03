@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">Kronos LBMS</string>
-    <string name="title_activity_main">Kronos LBMS</string>
+    <string name="app_name">Seymour OS</string>
+    <string name="title_activity_main">Seymour OS</string>
     <string name="package_name">com.kronosb.lbms</string>
     <string name="custom_url_scheme">com.kronosb.lbms</string>
 </resources>
