@@ -221,7 +221,7 @@ def send_to_printer(img: Image):
     # Cada byte = 8 píxeles. 1 es negro, 0 es blanco.
     # Invertimos la imagen (L) porque en TSPL BITMAP 1 es negro.
     # Nuestra imagen original es 255 (blanco), 0 (negro).
-    bw_img = img.point(lambda x: 0 if x > 128 else 1, mode='1')
+    bw_img = img.point(lambda x: 1 if x > 128 else 0, mode='1')
     raw_data = bw_img.tobytes()
 
     width_bytes = (img.width + 7) // 8
