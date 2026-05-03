@@ -1,3 +1,10 @@
+## [1.9.2](https://github.com/ElCuboNegro/kronos-lbms/compare/v1.9.1...v1.9.2) (2026-05-03)
+
+
+### Bug Fixes
+
+* **ui:** recuperar fotografias de la evolucion cargando imagenes blob autenticadas por jwt ([#67](https://github.com/ElCuboNegro/kronos-lbms/issues/67)) ([5228698](https://github.com/ElCuboNegro/kronos-lbms/commit/5228698774319ef70bc470d614df265bd4aac08e))
+
 ## [1.9.1](https://github.com/ElCuboNegro/kronos-lbms/compare/v1.9.0...v1.9.1) (2026-05-03)
 
 
