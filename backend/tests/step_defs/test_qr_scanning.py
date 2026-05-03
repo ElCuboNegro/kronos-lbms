@@ -132,3 +132,22 @@ def verify_prefilled_uid(uid):
 @then(parsers.parse('I should see a "{button_name}" button to scan again'))
 def verify_retry_button(button_name):
     pass
+
+@given(parsers.parse('I scan a generic factory barcode "{barcode}"'))
+def scan_generic_factory_barcode(auth_client, barcode, request):
+    response = auth_client.get(f"/scan/{barcode}")
+    request.node.response = response
+
+@given("the barcode does not exist in the database")
+def barcode_does_not_exist():
+    pass
+
+@then("I should see an error message indicating the QR/Barcode is not recognized")
+def verify_unrecognized_barcode(request):
+    res = request.node.response
+    assert res.status_code == 200
+    assert res.json()["tipo"] == "desconocido"
+
+@then(parsers.parse('I should see a button to "{button_text}"'))
+def verify_add_inventory_button(button_text):
+    pass
