@@ -31,10 +31,10 @@ export default function Scanner() {
     }
   }
 
-  const isUnknownUid = error && error.toLowerCase().includes('no encontrado') && lastScan?.startsWith('UID:')
+  const isUnknownUid = error && (error.toLowerCase().includes('no encontrado') || error.toLowerCase().includes('no reconocido')) && lastScan?.startsWith('UID:')
   const uidClean = isUnknownUid ? lastScan.substring(4) : ''
 
-  const isUnknownReactivo = error && error.toLowerCase().includes('no encontrado') && !lastScan?.startsWith('UID:') && !lastScan?.startsWith('CONT-') && !lastScan?.startsWith('SUST-') && !lastScan?.startsWith('REAC-')
+  const isUnknownReactivo = error && (error.toLowerCase().includes('no encontrado') || error.toLowerCase().includes('no reconocido')) && !lastScan?.startsWith('UID:') && !lastScan?.startsWith('CONT-') && !lastScan?.startsWith('SUST-') && !lastScan?.startsWith('REAC-')
 
   const [showReactivoForm, setShowReactivoForm] = useState(false)
 
