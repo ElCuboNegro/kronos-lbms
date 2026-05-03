@@ -72,14 +72,15 @@ def resolver_qr(
         rid = qr_data[6:]
         reactivo = db.query(models.Reactivo).filter(models.Reactivo.id == rid).first()
         if reactivo:
-            return schemas.ScanResult(tipo="reactivo", reactivo=reactivo)
+            return schemas.ScanResult(tipo="reactivo", reactivo=schemas.ReactivoOut.model_validate(reactivo))
         raise HTTPException(status_code=404, detail=f"Reactivo con ID '{rid}' no encontrado")
 
     if qr_data.startswith("SUST-"):
         codigo = qr_data[5:]
         sustrato = db.query(models.Sustrato).filter(models.Sustrato.codigo_formulacion == codigo).first()
         if sustrato:
-            return schemas.ScanResult(tipo="sustrato", sustrato=sustrato)
+            from app.routers.sustratos import _map_sustrato # Assuming it exists or we map it here
+            return schemas.ScanResult(tipo="sustrato", sustrato=schemas.SustratoOut.model_validate(sustrato))
         raise HTTPException(status_code=404, detail=f"Sustrato con código '{codigo}' no encontrado")
 
     # Si no tiene prefijo o el prefijo no funcionó, probar como UID de planta directo
@@ -102,6 +103,6 @@ def resolver_qr(
     codigo_barras_directo = qr_data
     reactivo_barras = db.query(models.Reactivo).filter(models.Reactivo.codigo_barras == codigo_barras_directo).first()
     if reactivo_barras:
-        return schemas.ScanResult(tipo="reactivo", reactivo=reactivo_barras)
+        return schemas.ScanResult(tipo="reactivo", reactivo=schemas.ReactivoOut.model_validate(reactivo_barras))
 
     return schemas.ScanResult(tipo="desconocido")
