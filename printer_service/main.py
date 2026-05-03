@@ -133,11 +133,35 @@ class LabelEngine:
 
         else:
             # ETIQUETA DOBLABLE (Especímenes)
-            draw.text((x_base, y_cursor), "KRONOS BIOLABS SAS", font=f_nano, fill=0)
-            y = y_cursor + 20
-            y = self.draw_text(draw, req.arg1, f_italic, x_base, y, max_chars=18)
-            draw.text((x_base, self.fold_y - 40), f"ID: {req.arg2}", font=f_micro, fill=0)
-            draw.text((x_base, self.fold_y - 22), f"F: {req.arg3 or date.today().isoformat()}", font=f_micro, fill=0)
+
+            # --- MITAD SUPERIOR (FRENTE) ---
+            # QR en la izquierda
+            qr = qrcode.QRCode(box_size=5, border=0)
+            qr.add_data(f"UID:{req.arg2}")
+            qr.make(fit=True)
+            qr_img = qr.make_image(fill_color="black", back_color="white").convert('L')
+
+            # Margen seguro en Y=12px, X=20px (desplazado a la derecha)
+            qr_px = self.fold_y - 24
+            qr_res = qr_img.resize((qr_px, qr_px))
+            img.paste(qr_res, (20, 12))
+
+            # Texto en la derecha
+            x_text = qr_px + 28
+            y = 12
+            draw.text((x_text, y), "KRONOS BIOLABS SAS", font=f_nano, fill=0)
+            y += 16
+
+            # Especie (Wrap si es muy larga)
+            especie_lines = textwrap.wrap(req.arg1, width=20)
+            for line in especie_lines:
+                draw.text((x_text, y), line, font=f_italic, fill=0)
+                y += f_italic.size + 2
+
+            y += 4
+            draw.text((x_text, y), f"ID: {req.arg2}", font=f_micro, fill=0)
+            y += f_micro.size + 4
+            draw.text((x_text, y), f"F: {req.arg3 or date.today().isoformat()}", font=f_micro, fill=0)
 
             # ── LÍNEA DE DOBLADO ──
             draw.rectangle([0, self.fold_y - 2, self.width, self.fold_y + 2], fill=0)
@@ -146,28 +170,25 @@ class LabelEngine:
             back_img = Image.new('L', (self.width, self.fold_y), color=255)
             back_draw = ImageDraw.Draw(back_img)
 
-            # QR
-            qr = qrcode.QRCode(box_size=3, border=0)
-            qr.add_data(f"UID:{req.arg2}")
-            qr.make(fit=True)
-            qr_img = qr.make_image(fill_color="black", back_color="white").convert('L')
-            qr_px = int(10 * MM_TO_PX)
-            qr_res = qr_img.resize((qr_px, qr_px))
-            back_img.paste(qr_res, (self.width - qr_px - 10, (self.fold_y - qr_px) // 2))
-
-            # Texto reverso
+            # Texto reverso a ancho completo
             ex = req.extra or {}
-            info_lines = [f"R:{ex.get('riego','—')}", f"L:{ex.get('luz','—')}", f"T:{ex.get('temp','—')}", f"pH:{ex.get('ph','—')} | NPK:{ex.get('npk','—')}"]
 
-            y_back = 10
+            # Combine fields efficiently
+            line_1 = f"R:{ex.get('riego','—')} | H:{ex.get('humedad','—')}"
+            line_2 = f"T:{ex.get('temp','—')} | pH:{ex.get('ph','—')} | NPK:{ex.get('npk','—')}"
+            line_3 = f"L:{ex.get('luz','—')}"
+
+            info_lines = [line_1, line_2, line_3]
+
+            y_back = 12
             for line_txt in info_lines:
-                y_back = self.draw_text(back_draw, line_txt, f_body, x_base, y_back, max_chars=32, spacing=1)
+                y_back = self.draw_text(back_draw, line_txt, f_body, 4, y_back, max_chars=40, spacing=2)
 
-            back_img = back_img.rotate(180)
+            back_img = back_img.transpose(Image.ROTATE_180)
             img.paste(back_img, (0, self.fold_y + 2))
 
             # Rotación final para la GEZI
-            return img.rotate(180)
+            return img.transpose(Image.ROTATE_180)
 
 engine = LabelEngine()
 
