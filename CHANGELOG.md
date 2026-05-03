@@ -1,3 +1,10 @@
+## [1.12.6](https://github.com/ElCuboNegro/kronos-lbms/compare/v1.12.5...v1.12.6) (2026-05-03)
+
+
+### Bug Fixes
+
+* **printer:** optimizar diseño de etiquetas grandes para reactivos con emojis de peligro GHS, evitar overlap y normalizar campos ([e899f18](https://github.com/ElCuboNegro/kronos-lbms/commit/e899f18095933260260026fe90513cebbde51ec5))
+
 ## [1.12.5](https://github.com/ElCuboNegro/kronos-lbms/compare/v1.12.4...v1.12.5) (2026-05-03)
 
 
