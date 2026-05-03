@@ -1,4 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom'
+import { useEffect } from 'react'
+import { App as CapApp } from '@capacitor/app'
 import { AuthProvider, useAuth } from './contexts/AuthContext'
 import { TimerProvider } from './contexts/TimerContext'
 import { ThemeProvider, useTheme } from './contexts/ThemeContext'
@@ -54,6 +56,21 @@ function Layout({ children }) {
       else navigate('/', { replace: true })
     }
   }
+
+  useEffect(() => {
+    const backButtonListener = CapApp.addListener('backButton', (event) => {
+      // Evitar salir de la aplicación a menos que estemos en el inicio
+      if (location.pathname === '/' || location.pathname === '/login') {
+        CapApp.exitApp();
+      } else {
+        handleBack();
+      }
+    });
+
+    return () => {
+      backButtonListener.then(listener => listener.remove());
+    };
+  }, [location.pathname, navigate]);
 
   const getPageTitle = () => {
     const p = location.pathname

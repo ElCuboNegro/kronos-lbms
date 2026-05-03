@@ -37,3 +37,10 @@ Feature: QR and UID Label Scanning
     When I scan a QR code with invalid formatting
     Then I should see an error message "QR no reconocido por el sistema"
     And I should see a "Reintentar" button to scan again
+
+  Scenario: Unknown generic barcode (reagent bottle) prompts to add to inventory
+    Given I am logged into the LBMS
+    And I scan a generic factory barcode "7501031311309"
+    And the barcode does not exist in the database
+    Then I should see an error message indicating the QR/Barcode is not recognized
+    And I should see a button to "Registrar en Inventario de Reactivos"

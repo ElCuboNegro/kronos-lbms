@@ -1,3 +1,34 @@
+## [1.1.3](https://github.com/ElCuboNegro/kronos-lbms/compare/v1.1.2...v1.1.3) (2026-05-03)
+
+
+### Bug Fixes
+
+* Navegación de Botón Atrás ([#62](https://github.com/ElCuboNegro/kronos-lbms/issues/62)) ([22ccb53](https://github.com/ElCuboNegro/kronos-lbms/commit/22ccb536e7c2ebfecc4ae768b73520ea506d69b2))
+* serialización de ORM en ScanResult ([#61](https://github.com/ElCuboNegro/kronos-lbms/issues/61)) ([bc46f46](https://github.com/ElCuboNegro/kronos-lbms/commit/bc46f4607c0c9517fc60d78b7256774a86dccd16))
+
+## [1.0.3](https://github.com/ElCuboNegro/kronos-lbms/compare/v1.0.2...v1.0.3) (2026-05-03)
+
+
+### Bug Fixes
+
+* explicit pydantic validation in scan router to prevent orm serialization errors ([a10391b](https://github.com/ElCuboNegro/kronos-lbms/commit/a10391b8d88af099730ff60c3222fac39d8074d1))
+
+## [1.0.2](https://github.com/ElCuboNegro/kronos-lbms/compare/v1.0.1...v1.0.2) (2026-05-03)
+
+
+### Bug Fixes
+
+* add from_attributes to ScanResult schemas to fix serialization error ([310d0a4](https://github.com/ElCuboNegro/kronos-lbms/commit/310d0a417459730388b7d957598e2ef4faeeb100))
+* **scanner:** show 'Add Reactivo' button for unknown generic barcodes ([5d5cbc5](https://github.com/ElCuboNegro/kronos-lbms/commit/5d5cbc5c17ecbc951ee5427ce476e1d19301207a))
+* serialización de ORM en ScanResult ([#61](https://github.com/ElCuboNegro/kronos-lbms/issues/61)) ([5b066f6](https://github.com/ElCuboNegro/kronos-lbms/commit/5b066f6aff54b85079bbebb7d3b532544483703a))
+
+## [1.0.1](https://github.com/ElCuboNegro/kronos-lbms/compare/v1.0.0...v1.0.1) (2026-05-03)
+
+
+### Bug Fixes
+
+* **ci:** evitar permission error en pytest proviendo UPLOAD_DIR dinamico y secrets ([#60](https://github.com/ElCuboNegro/kronos-lbms/issues/60)) ([3151189](https://github.com/ElCuboNegro/kronos-lbms/commit/3151189fb18ee58a61ecd6c380d3373a822f730b))
+
 # 1.0.0 (2026-05-03)
 
 
