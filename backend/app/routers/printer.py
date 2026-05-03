@@ -276,3 +276,31 @@ def generar_uid(especie_id: UUID, db: Session = Depends(get_db), _=Depends(auth.
 
     uid = f"{prefix}{idx:02d}"
     return {"uid": uid}
+
+@router.post("/imprimir-etiqueta-libre", status_code=200)
+async def imprimir_etiqueta_libre(
+    payload: schemas.EtiquetaLibre,
+    _=Depends(auth.get_current_user),
+):
+    """Permite imprimir una etiqueta con datos personalizados (ej. muestras de protocolos)."""
+    try:
+        # Preparamos el payload para el microservicio lab_printer_api
+        print_data = {
+            "modo": "reactivo",
+            "arg1": payload.titulo,
+            "arg2": payload.subtitulo,
+            "arg3": payload.info,
+            "extra": {
+                "metodo": payload.extra
+            },
+            "qr": payload.qr
+        }
+
+        async with httpx.AsyncClient() as client:
+            resp = await client.post(f"{PRINTER_URL}/imprimir", json=print_data, timeout=5.0)
+            if resp.status_code != 200:
+                raise HTTPException(status_code=500, detail="Error en el servicio de impresión")
+
+        return {"status": "ok", "message": "Impresión enviada"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))

@@ -776,3 +776,10 @@ class LotePreparadoOut(BaseModel):
     estado: str
     notas: Optional[str] = None
     model_config = {"from_attributes": True}
+
+class EtiquetaLibre(BaseModel):
+    titulo: str
+    subtitulo: Optional[str] = ""
+    info: Optional[str] = ""
+    extra: Optional[str] = ""
+    qr: Optional[str] = ""
