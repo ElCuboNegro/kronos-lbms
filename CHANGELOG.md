@@ -1,3 +1,10 @@
+# [1.12.0](https://github.com/ElCuboNegro/kronos-lbms/compare/v1.11.1...v1.12.0) (2026-05-03)
+
+
+### Features
+
+* **printer:** stabilize golden version with correct bit polarity and layout ([5715dc2](https://github.com/ElCuboNegro/kronos-lbms/commit/5715dc2ca16e574393733af0ccf4533c58859bec))
+
 ## [1.11.1](https://github.com/ElCuboNegro/kronos-lbms/compare/v1.11.0...v1.11.1) (2026-05-03)
 
 
