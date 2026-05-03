@@ -68,7 +68,17 @@ export const api = {
       throw new Error('Servidor fuera de línea o reiniciándose (502 Bad Gateway)')
     }
 
-    const data = await res.json()
+    let data;
+    try {
+      const isJson = res.headers.get('content-type')?.includes('application/json');
+      if (!isJson) {
+        throw new Error('La URL del servidor es incorrecta (respondió con HTML en lugar de JSON). Verifica que apunte al Backend (ej. puerto 8001) y no al Frontend.');
+      }
+      data = await res.json()
+    } catch (err) {
+      throw new Error(err.message || 'Respuesta inválida del servidor')
+    }
+
     if (!res.ok) throw new Error(data?.detail || 'Credenciales incorrectas')
     return data
   },
