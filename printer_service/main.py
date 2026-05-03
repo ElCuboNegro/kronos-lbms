@@ -157,11 +157,18 @@ class LabelEngine:
 
             # Texto reverso
             ex = req.extra or {}
-            info_lines = [f"R:{ex.get('riego','—')}", f"L:{ex.get('luz','—')}", f"T:{ex.get('temp','—')}", f"pH:{ex.get('ph','—')} | NPK:{ex.get('npk','—')}"]
 
-            y_back = 10
+            # Combine short fields
+            line_1 = f"R:{ex.get('riego','—')} | H:{ex.get('humedad','—')}"
+            line_2 = f"T:{ex.get('temp','—')} | pH:{ex.get('ph','—')}"
+            line_3 = f"NPK:{ex.get('npk','—')}"
+            line_4 = f"L:{ex.get('luz','—')}"
+
+            info_lines = [line_1, line_2, line_3, line_4]
+
+            y_back = 4
             for line_txt in info_lines:
-                y_back = self.draw_text(back_draw, line_txt, f_body, x_base, y_back, max_chars=32, spacing=1)
+                y_back = self.draw_text(back_draw, line_txt, f_body, x_base, y_back, max_chars=32, spacing=0)
 
             back_img = back_img.rotate(180)
             img.paste(back_img, (0, self.fold_y + 2))

@@ -28,8 +28,18 @@ async def imprimir_etiqueta(
     # 1. Base: Especie
     if esp.especie_id:
         especie = db.query(models.Especie).filter(models.Especie.id == esp.especie_id).first()
-        if especie and especie.config_estandar:
-            defaults.update(especie.config_estandar)
+        if especie:
+            if especie.requerimientos:
+                # Map requerimientos text values to standard keys if config_estandar is missing them
+                req = especie.requerimientos
+                defaults['temperatura_c'] = req.get('temperatura_optima_c') or req.get('temperatura')
+                defaults['humedad_relativa_pct'] = req.get('humedad_optima_pct') or req.get('humedad')
+                defaults['ph_sustrato'] = req.get('ph_optimo') or req.get('ph')
+                defaults['luz_lux'] = req.get('luz_optima_lux') or req.get('luz')
+                defaults['npk'] = req.get('npk')
+                defaults['riego'] = req.get('riego')
+            if especie.config_estandar:
+                defaults.update(especie.config_estandar)
 
     # 2. Sobrescribe: Línea
     if esp.linea_id:
@@ -56,10 +66,14 @@ async def imprimir_etiqueta(
 
     def fmt(val, unit=""):
         if val is None or val == "": return "—"
-        return f"{val}{unit}"
+        v = str(val)
+        if unit and not v.endswith(unit.strip()) and not v.endswith(unit[-1]):
+            return f"{v}{unit}"
+        return v
 
     extra = {
-        "riego": fmt(defaults.get('humedad_sustrato_pct') or defaults.get('humedad_relativa_pct'), "%"),
+        "riego": fmt(defaults.get('riego') or defaults.get('humedad_sustrato_pct'), "%"),
+        "humedad": fmt(defaults.get('humedad_relativa_pct'), "%"),
         "luz": fmt(defaults.get('luz_lux'), "lx"),
         "temp": fmt(defaults.get('temperatura_c'), "°C"),
         "ph": fmt(defaults.get('ph_sustrato')),
