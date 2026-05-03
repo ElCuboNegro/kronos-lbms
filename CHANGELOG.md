@@ -1,3 +1,11 @@
+## [1.1.3](https://github.com/ElCuboNegro/kronos-lbms/compare/v1.1.2...v1.1.3) (2026-05-03)
+
+
+### Bug Fixes
+
+* Navegación de Botón Atrás ([#62](https://github.com/ElCuboNegro/kronos-lbms/issues/62)) ([22ccb53](https://github.com/ElCuboNegro/kronos-lbms/commit/22ccb536e7c2ebfecc4ae768b73520ea506d69b2))
+* serialización de ORM en ScanResult ([#61](https://github.com/ElCuboNegro/kronos-lbms/issues/61)) ([bc46f46](https://github.com/ElCuboNegro/kronos-lbms/commit/bc46f4607c0c9517fc60d78b7256774a86dccd16))
+
 ## [1.0.3](https://github.com/ElCuboNegro/kronos-lbms/compare/v1.0.2...v1.0.3) (2026-05-03)
 
 
