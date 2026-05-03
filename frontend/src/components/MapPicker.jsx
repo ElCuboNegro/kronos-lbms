@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet'
+import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
 import L from 'leaflet'
 import { Geolocation } from '@capacitor/geolocation'
@@ -13,6 +13,14 @@ L.Icon.Default.mergeOptions({
 })
 
 function LocationMarker({ position, setPosition }) {
+  const map = useMap()
+
+  useEffect(() => {
+    if (position) {
+      map.flyTo([position.lat, position.lng], 16, { animate: true, duration: 1 })
+    }
+  }, [position, map])
+
   useMapEvents({
     click(e) {
       setPosition({ lat: e.latlng.lat, lng: e.latlng.lng })
