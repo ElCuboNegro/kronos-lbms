@@ -66,7 +66,7 @@ def health():
 def release_info():
     # En el futuro esto puede venir de una DB o archivo de configuración
     return {
-        "version": "1.0.3",
+        "version": "1.1.0",
         "required": False,
         "url": "https://github.com/ElCuboNegro/kronos-lbms/releases/latest",
         "notes": "Actualización Mayor 1.1.0: Seymour OS, Telemetría, UI Consolidada, Lector Reactivos (PubChem) y App Nativa."
