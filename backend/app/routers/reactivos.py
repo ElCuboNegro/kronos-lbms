@@ -81,6 +81,40 @@ def obtener_formulacion(id: UUID, db: Session = Depends(get_db), _=Depends(auth.
         raise HTTPException(status_code=404, detail="Formulación no encontrada")
     return f
 
+@router.get("/formulaciones/{id}/flatten")
+def aplanar_formulacion(id: UUID, db: Session = Depends(get_db), _=Depends(auth.get_current_user)):
+    """Resuelve recursivamente todos los componentes de una formulación."""
+    def _flatten(form_id, ratio=1.0):
+        f = (
+            db.query(models.Formulacion)
+            .options(
+                joinedload(models.Formulacion.componentes).joinedload(models.FormulacionComponente.reactivo),
+                joinedload(models.Formulacion.componentes).joinedload(models.FormulacionComponente.formulacion_ingrediente)
+            )
+            .filter(models.Formulacion.id == form_id)
+            .first()
+        )
+        if not f: return []
+
+        flat_list = []
+        for c in f.componentes:
+            cant_escalada = c.cantidad_base * ratio
+            if c.formulacion_ingrediente_id and not c.reactivo_id:
+                # Es una sub-formulación
+                sub_ratio = cant_escalada / f.volumen_base_l
+                flat_list.extend(_flatten(c.formulacion_ingrediente_id, sub_ratio))
+            else:
+                flat_list.append({
+                    "id": c.id,
+                    "reactivo": c.reactivo,
+                    "formulacion_ingrediente": c.formulacion_ingrediente,
+                    "cantidad_base": cant_escalada,
+                    "notas_pesaje": c.notas_pesaje
+                })
+        return flat_list
+
+    return _flatten(id)
+
 # ── Lotes Preparados (Batch Tracking) ──────────────────────────────────────
 
 @router.get("/lotes", response_model=list[schemas.LotePreparadoOut])

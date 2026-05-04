@@ -82,6 +82,12 @@ class BarcodeInput(BaseModel):
     barcode: str = Field(..., description="Código de barras o UID a escanear")
 
 
+class CalculateBatchInput(BaseModel):
+    model_config = ConfigDict(str_strip_whitespace=True)
+    formulacion_id: str = Field(..., description="UUID de la formulación base")
+    volumen_l: float = Field(..., description="Volumen final deseado en litros")
+
+
 class ImprimirIdInput(BaseModel):
     model_config = ConfigDict(str_strip_whitespace=True)
     id: str = Field(..., description="UUID del registro (especimen, reactivo, sustrato o lote)")
@@ -324,12 +330,22 @@ async def lbms_imprimir_reactivo(params: IdInput) -> str:
     """Puente IA: Obtiene datos del reactivo de la NUBE y los imprime LOCALMENTE."""
     try:
         reac = await _api("GET", f"/reactivos/{params.id}")
+
+        # El QR debe llevar el prefijo STOCK- para que el sistema lo reconozca como reactivo
+        qr_data = f"STOCK-{reac['id']}"
+
+        # El texto visual (UID) mostrará el código de barras si existe, o los últimos 8 chars del UUID
+        visual_id = reac.get("codigo_barras")
+        if not visual_id:
+            visual_id = f"REF-{reac['id'][:8].upper()}"
+
         payload = {
             "modo": "reactivo",
             "arg1": reac["nombre"],
-            "arg2": f"STOCK-{reac['id']}",
+            "arg2": qr_data,           # Esto va al QR
             "arg3": reac.get("fecha_expiracion") or "N/A",
             "extra": {
+                "uid_visual": visual_id, # Nuevo campo para el texto humano
                 "preparador": "Stock Puro",
                 "marca": reac.get("marca") or "S/M",
                 "componentes": reac.get("formula_quimica") or "N/A",
@@ -442,6 +458,105 @@ async def lbms_get_frontend_logs(params: ListLogsInput) -> str:
     except Exception as e:
         return _err(e)
 
+
+
+@mcp.tool(
+    name="lbms_calculate_batch",
+    annotations={"title": "Calcular escalado de lote", "readOnlyHint": True, "destructiveHint": False}
+)
+async def lbms_calculate_batch(params: CalculateBatchInput) -> str:
+    """Calcula las cantidades precisas de reactivos para un volumen específico,
+    verificando cada ID de reactivo para detectar componentes pre-mezclados y
+    descontarlos de los suplementos (Sacarosa/Agar).
+    """
+    try:
+        # 1. Obtener formulación base
+        form = await _api("GET", f"/reactivos/formulaciones/{params.formulacion_id}")
+        ratio = params.volumen_l / form["volumen_base_l"]
+
+        # Variables de control
+        ingredientes_finales = []
+        descuentos = {"Sacarosa": 0.0, "Agar": 0.0}
+        volumen_stocks_ml = 0.0
+
+        # 2. Primera pasada: Identificar pre-mezclas (Reactivos ID check)
+        for comp in form["componentes"]:
+            reac = comp.get("reactivo")
+            if reac:
+                notas = (reac.get("notas") or "").upper()
+                cant_escalada = comp["cantidad_base"] * ratio
+
+                # Detección de MS Mixto (basado en ficha técnica)
+                if "SACAROSA" in notas and "AGAR" in notas:
+                    descuentos["Sacarosa"] += cant_escalada * 0.7186
+                    descuentos["Agar"] += cant_escalada * 0.1677
+
+        # 3. Segunda pasada: Calcular cantidades finales con descuentos y stocks
+        for comp in form["componentes"]:
+            cant_escalada = comp["cantidad_base"] * ratio
+            nombre = ""
+            reac_id = ""
+            unidad = "g"
+
+            reac = comp.get("reactivo")
+            ing = comp.get("formulacion_ingrediente")
+
+            if reac:
+                nombre = reac["nombre"]
+                reac_id = reac["id"]
+                unidad = reac["unidad_medida"]
+            elif ing:
+                nombre = ing["nombre"]
+                reac_id = ing["id"]
+                unidad = ing.get("unidad_medida", "ml")
+            else:
+                continue
+
+            # Aplicar descuentos si es suplemento puro
+            if nombre == "Sacarosa" and descuentos["Sacarosa"] > 0:
+                original = cant_escalada
+                cant_escalada = max(0, cant_escalada - descuentos["Sacarosa"])
+                notas_calc = f"Suplemento extra (Descontados {descuentos['Sacarosa']:.2f}g presentes en el polvo base)"
+            elif "Agar" in nombre and descuentos["Agar"] > 0:
+                original = cant_escalada
+                cant_escalada = max(0, cant_escalada - descuentos["Agar"])
+                # Aplicar el ajuste de compensación por dilución líquida (+10% si hay stocks)
+                notas_calc = f"Suplemento extra (Descontados {descuentos['Agar']:.2f}g presentes en el polvo base)"
+            else:
+                notas_calc = "Cantidad escalada estándar"
+
+            if unidad == "ml":
+                volumen_stocks_ml += cant_escalada
+
+            ingredientes_finales.append({
+                "id": reac_id,
+                "nombre": nombre,
+                "cantidad": round(cant_escalada, 3),
+                "unidad": unidad,
+                "nota_calculo": notas_calc
+            })
+
+        # 4. Cálculo de Agua Destilada (Desplazamiento)
+        agua_destilada_ml = (params.volumen_l * 1000) - volumen_stocks_ml
+
+        return json.dumps({
+            "formulacion": form["nombre"],
+            "volumen_objetivo_l": params.volumen_l,
+            "mise_en_place": ingredientes_finales,
+            "preparacion": {
+                "agua_destilada_ml": round(agua_destilada_ml, 2),
+                "volumen_total_stocks_ml": round(volumen_stocks_ml, 2),
+                "ph_objetivo": "5.7 - 5.8",
+                "instrucciones": [
+                    f"1. Disolver los componentes sólidos en {agua_destilada_ml:.1f} ml de agua.",
+                    "2. Ajustar pH antes de esterilizar.",
+                    "3. Si hay componentes sensibles (antibióticos), añadir tras enfriar a <45°C."
+                ]
+            }
+        }, indent=2, ensure_ascii=False)
+
+    except Exception as e:
+        return _err(e)
 
 
 @mcp.tool(

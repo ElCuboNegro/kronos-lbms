@@ -4,11 +4,6 @@ import ScanInput from './ScanInput';
 import StepAccordion from './RunMode/StepAccordion';
 
 export default function LotePreparacionForm({ formulacion, onSaved, onCancel }) {
-  // Debug mount
-  useEffect(() => {
-    console.log("LotePreparacionForm montado para:", formulacion?.nombre);
-  }, []);
-
   const [volumen, setVolumen] = useState(formulacion?.volumen_base_l || 1.0);
   const [concentracion, setConcentracion] = useState(1.0);
   const [phFinal, setPhFinal] = useState('');
@@ -16,6 +11,27 @@ export default function LotePreparacionForm({ formulacion, onSaved, onCancel }) 
   const [checkedItems, setCheckedItems] = useState({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [flatComponents, setFlatComponents] = useState([]);
+  const [loadingComps, setLoadingFlat] = useState(true);
+
+  // Debug mount & Fetch flattened components
+  useEffect(() => {
+    console.log("LotePreparacionForm montado para:", formulacion?.nombre);
+    const fetchFlattened = async () => {
+      if (!formulacion?.id) return;
+      setLoadingFlat(true);
+      try {
+        const data = await api.get(`/reactivos/formulaciones/${formulacion.id}/flatten`);
+        setFlatComponents(data);
+      } catch (err) {
+        console.error("Error aplanando formulación:", err);
+        setError("No se pudieron cargar los componentes detallados");
+      } finally {
+        setLoadingFlat(false);
+      }
+    };
+    fetchFlattened();
+  }, [formulacion?.id]);
 
   // Paso activo para el acordeón controlado
   const [activeStep, setActiveStep] = useState(1);
@@ -59,8 +75,8 @@ export default function LotePreparacionForm({ formulacion, onSaved, onCancel }) 
     }
   }
 
-  // Precalculamos los componentes con salvaguardas
-  const componentes = (formulacion.componentes || []).map(c => {
+  // Precalculamos los componentes con salvaguardas (usando la lista aplanada)
+  const componentes = (flatComponents.length > 0 ? flatComponents : (formulacion.componentes || [])).map(c => {
     const isReactivo = !!c.reactivo;
     const item = c.reactivo || c.formulacion_ingrediente;
 
@@ -121,35 +137,39 @@ export default function LotePreparacionForm({ formulacion, onSaved, onCancel }) 
           expanded={activeStep === 2}
           onToggle={() => setActiveStep(2)}
         >
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
-            {componentes.map(c => (
-              <div key={c.id} className="card" style={{ padding: '1rem', margin: 0, opacity: checkedItems[c.id] ? 0.5 : 1 }}>
-                <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-                  <input
-                    type="checkbox"
-                    checked={!!checkedItems[c.id]}
-                    onChange={() => toggleCheck(c.id)}
-                    style={{ width: '24px', height: '24px', marginTop: 0 }}
-                  />
-                  <div style={{ flex: 1 }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <span style={{ fontWeight: 'bold', textDecoration: checkedItems[c.id] ? 'line-through' : 'none' }}>{c.item.nombre}</span>
-                      <span className="text-primary" style={{ fontWeight: 'bold' }}>{c.requiredAmount} {c.unidad}</span>
-                    </div>
-                    {c.isReactivo && !checkedItems[c.id] && (
-                      <div style={{ marginTop: '0.5rem' }}>
-                        <ScanInput
-                          placeholder="Lote origen..."
-                          value={trazabilidad[c.item.id] || ''}
-                          onChange={val => handleTrazabilidad(c.item.id, val)}
-                        />
+          {loadingComps ? (
+             <p className="text-muted text-center" style={{ padding: '1rem' }}>Aplanando recursividad...</p>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
+              {componentes.map(c => (
+                <div key={c.id} className="card" style={{ padding: '1rem', margin: 0, opacity: checkedItems[c.id] ? 0.5 : 1 }}>
+                  <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                    <input
+                      type="checkbox"
+                      checked={!!checkedItems[c.id]}
+                      onChange={() => toggleCheck(c.id)}
+                      style={{ width: '24px', height: '24px', marginTop: 0 }}
+                    />
+                    <div style={{ flex: 1 }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <span style={{ fontWeight: 'bold', textDecoration: checkedItems[c.id] ? 'line-through' : 'none' }}>{c.item.nombre}</span>
+                        <span className="text-primary" style={{ fontWeight: 'bold' }}>{c.requiredAmount} {c.unidad}</span>
                       </div>
-                    )}
+                      {c.isReactivo && !checkedItems[c.id] && (
+                        <div style={{ marginTop: '0.5rem' }}>
+                          <ScanInput
+                            placeholder="Lote origen..."
+                            value={trazabilidad[c.item.id] || ''}
+                            onChange={val => handleTrazabilidad(c.item.id, val)}
+                          />
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
           <button type="button" className="btn btn--primary btn--block" style={{ marginTop: '1rem' }} onClick={() => setActiveStep(3)}>Ir al cierre</button>
         </StepAccordion>
 

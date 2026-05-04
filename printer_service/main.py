@@ -59,61 +59,65 @@ class LabelEngine:
         draw = ImageDraw.Draw(img)
 
         try:
-            f_title = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 20)
-            f_italic = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Oblique.ttf", 18)
-            f_body = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 14)
-            f_micro = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 12)
-            f_nano = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 10)
-        except:
-            f_title = f_italic = f_body = f_micro = f_nano = ImageFont.load_default()
+            # Fuentes optimizadas (Tamaño medio para que quepa todo)
+            f_title = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 24)
+            f_body = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 18)
+            f_micro = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 14)
+            f_nano = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 12)
+        except Exception as e:
+            f_title = f_body = f_micro = f_nano = ImageFont.load_default()
 
         if req.modo in ['reactivo', 'contenedor']:
             # --- DISEÑO REACTIVO ---
-            qr_px = 100
+            qr_px = 130
             qr = qrcode.QRCode(box_size=4, border=1)
             qr.add_data(req.arg2)
             qr.make(fit=True)
             qr_img = qr.make_image(fill_color="black", back_color="white").convert('L')
             qr_res = qr_img.resize((qr_px, qr_px))
 
-            # Físicamente queremos QR a la IZQUIERDA.
-            # En la imagen pre-rotación, lo ponemos a la DERECHA.
-            # Margen físico: 24px (~3mm). 400 - 24 - 100 = 276.
-            img.paste(qr_res, (276, 54))
-
-            # Físicamente queremos TEXTO a la DERECHA.
-            # En la imagen pre-rotación, lo ponemos a la IZQUIERDA.
-            # Columna segura: x=20 hasta x=250.
-            x_col = 20
-            y = 19
-
-            draw.text((x_col, y), "KRONOS BIOLABS", font=f_nano, fill=0)
-            y += 15
-
-            lote = req.extra.get('preparador', '—')
-            draw.text((x_col, y), f"LOTE: {lote[:15]}", font=f_micro, fill=0)
-            y += 15
-
-            draw.text((x_col, y), f"ID: {req.arg2}", font=f_micro, fill=0)
-            y += 20
-
-            # Título (max_chars=18 para evitar solape central)
-            y = self.draw_text(draw, req.arg1, f_title, x_col, y, max_chars=18)
-            y += 6
+            x_col = 15
+            y = 8
 
             ex = req.extra or {}
-            self.draw_text(draw, f"VOL: {ex.get('volumen','—')}", f_body, x_col, y, max_chars=20)
-            y += 16
-            self.draw_text(draw, f"CONC: {ex.get('conc. (%)','—')}", f_body, x_col, y, max_chars=20)
-            y += 16
 
-            self.draw_text(draw, f"FABR: {ex.get('formulado','—')}", f_micro, x_col, y, max_chars=22)
-            y += 14
-            self.draw_text(draw, f"VENCE: {req.arg3 or '—'}", f_body, x_col, y, max_chars=22)
+            # Línea 1: Lote e ID Visual (Arriba y claro)
+            lote = ex.get('preparador', '—')
+            visual = ex.get('uid_visual', req.arg2)[:16]
+            draw.text((x_col, y), f"LOTE: {lote[:10]} | {visual}", font=f_micro, fill=0)
             y += 18
 
+            # Línea 2: Título (Grande)
+            y = self.draw_text(draw, req.arg1, f_title, x_col, y, max_chars=16)
+            y += 6
+
+            # Datos Técnicos (Cuerpo)
+            draw.text((x_col, y), f"VOL: {ex.get('volumen','—')} | CONC: {ex.get('conc. (%)','—')}", font=f_body, fill=0)
+            y += 22
+
+            # Fechas (Importante)
+            fab = ex.get('formulado', 'N/A')[:10]
+            ven = req.arg3[:10] if req.arg3 else 'N/A'
+            draw.text((x_col, y), f"F: {fab} | V: {ven}", font=f_body, fill=0)
+            y += 22
+
+            # Peligros / Advertencias
+            peligros_list = ex.get('peligros', [])
+            if peligros_list:
+                peligros_str = ", ".join(peligros_list)
+                draw.text((x_col, y), f"⚠️ {peligros_str.upper()}", font=f_micro, fill=0)
+                y += 18
+
+            # Componentes (Letra pequeña al final)
             comps = ex.get('componentes', '—')
-            y = self.draw_text(draw, f"COMP: {comps}", f_nano, x_col, y, max_chars=32)
+            self.draw_text(draw, f"COMP: {comps}", f_nano, x_col, y, max_chars=35)
+
+            # --- QR (Posición y Quiet Zone) ---
+            qr_x = 260
+            qr_y = 50
+            # Dibujamos zona de seguridad ANTES de que el texto lo toque
+            draw.rectangle([qr_x - 4, qr_y - 4, qr_x + qr_px + 4, qr_y + qr_px + 4], fill=255)
+            img.paste(qr_res, (qr_x, qr_y))
 
             return img.transpose(Image.ROTATE_180)
         else:

@@ -40,16 +40,11 @@ export default function FormulacionesList() {
                 </div>
                 <p className="text-muted" style={{ fontSize: '0.88rem', margin: '0.2rem 0' }}>{f.descripcion}</p>
                 <div style={{ background: 'var(--theme-background)', borderRadius: 'var(--radius-base)', padding: '0.75rem', marginTop: '0.6rem' }}>
-                  <p style={{ color: 'var(--theme-secondary)', fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', margin: '0 0 5px' }}>Composición base ({f.volumen_base_l}L):</p>
-                  <ul style={{ margin: 0, paddingLeft: '1.2rem', color: 'var(--theme-text)', fontSize: '0.85rem' }}>
-                    {f.componentes.map(c => {
-                      const item = c.reactivo || c.formulacion_ingrediente;
-                      const unidad = c.reactivo ? c.reactivo.unidad_medida : (c.formulacion_ingrediente.unidad_medida || 'ml');
-                      return (
-                        <li key={c.id}>{item.nombre}: {c.cantidad_base} {unidad}</li>
-                      );
-                    })}
-                  </ul>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '5px' }}>
+                    <p style={{ color: 'var(--theme-secondary)', fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', margin: 0 }}>Composición base ({f.volumen_base_l}L):</p>
+                    <FlattenToggle id={f.id} onData={(data) => console.log("Flattened:", data)} />
+                  </div>
+                  <CompositionList componentes={f.componentes} />
                 </div>
                 <button className="btn btn--primary btn--block" style={{ marginTop: '0.8rem' }} onClick={() => handlePrepare(f)}>
                   🧪 Preparar este medio
@@ -76,6 +71,71 @@ export default function FormulacionesList() {
       )}
     </div>
   )
+}
+
+function FlattenToggle({ id }) {
+  const [flat, setFlat] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [expanded, setExpanded] = useState(false);
+
+  const toggle = async () => {
+    if (!expanded && !flat) {
+      setLoading(true);
+      try {
+        const data = await api.get(`/reactivos/formulaciones/${id}/flatten`);
+        setFlat(data);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    setExpanded(!expanded);
+  };
+
+  return (
+    <>
+      <button
+        className="btn btn--ghost"
+        style={{ fontSize: '0.65rem', minHeight: 'auto', padding: '2px 6px', color: expanded ? 'var(--theme-primary)' : 'var(--theme-secondary)' }}
+        onClick={toggle}
+      >
+        {loading ? '...' : (expanded ? '✕ Cerrar detalle' : '🔍 Ver detalle recursivo')}
+      </button>
+      {expanded && flat && (
+        <div style={{ borderLeft: '2px solid var(--theme-primary)', paddingLeft: '0.5rem', marginTop: '0.5rem', background: 'rgba(0,0,0,0.05)', borderRadius: '4px', padding: '4px' }}>
+          <p style={{ fontSize: '0.7rem', fontWeight: 'bold', color: 'var(--theme-primary)', marginBottom: '4px' }}>COMPOSICIÓN APLANADA (Mise en place real):</p>
+          <ul style={{ margin: 0, paddingLeft: '1rem', listStyle: 'circle' }}>
+            {flat.map((c, idx) => (
+              <li key={idx} style={{ fontSize: '0.8rem' }}>
+                {(c.reactivo || c.formulacion_ingrediente).nombre}: <span style={{ fontWeight: 'bold' }}>{c.cantidad_base}</span> {c.reactivo ? c.reactivo.unidad_medida : 'ml'}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </>
+  );
+}
+
+function CompositionList({ componentes }) {
+  return (
+    <ul style={{ margin: 0, paddingLeft: '1.2rem', color: 'var(--theme-text)', fontSize: '0.85rem' }}>
+      {componentes.map(c => {
+        const item = c.reactivo || c.formulacion_ingrediente;
+        if (!item) return null;
+        const isSub = !!c.formulacion_ingrediente_id && !c.reactivo_id;
+        const unidad = c.reactivo ? c.reactivo.unidad_medida : (c.formulacion_ingrediente.unidad_medida || 'ml');
+        return (
+          <li key={c.id}>
+            <span style={{ color: isSub ? 'var(--theme-primary)' : 'inherit', fontWeight: isSub ? 'bold' : 'normal' }}>
+              {item.nombre}{isSub ? ' (Sub-receta)' : ''}
+            </span>: {c.cantidad_base} {unidad}
+          </li>
+        );
+      })}
+    </ul>
+  );
 }
 
 function FormulacionForm({ onSaved, onCancel }) {
