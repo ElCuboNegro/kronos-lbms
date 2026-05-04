@@ -1,3 +1,10 @@
+# [1.14.0](https://github.com/ElCuboNegro/kronos-lbms/compare/v1.13.0...v1.14.0) (2026-05-04)
+
+
+### Features
+
+* **mcp:** calculo de lotes recursivo, correccion en despliegue ui y mejora de la etiqueta termica ([1050c50](https://github.com/ElCuboNegro/kronos-lbms/commit/1050c5003f25df8232690f7335a60a94d23c8255))
+
 # [1.13.0](https://github.com/ElCuboNegro/kronos-lbms/compare/v1.12.9...v1.13.0) (2026-05-03)
 
 
