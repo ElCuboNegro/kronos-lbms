@@ -1,3 +1,4 @@
+import './theme.css'
 import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom'
 import { useEffect } from 'react'
 import { App as CapApp } from '@capacitor/app'

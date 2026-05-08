@@ -1,0 +1,74 @@
+:root {
+  /* Colors */
+  --theme-primary: #2c3e50;
+  --theme-primary-light: #34495e;
+  --theme-secondary: #27ae60;
+  --theme-accent: #e67e22;
+  --theme-danger: #c0392b;
+  --theme-info: #2980b9;
+
+  /* Backgrounds */
+  --theme-background: #f8f9fa;
+  --theme-surface: #ffffff;
+  --theme-border: #e9ecef;
+
+  /* Text */
+  --theme-text: #212529;
+  --theme-text-muted: #6c757d;
+  --theme-text-on-primary: #ffffff;
+
+  /* Spacing & Radius */
+  --radius-sm: 4px;
+  --radius-base: 8px;
+  --radius-lg: 12px;
+  --space-unit: 1rem;
+
+  /* Shadow */
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.12);
+  --shadow-base: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--theme-background);
+  color: var(--theme-text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.card {
+  background: var(--theme-surface);
+  border-radius: var(--radius-base);
+  border: 1px solid var(--theme-border);
+  box-shadow: var(--shadow-sm);
+  padding: var(--space-unit);
+}
+
+.btn {
+  padding: 0.6rem 1.2rem;
+  border-radius: var(--radius-sm);
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.btn--primary { background: var(--theme-primary); color: white; }
+.btn--secondary { background: var(--theme-secondary); color: white; }
+.btn--ghost { background: transparent; border: 1px solid var(--theme-border); color: var(--theme-text-muted); }
+
+/* Icon Sizes */
+.icon-sm { width: 16px; height: 16px; font-size: 1rem; }
+.icon-md { width: 24px; height: 24px; font-size: 1.5rem; }
+.icon-lg { width: 32px; height: 32px; font-size: 2rem; }
+
+/* Global Icon Restraint */
+svg, .emoji-icon {
+  max-width: 1.5rem;
+  max-height: 1.5rem;
+}
