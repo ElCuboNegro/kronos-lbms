@@ -1,8 +1,9 @@
-import { useState } from 'react'
-import PeatPHProtocol from '../components/Characterization/PeatPHProtocol'
+import { useState, useEffect } from "react"
+import { api } from "../api/client"
+import PeatPHProtocol from "../components/Characterization/PeatPHProtocol"
 
 export default function Calculators() {
-  const [tab, setTab] = useState('c1v1')
+  const [tab, setTab] = useState('db-dilution')
 
   return (
     <div className="page-container" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', minHeight: '100%' }}>
@@ -11,7 +12,8 @@ export default function Calculators() {
       </div>
 
       <div style={{ display: 'flex', overflowX: 'auto', gap: '0.5rem', paddingBottom: '0.5rem', borderBottom: '1px solid var(--theme-border)' }}>
-        <TabButton active={tab === 'c1v1'} onClick={() => setTab('c1v1')}>C1V1</TabButton>
+        <TabButton active={tab === 'db-dilution'} onClick={() => setTab('db-dilution')}>Dilución DB</TabButton>
+        <TabButton active={tab === 'c1v1'} onClick={() => setTab('c1v1')}>C1V1 Estándar</TabButton>
         <TabButton active={tab === 'molaridad'} onClick={() => setTab('molaridad')}>Molaridad</TabButton>
         <TabButton active={tab === 'viabilidad'} onClick={() => setTab('viabilidad')}>Viabilidad Celular</TabButton>
         <TabButton active={tab === 'cfu'} onClick={() => setTab('cfu')}>Contador UFC</TabButton>
@@ -19,6 +21,7 @@ export default function Calculators() {
       </div>
 
       <div style={{ flex: 1 }}>
+        {tab === 'db-dilution' && <IntegratedDilutionCalculator />}
         {tab === 'c1v1' && <C1V1Calculator />}
         {tab === 'molaridad' && <MolarityCalculator />}
         {tab === 'viabilidad' && <CellViabilityCounter />}
@@ -47,6 +50,156 @@ function TabButton({ active, onClick, children }) {
     >
       {children}
     </button>
+  )
+}
+
+function IntegratedDilutionCalculator() {
+  const [reagents, setReagents] = useState([])
+  const [batches, setBatches] = useState([])
+  const [searchTerm, setSearchTerm] = useState('')
+  const [selectedItem, setSelectedItem] = useState(null)
+
+  const [c1, setC1] = useState('')
+  const [c2, setC2] = useState('')
+  const [vSolvent, setVSolvent] = useState('')
+  const [loading, setLoading] = useState(false)
+
+  useEffect(() => {
+    loadData()
+  }, [])
+
+  async function loadData() {
+    setLoading(true)
+    try {
+      const [reacData, batchData] = await Promise.all([
+        api.get('/reactivos'),
+        api.get('/reactivos/lotes')
+      ])
+      setReagents(reacData)
+      setBatches(batchData)
+    } catch (err) {
+      console.error("Error loading data:", err)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const filteredReagents = reagents.filter(r =>
+    r.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (r.codigo_barras && r.codigo_barras.includes(searchTerm))
+  )
+
+  const filteredBatches = batches.filter(b =>
+    b.uid.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    b.formulacion.nombre.toLowerCase().includes(searchTerm.toLowerCase())
+  )
+
+  const handleSelect = (item, type) => {
+    setSelectedItem({ ...item, type })
+    if (type === 'reagent' && item.concentracion_gl) {
+      setC1(item.concentracion_gl.toString())
+    } else if (type === 'batch') {
+      // For batches, we might use concentracion_x or if it has a base concentration
+      // Usually lotes have a concentration relative to the formulation.
+      // If we don't have a direct g/L, we might need to assume something or just let user fill C1.
+      setC1(item.concentracion_x.toString())
+    }
+    setSearchTerm('')
+  }
+
+  const c1Val = parseFloat(c1)
+  const c2Val = parseFloat(c2)
+  const vSolvVal = parseFloat(vSolvent)
+
+  let v1 = null
+  let vTotal = null
+  if (c1Val > 0 && c2Val > 0 && vSolvVal > 0 && c1Val > c2Val) {
+    v1 = (c2Val * vSolvVal) / (c1Val - c2Val)
+    vTotal = v1 + vSolvVal
+  }
+
+  return (
+    <div className="card">
+      <h3 className="text-secondary" style={{ margin: '0 0 1rem' }}>Calculadora de Dilución con Base de Datos</h3>
+
+      <div className="form-group" style={{ position: 'relative' }}>
+        <label>Buscar Compuesto o Lote (DB)</label>
+        <input
+          type="text"
+          value={searchTerm}
+          onChange={e => setSearchTerm(e.target.value)}
+          placeholder="Escribe nombre de reactivo o UID de lote..."
+        />
+        {searchTerm && (filteredReagents.length > 0 || filteredBatches.length > 0) && (
+          <div style={{
+            position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 10,
+            background: 'var(--theme-surface)', border: '1px solid var(--theme-border)',
+            borderRadius: 'var(--radius-base)', boxShadow: 'var(--shadow-lg)',
+            maxHeight: '300px', overflowY: 'auto'
+          }}>
+            {filteredReagents.map(r => (
+              <div
+                key={r.id}
+                onClick={() => handleSelect(r, 'reagent')}
+                style={{ padding: '0.5rem 1rem', cursor: 'pointer', borderBottom: '1px solid var(--theme-border)' }}
+                className="hover-bg"
+              >
+                <span className="badge badge--sm" style={{ marginRight: '0.5rem', background: 'var(--theme-primary-light)' }}>Reactivo</span>
+                <strong>{r.nombre}</strong>
+                {r.concentracion_gl && <span style={{ marginLeft: '0.5rem', fontSize: '0.8rem', color: 'var(--theme-text-muted)' }}>({r.concentracion_gl} g/L)</span>}
+              </div>
+            ))}
+            {filteredBatches.map(b => (
+              <div
+                key={b.id}
+                onClick={() => handleSelect(b, 'batch')}
+                style={{ padding: '0.5rem 1rem', cursor: 'pointer', borderBottom: '1px solid var(--theme-border)' }}
+                className="hover-bg"
+              >
+                <span className="badge badge--sm" style={{ marginRight: '0.5rem', background: 'var(--theme-secondary-light)' }}>Lote</span>
+                <strong>{b.uid}</strong> - {b.formulacion.nombre}
+                <span style={{ marginLeft: '0.5rem', fontSize: '0.8rem', color: 'var(--theme-text-muted)' }}>({b.concentracion_x}x)</span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {selectedItem && (
+        <div style={{ marginBottom: '1rem', padding: '0.5rem', background: 'rgba(2, 60, 105, 0.1)', borderRadius: 'var(--radius-base)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div>
+            <strong>Seleccionado:</strong> {selectedItem.type === 'reagent' ? selectedItem.nombre : selectedItem.uid}
+          </div>
+          <button className="btn btn--ghost btn--sm" onClick={() => setSelectedItem(null)}>X</button>
+        </div>
+      )}
+
+      <div className="grid-2">
+        <div className="form-group">
+          <label>Concentración Madre (C₁)</label>
+          <input type="number" step="any" value={c1} onChange={e => setC1(e.target.value)} placeholder="Ej: 50" />
+        </div>
+        <div className="form-group">
+          <label>Concentración Objetivo (C₂)</label>
+          <input type="number" step="any" value={c2} onChange={e => setC2(e.target.value)} placeholder="Ej: 1" />
+        </div>
+        <div className="form-group">
+          <label>Cantidad Solvente (V_solv) ml</label>
+          <input type="number" step="any" value={vSolvent} onChange={e => setVSolvent(e.target.value)} placeholder="Ej: 250" />
+        </div>
+      </div>
+
+      {v1 !== null ? (
+        <div style={{ marginTop: '1.5rem', padding: '1rem', background: 'var(--theme-background)', borderRadius: 'var(--radius-base)', border: '1px solid var(--theme-primary)' }}>
+          <p className="text-muted" style={{ margin: '0 0 0.5rem', fontSize: '0.85rem' }}>Resultados:</p>
+          <p style={{ margin: '0 0 0.5rem', fontSize: '1.1rem' }}>Tomar <strong className="text-primary">{v1.toFixed(2)} ml</strong> de solución madre.</p>
+          <p style={{ margin: '0 0 0.5rem', fontSize: '1.1rem' }}>Añadir a <strong className="text-secondary">{vSolvVal.toFixed(2)} ml</strong> de solvente.</p>
+          <p style={{ margin: '0', fontSize: '0.9rem', color: 'var(--theme-text-muted)' }}>Volumen Total (V₂): {vTotal.toFixed(2)} ml</p>
+        </div>
+      ) : (
+        <p className="text-muted" style={{ fontSize: '0.85rem', marginTop: '1rem' }}>Busca un reactivo/lote o ingresa los valores (C₁ &gt; C₂).</p>
+      )}
+    </div>
   )
 }
 

@@ -3,7 +3,7 @@ import httpx
 from datetime import datetime, timezone
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session, joinedload
-from sqlalchemy import distinct
+from sqlalchemy import distinct, func
 from app.database import get_db
 from app import models, schemas, auth
 
@@ -59,9 +59,8 @@ def _especie_out(e: models.Especie) -> schemas.EspecieOut:
         total_individuos=len(e.especimenes),
     )
 
-
-def _load_especie(id: UUID, db: Session) -> models.Especie:
-    e = (
+def _load_especie(id_or_code, db: Session) -> models.Especie:
+    query = (
         db.query(models.Especie)
         .options(
             joinedload(models.Especie.lineas)
@@ -71,13 +70,17 @@ def _load_especie(id: UUID, db: Session) -> models.Especie:
             .joinedload(models.Linea.especimenes),
             joinedload(models.Especie.especimenes),
         )
-        .filter(models.Especie.id == id)
-        .first()
     )
+
+    try:
+        parsed_id = UUID(str(id_or_code))
+        e = query.filter(models.Especie.id == parsed_id).first()
+    except ValueError:
+        e = query.filter(models.Especie.codigo.ilike(id_or_code)).first()
+
     if not e:
         raise HTTPException(status_code=404, detail="Especie no encontrada")
     return e
-
 
 # ── Especies ──────────────────────────────────────────────────────────────────
 
@@ -88,17 +91,32 @@ def listar(
     db: Session = Depends(get_db),
     _=Depends(auth.get_current_user)
 ):
-    especies = (
-        db.query(models.Especie)
-        .options(
-            joinedload(models.Especie.lineas),
-            joinedload(models.Especie.especimenes),
+    # Subconsultas para contar sin cargar todos los objetos en memoria (Issue #9)
+    lineas_subq = (
+        db.query(models.Linea.especie_id, func.count(models.Linea.id).label("total_lineas"))
+        .group_by(models.Linea.especie_id)
+        .subquery()
+    )
+    especimenes_subq = (
+        db.query(models.Especimen.especie_id, func.count(models.Especimen.id).label("total_individuos"))
+        .group_by(models.Especimen.especie_id)
+        .subquery()
+    )
+
+    results = (
+        db.query(
+            models.Especie,
+            func.coalesce(lineas_subq.c.total_lineas, 0).label("total_lineas"),
+            func.coalesce(especimenes_subq.c.total_individuos, 0).label("total_individuos")
         )
+        .outerjoin(lineas_subq, models.Especie.id == lineas_subq.c.especie_id)
+        .outerjoin(especimenes_subq, models.Especie.id == especimenes_subq.c.especie_id)
         .order_by(models.Especie.nombre_cientifico)
         .offset(skip)
         .limit(limit)
         .all()
     )
+
     return [
         schemas.EspecieListItem(
             id=e.id,
@@ -107,10 +125,10 @@ def listar(
             categoria=e.categoria,
             nombre_comun=e.nombre_comun,
             familia=e.familia,
-            total_lineas=len(e.lineas),
-            total_individuos=len(e.especimenes),
+            total_lineas=total_lineas,
+            total_individuos=total_individuos,
         )
-        for e in especies
+        for e, total_lineas, total_individuos in results
     ]
 
 
@@ -132,9 +150,9 @@ def crear(payload: schemas.EspecieCreate, db: Session = Depends(get_db),
     return _especie_out(_load_especie(e.id, db))
 
 
-@router.get("/{id}", response_model=schemas.EspecieOut)
-def obtener(id: UUID, db: Session = Depends(get_db), _=Depends(auth.get_current_user)):
-    return _especie_out(_load_especie(id, db))
+@router.get("/{id_or_code}", response_model=schemas.EspecieOut)
+def obtener(id_or_code: str, db: Session = Depends(get_db), _=Depends(auth.get_current_user)):
+    return _especie_out(_load_especie(id_or_code, db))
 
 
 @router.patch("/{id}", response_model=schemas.EspecieOut)
@@ -257,23 +275,28 @@ def experimentos_de_especie(id: UUID, db: Session = Depends(get_db),
     if not db.query(models.Especie).filter(models.Especie.id == id).first():
         raise HTTPException(status_code=404, detail="Especie no encontrada")
 
-    exps = (
-        db.query(models.Experimento)
-        .join(models.experimento_especimen,
-              models.Experimento.id == models.experimento_especimen.c.experimento_id)
+    # Optimización N+1: Contar especímenes por experimento usando subquery para evitar GroupingError en Postgres
+    counts_subq = (
+        db.query(
+            models.experimento_especimen.c.experimento_id,
+            func.count(models.Especimen.id).label("num_especimenes")
+        )
         .join(models.Especimen,
               models.Especimen.id == models.experimento_especimen.c.especimen_id)
         .filter(models.Especimen.especie_id == id)
-        .distinct()
+        .group_by(models.experimento_especimen.c.experimento_id)
+        .subquery()
+    )
+
+    exps_with_counts = (
+        db.query(models.Experimento, counts_subq.c.num_especimenes)
+        .join(counts_subq, models.Experimento.id == counts_subq.c.experimento_id)
         .options(joinedload(models.Experimento.director))
         .all()
     )
 
     result = []
-    for exp in exps:
-        num_esp = sum(
-            1 for esp in exp.especimenes if esp.especie_id == id
-        )
+    for exp, num_esp in exps_with_counts:
         result.append(schemas.EspecieExperimentoItem(
             id=exp.id,
             nombre=exp.nombre,
@@ -329,3 +352,28 @@ def protocolos_de_especie(id: UUID, db: Session = Depends(get_db),
                 estado_validacion=p.estado_validacion,
             ))
     return result
+
+@router.get("/{id}/galeria", response_model=list[schemas.GaleriaFotoOut])
+def galeria_de_especie(id: UUID, db: Session = Depends(get_db), _=Depends(auth.get_current_user)):
+    from sqlalchemy import text
+    regs = (
+        db.query(models.RegistroEvolucion, models.Especimen.uid)
+        .join(models.Especimen, models.Especimen.id == models.RegistroEvolucion.especimen_id)
+        .filter(models.Especimen.especie_id == id)
+        .filter(text("fotos::text != '{}'"))
+        .order_by(models.RegistroEvolucion.fecha.desc())
+        .all()
+    )
+
+    resultados = []
+    for reg, uid in regs:
+        if reg.fotos:
+            for angulo, url in reg.fotos.items():
+                resultados.append(schemas.GaleriaFotoOut(
+                    url=url,
+                    angulo=angulo,
+                    fecha=reg.fecha,
+                    especimen_id=reg.especimen_id,
+                    especimen_uid=uid
+                ))
+    return resultados

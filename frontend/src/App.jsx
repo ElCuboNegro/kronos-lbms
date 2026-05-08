@@ -181,10 +181,14 @@ export default function App() {
                       <Route path="/nuevo-lote" element={<IndividuoMultiCreate />} />
                       <Route path="/especimenes" element={<EspecimenesList />} />
                       <Route path="/especimen/:id" element={<EspecimenDetail />} />
+                      {/* Rutas semánticas (ej: /especimen/MOSS-260503-062718/1/evolucion/1) */}
+                      <Route path="/especimen/:lote/:indice" element={<EspecimenDetail />} />
+                      <Route path="/especimen/:lote/:indice/evolucion/:reg_index" element={<EspecimenDetail />} />
                       <Route path="/elementos" element={<ElementosList />} />
                       <Route path="/elemento/:id" element={<ElementoDetail />} />
                       <Route path="/especies" element={<EspeciesList />} />
                       <Route path="/especies/:id" element={<EspecieDetail />} />
+                      <Route path="/especies/:id/:tab" element={<EspecieDetail />} />
                       <Route path="/experimentos/:id" element={<ExperimentoDetail />} />
                       <Route path="/protocolos" element={<ProtocolosList />} />
                       <Route path="/protocolos/nuevo" element={<ProtocoloEditor />} />

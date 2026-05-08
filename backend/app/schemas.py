@@ -51,6 +51,8 @@ class UsuarioListItem(BaseModel):
     model_config = {"from_attributes": True}
 
 
+from app.schemas_config import ScientificConfig
+
 # ── Especie / Linea / Variegacion ─────────────────────────────────────────────
 
 class EspecieCreate(BaseModel):
@@ -62,7 +64,7 @@ class EspecieCreate(BaseModel):
     genero: Optional[str] = None
     descripcion: Optional[str] = None
     requerimientos: Optional[dict[str, Any]] = None
-    config_estandar: Optional[dict[str, Any]] = None
+    config_estandar: Optional[ScientificConfig] = None
 
 
 class EspecieUpdate(BaseModel):
@@ -237,6 +239,7 @@ class EspecimenOut(BaseModel):
     contenedor_uid: Optional[str] = None
     especie: str
     especie_id: Optional[UUID] = None
+    especie_codigo: Optional[str] = None
     linea_id: Optional[UUID] = None
     linea_nombre: Optional[str] = None
     variegacion_id: Optional[UUID] = None
@@ -357,6 +360,7 @@ class ValidacionOut(BaseModel):
 
 class ProtocoloOut(BaseModel):
     id: UUID
+    codigo: Optional[str] = None
     nombre: str
     tipo: str
     version: str
@@ -424,6 +428,7 @@ class ExperimentoUpdate(BaseModel):
 
 class ExperimentoOut(BaseModel):
     id: UUID
+    codigo: Optional[str] = None
     nombre: str
     hipotesis: Optional[str] = None
     protocolo_id: Optional[UUID] = None
@@ -515,6 +520,16 @@ class SustratoCreate(BaseModel):
     formulacion_id: Optional[UUID] = None
     lote_id: Optional[UUID] = None
 
+class SustratoUpdate(BaseModel):
+    codigo_formulacion: Optional[str] = None
+    tipo: Optional[str] = None
+    nombre: Optional[str] = None
+    descripcion: Optional[str] = None
+    componentes: Optional[list[ComponenteCreate]] = None
+    ph_teorico: Optional[float] = None
+    conductividad_teorica: Optional[float] = None
+    formulacion_id: Optional[UUID] = None
+    lote_id: Optional[UUID] = None
 
 class SustratoOut(BaseModel):
     id: UUID
@@ -548,14 +563,14 @@ class RegistroEvolucionCreate(BaseModel):
     sustrato_id: Optional[UUID] = None
     notas: Optional[str] = None
     # Morfológicas
-    altura_cm: Optional[float] = None
-    ancho_hoja_max_cm: Optional[float] = None
-    largo_hoja_max_cm: Optional[float] = None
-    num_hojas: Optional[int] = None
-    num_brotes: Optional[int] = None
-    num_hijuelos: Optional[int] = None
-    num_nodos: Optional[int] = None
-    diametro_tallo_mm: Optional[float] = None
+    altura_cm: Annotated[Optional[float], Field(ge=0)] = None
+    ancho_hoja_max_cm: Annotated[Optional[float], Field(ge=0)] = None
+    largo_hoja_max_cm: Annotated[Optional[float], Field(ge=0)] = None
+    num_hojas: Annotated[Optional[int], Field(ge=0)] = None
+    num_brotes: Annotated[Optional[int], Field(ge=0)] = None
+    num_hijuelos: Annotated[Optional[int], Field(ge=0)] = None
+    num_nodos: Annotated[Optional[int], Field(ge=0)] = None
+    diametro_tallo_mm: Annotated[Optional[float], Field(ge=0)] = None
     # Variegación
     porcentaje_variegacion: Annotated[Optional[float], Field(ge=0, le=100)] = None
     patron_variegacion: Optional[str] = None
@@ -563,16 +578,16 @@ class RegistroEvolucionCreate(BaseModel):
     # Contenedor
     sustrato: Optional[str] = None
     tipo_contenedor: Optional[str] = None
-    diametro_contenedor_cm: Optional[float] = None
+    diametro_contenedor_cm: Annotated[Optional[float], Field(ge=0)] = None
     # Condiciones ambientales
     temperatura_c: Annotated[Optional[float], Field(ge=-20, le=60)] = None
     humedad_relativa_pct: Annotated[Optional[float], Field(ge=0, le=100)] = None
     humedad_sustrato_pct: Annotated[Optional[float], Field(ge=0, le=100)] = None
     ph_sustrato: Annotated[Optional[float], Field(ge=0, le=14)] = None
-    luz_lux: Optional[float] = None
-    conductividad_ec: Optional[float] = None
+    luz_lux: Annotated[Optional[float], Field(ge=0)] = None
+    conductividad_ec: Annotated[Optional[float], Field(ge=0)] = None
     npk: Optional[str] = None
-    ppm: Optional[float] = None
+    ppm: Annotated[Optional[float], Field(ge=0)] = None
 
 
 class FotosRegistro(BaseModel):
@@ -652,6 +667,15 @@ class EspecieProtocoloItem(BaseModel):
     tipo: str
     version: str
     estado_validacion: str
+    model_config = {"from_attributes": True}
+
+
+class GaleriaFotoOut(BaseModel):
+    url: str
+    angulo: str
+    fecha: date
+    especimen_id: UUID
+    especimen_uid: str
     model_config = {"from_attributes": True}
 
 
@@ -741,6 +765,15 @@ class FormulacionCreate(BaseModel):
     volumen_base_l: float = 1.0
     caducidad_dias: int = 30
     componentes: list[ComponenteCreate]
+
+class FormulacionUpdate(BaseModel):
+    nombre: Optional[str] = None
+    codigo_referencia: Optional[str] = None
+    descripcion: Optional[str] = None
+    procedimiento: Optional[str] = None
+    volumen_base_l: Optional[float] = None
+    caducidad_dias: Optional[int] = None
+    componentes: Optional[list[ComponenteCreate]] = None
 
 class FormulacionOut(BaseModel):
     id: UUID

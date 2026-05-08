@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session, joinedload
 from app.database import get_db
 from app import models, schemas, auth
-from app.routers.especimenes import _especimen_out
+from app.services.specimen_service import SpecimenService
 from app.routers.elementos import _elemento_out
 
 router = APIRouter(prefix="/scan", tags=["scan"])
@@ -30,7 +30,7 @@ def resolver_qr(
             .first()
         )
         if esp:
-            return schemas.ScanResult(tipo="especimen", especimen=_especimen_out(esp))
+            return schemas.ScanResult(tipo="especimen", especimen=SpecimenService.map_to_out(esp))
         raise HTTPException(status_code=404, detail=f"Espécimen con UID '{uid}' no encontrado")
 
     if qr_data.startswith("ID:"):
@@ -64,7 +64,7 @@ def resolver_qr(
         if especimenes:
             return schemas.ScanResult(
                 tipo="contenedor",
-                contenedor={"contenedor_uid": qr_data, "especimenes": [_especimen_out(e) for e in especimenes]}
+                contenedor={"contenedor_uid": qr_data, "especimenes": [SpecimenService.map_to_out(e) for e in especimenes]}
             )
         raise HTTPException(status_code=404, detail=f"Contenedor '{qr_data}' vacío o no encontrado")
 
@@ -97,7 +97,7 @@ def resolver_qr(
         .first()
     )
     if esp:
-        return schemas.ScanResult(tipo="especimen", especimen=_especimen_out(esp))
+        return schemas.ScanResult(tipo="especimen", especimen=SpecimenService.map_to_out(esp))
 
     # Probar como código de barras de fábrica de un Reactivo
     codigo_barras_directo = qr_data

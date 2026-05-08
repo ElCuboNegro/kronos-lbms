@@ -42,7 +42,7 @@ export default function EspeciesList() {
         : filtradas.length === 0
           ? <p style={{color:'var(--theme-text-muted)',textAlign:'center',padding:'2rem 0'}}>{busqueda ? 'Sin resultados' : 'No hay especies registradas'}</p>
           : filtradas.map(e => (
-              <EspecieCard key={e.id} e={e} onClick={() => navigate(`/especies/${e.id}`)} />
+              <EspecieCard key={e.id} e={e} onClick={() => navigate(`/especies/${e.codigo || e.id}`)} />
             ))
       }
 

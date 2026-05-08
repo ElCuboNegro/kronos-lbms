@@ -40,6 +40,7 @@ This document serves as a master index of all the tools and features provided to
 
 ## 6. Frontend Lab Utilities (Micro-tools)
 *Sterile-workflow mathematical tools.*
+*   **Integrated Dilution Calculator (DB-linked):** Search for reagents or previously prepared batches (lotes) directly from the database to auto-fill stock concentrations. Calculates required stock volume based on target concentration and total solvent volume.
 *   **Serial Dilution & Molarity:** On-device `C1V1` calculations ensuring precise liquid transfers without needing external calculators.
 *   **Viability & Colony Counters:** Rapid screen-tapping tools with haptic feedback to count live/dead cells or CFUs while looking through a microscope, keeping hands clean.
 *   *(Ref: `frontend_calculators.feature`)*

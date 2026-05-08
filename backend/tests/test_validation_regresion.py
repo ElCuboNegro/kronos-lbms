@@ -42,3 +42,20 @@ class TestValidationRegresion:
 
         assert res.status_code == 422
         assert "humedad_relativa_pct" in res.text
+
+    def test_rango_morfologico_falla_con_negativo(self, auth_client, db):
+        import uuid
+        test_esp_id = uuid.uuid4()
+        esp = models.Especimen(id=test_esp_id, uid=f"TEST-{str(uuid.uuid4())[:8]}", especie="Test Specie", estado="activo")
+        db.add(esp)
+        db.commit()
+
+        # 2. Intentar registrar evolución con altura negativa
+        res1 = auth_client.post(f"/especimenes/{test_esp_id}/evolucion", json={"altura_cm": -10.0})
+        assert res1.status_code == 422
+        assert "altura_cm" in res1.text
+
+        # 3. Intentar registrar evolución con número de hojas negativo
+        res2 = auth_client.post(f"/especimenes/{test_esp_id}/evolucion", json={"num_hojas": -1})
+        assert res2.status_code == 422
+        assert "num_hojas" in res2.text

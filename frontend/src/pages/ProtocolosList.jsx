@@ -109,10 +109,10 @@ export default function ProtocolosList() {
               <h4 className="text-primary" style={{ margin: '0 0 0.2rem', fontSize: '1.1rem' }}>{p.nombre}</h4>
               <p className="text-muted" style={{ margin: '0 0 1rem', fontSize: '0.8rem' }}>Versión: {p.version}</p>
               <div style={{ display: 'flex', gap: '0.5rem' }}>
-                <button className="btn btn--primary" style={{ flex: 1 }} onClick={() => navigate(`/protocolos/${p.id}/ejecutar`)}>
+                <button className="btn btn--primary" style={{ flex: 1 }} onClick={() => navigate(`/protocolos/${p.codigo || p.id}/ejecutar`)}>
                   ▶ Ejecutar
                 </button>
-                <button className="btn btn--ghost" onClick={() => navigate(`/protocolos/${p.id}`)}>
+                <button className="btn btn--ghost" onClick={() => navigate(`/protocolos/${p.codigo || p.id}`)}>
                   Ver / Editar
                 </button>
               </div>
