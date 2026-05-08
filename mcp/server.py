@@ -323,3 +323,52 @@ async def lbms_get_frontend_logs(params: ListLogsInput) -> str:
 
 if __name__ == "__main__":
     mcp.run()
+
+# ── Tools: Creación (Escritura) ──────────────────────────────────────────────
+
+class CreateLoteInput(BaseModel):
+    model_config = ConfigDict(str_strip_whitespace=True)
+    formulacion_id: str = Field(..., description="UUID de la formulación")
+    volumen_l: float = Field(..., description="Volumen final en litros")
+    notas: Optional[str] = None
+
+class CreateExperimentoInput(BaseModel):
+    model_config = ConfigDict(str_strip_whitespace=True)
+    nombre: str
+    especie_id: str
+    fecha_inicio: str = Field(default_factory=lambda: date.today().isoformat())
+    hipotesis: Optional[str] = None
+    notas: Optional[str] = None
+
+class BulkEspecimenInput(BaseModel):
+    model_config = ConfigDict(str_strip_whitespace=True)
+    especie_id: str
+    madre_id: Optional[str] = None
+    lote_id: Optional[str] = None
+    experimento_id: Optional[str] = None
+    contenedor_uid: str
+    items: list[dict[str, Any]] = Field(..., description="Lista de {cantidad: int, notas: str}")
+
+@mcp.tool()
+async def lbms_create_lote(params: CreateLoteInput) -> str:
+    """Crea un nuevo lote de medio preparado."""
+    try:
+        res = await _api("POST", "/reactivos/lotes", json=params.model_dump())
+        return json.dumps(res, indent=2, default=str)
+    except Exception as e: return _err(e)
+
+@mcp.tool()
+async def lbms_create_experimento(params: CreateExperimentoInput) -> str:
+    """Registra un nuevo experimento científico."""
+    try:
+        res = await _api("POST", "/experimentos", json=params.model_dump())
+        return json.dumps(res, indent=2, default=str)
+    except Exception as e: return _err(e)
+
+@mcp.tool()
+async def lbms_bulk_create_especimenes(params: BulkEspecimenInput) -> str:
+    """Registra múltiples explantes en un contenedor/frasco."""
+    try:
+        res = await _api("POST", "/especimenes/bulk", json=params.model_dump())
+        return json.dumps(res, indent=2, default=str)
+    except Exception as e: return _err(e)
