@@ -125,5 +125,41 @@ class SpecimenService:
                     current_global_idx += 1
 
             db.commit()
+            if experimento:
+                db.refresh(experimento)
+                print(f"📦 Verificación: {len(especimenes)} especímenes vinculados al experimento {experimento.codigo}")
 
         return [cls.map_to_out(e) for e in especimenes]
+
+    @classmethod
+    def get_lineage(cls, db: Session, especimen_id: str):
+        """Obtiene el árbol genealógico completo (ascendencia y descendencia)."""
+        esp = db.query(models.Especimen).get(especimen_id)
+        if not esp:
+            raise HTTPException(status_code=404, detail="Espécimen no encontrado")
+
+        def _get_ancestors(current_esp):
+            tree = {"id": str(current_esp.id), "uid": current_esp.uid, "parents": []}
+            if current_esp.madre:
+                tree["parents"].append(_get_ancestors(current_esp.madre))
+            if current_esp.padre:
+                tree["parents"].append(_get_ancestors(current_esp.padre))
+            return tree
+
+        def _get_descendants(current_esp):
+            children = db.query(models.Especimen).filter(
+                (models.Especimen.madre_id == current_esp.id) |
+                (models.Especimen.padre_id == current_esp.id)
+            ).all()
+
+            return [{
+                "id": str(child.id),
+                "uid": child.uid,
+                "children": _get_descendants(child)
+            } for child in children]
+
+        return {
+            "origin": {"id": str(esp.id), "uid": esp.uid},
+            "ancestors": _get_ancestors(esp),
+            "descendants": _get_descendants(esp)
+        }

@@ -3,6 +3,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session, joinedload
 from app.database import get_db
 from app import models, schemas, auth
+from app.services.experiment_service import ExperimentService
 
 router = APIRouter(prefix="/experimentos", tags=["experimentos"])
 
@@ -69,35 +70,7 @@ def listar(
 def crear(payload: schemas.ExperimentoCreate, db: Session = Depends(get_db),
           current_user: models.Usuario = Depends(auth.get_current_user)):
     director_id = payload.director_id or current_user.id
-
-    if not db.query(models.Usuario).filter(models.Usuario.id == director_id).first():
-        raise HTTPException(status_code=404, detail="Director no encontrado")
-    if payload.operador_id and not db.query(models.Usuario).filter(
-            models.Usuario.id == payload.operador_id).first():
-        raise HTTPException(status_code=404, detail="Operador no encontrado")
-
-    data = payload.model_dump(exclude={"especimen_ids", "elemento_ids", "director_id"})
-    exp = models.Experimento(**data, director_id=director_id)
-    db.add(exp)
-    db.flush()
-
-    for eid in payload.especimen_ids:
-        esp = db.query(models.Especimen).filter(models.Especimen.id == eid).first()
-        if esp:
-            exp.especimenes.append(esp)
-            if esp.estado == "activo":
-                esp.estado = "en_experimento"
-
-    for eid in payload.elemento_ids:
-        el = db.query(models.Elemento).filter(models.Elemento.id == eid).first()
-        if el:
-            exp.elementos.append(el)
-
-    db.commit()
-    exp = _query_exp(db).filter(models.Experimento.id == exp.id).first()
-    return _exp_out(exp)
-
-
+    return ExperimentService.create_experiment(db, payload, director_id)
 def _query_exp(db: Session):
     return db.query(models.Experimento).options(
         joinedload(models.Experimento.director),

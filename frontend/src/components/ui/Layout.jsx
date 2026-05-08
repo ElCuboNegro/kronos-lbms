@@ -1,3 +1,4 @@
+import VoiceController from './VoiceController'
 import { useNavigate, useLocation } from 'react-router-dom'
 
 export default function Layout({ children, title, showBack = false }) {
@@ -29,6 +30,7 @@ export default function Layout({ children, title, showBack = false }) {
       <main style={{ flex: 1, padding: '1rem' }}>
         {children}
       </main>
+      <VoiceController />
 
       <nav style={{
         display: 'flex',
