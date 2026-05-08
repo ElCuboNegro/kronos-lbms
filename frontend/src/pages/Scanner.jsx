@@ -110,7 +110,7 @@ export default function Scanner() {
               Ver Inventario / Ficha
             </button>
             {scanResult.tipo === 'especimen' && (
-              <>
+              <div style={{ display: "flex", flexDirection: "column", gap: 10, width: "100%" }}>
                 <button className="btn btn--accent btn--block" onClick={() => navigate(`/especimen/${scanResult.especimen.uid || scanResult.especimen.id}?quick=foto`)}>
                   📸 Añadir Foto / Evo
                 </button>
