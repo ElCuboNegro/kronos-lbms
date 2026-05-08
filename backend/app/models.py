@@ -111,6 +111,7 @@ class Especimen(Base):
     variegacion_id = Column(UUID(as_uuid=True), ForeignKey("variegaciones.id"), nullable=True, index=True)
     madre_id = Column(UUID(as_uuid=True), ForeignKey("especimenes.id"), nullable=True, index=True)
     padre_id = Column(UUID(as_uuid=True), ForeignKey("especimenes.id"), nullable=True, index=True)
+    lote_id = Column(UUID(as_uuid=True), ForeignKey("lotes_preparados.id"), nullable=True, index=True)
     fecha_ingreso = Column(Date, nullable=False, default=date.today)
     origen = Column(String(255), nullable=True)
     coordenadas = Column(JSONB, nullable=True)
@@ -122,6 +123,7 @@ class Especimen(Base):
     especie_rel = relationship("Especie", back_populates="especimenes")
     linea_rel = relationship("Linea", back_populates="especimenes")
     variegacion_rel = relationship("Variegacion", back_populates="especimenes")
+    lote_rel = relationship("LotePreparado")
 
     madre = relationship("Especimen", remote_side=[id], foreign_keys=[madre_id], backref="hijos_madre")
     padre = relationship("Especimen", remote_side=[id], foreign_keys=[padre_id], backref="hijos_padre")

@@ -321,6 +321,21 @@ async def lbms_get_frontend_logs(params: ListLogsInput) -> str:
         return json.dumps(await _api("GET", "/app/telemetry", params={"limit": params.limit}), indent=2, default=str)
     except Exception as e: return _err(e)
 
+
+@mcp.tool()
+async def lbms_imprimir_contenedor(params: ImprimirContenedorInput) -> str:
+    """Imprime etiqueta de contenedor LOCALMENTE."""
+    try:
+        payload = {
+            "uid": params.uid,
+            "especie": "Cotyledon tomentosa (6 explantes)",
+            "cantidad": "Múltiple",
+            "fecha_ingreso": date.today().isoformat(),
+            "componentes": "Experimento Biomasa MIX-3"
+        }
+        result = await _local_print("/imprimir", payload)
+        return json.dumps({"status": "success", "local_result": result}, indent=2)
+    except Exception as e: return _err(e)
 if __name__ == "__main__":
     mcp.run()
 

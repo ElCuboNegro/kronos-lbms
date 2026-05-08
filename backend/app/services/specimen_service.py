@@ -50,6 +50,7 @@ class SpecimenService:
         return schemas.EspecimenOut(
             id=esp.id,
             uid=esp.uid,
+            lote_id=esp.lote_id,
             especie=esp.especie,
             especie_id=esp.especie_id,
             especie_codigo=esp.especie_rel.codigo if esp.especie_rel else None,
@@ -79,6 +80,12 @@ class SpecimenService:
         prefix = cls._generate_uid_prefix(especie_obj.codigo, especie_obj.nombre_cientifico)
         cm = ConcurrencyManager(db)
 
+        experimento = None
+        if payload.experimento_id:
+            experimento = db.query(models.Experimento).filter(models.Experimento.id == payload.experimento_id).first()
+            if not experimento:
+                raise HTTPException(status_code=404, detail="Experimento no encontrado")
+
         especimenes = []
         # Bloqueamos el prefijo para toda la operación de creación masiva
         with cm.transactional_lock(f"bulk_create_{prefix}"):
@@ -101,6 +108,7 @@ class SpecimenService:
                         variegacion_id=payload.variegacion_id,
                         madre_id=payload.madre_id,
                         padre_id=payload.padre_id,
+                        lote_id=payload.lote_id,
                         contenedor_uid=payload.contenedor_uid,
                         estado=payload.estado,
                         fecha_ingreso=payload.fecha_ingreso,
@@ -109,6 +117,9 @@ class SpecimenService:
                         notas=item.notas,
                         **defaults
                     )
+                    if experimento:
+                        esp.experimentos.append(experimento)
+
                     db.add(esp)
                     especimenes.append(esp)
                     current_global_idx += 1

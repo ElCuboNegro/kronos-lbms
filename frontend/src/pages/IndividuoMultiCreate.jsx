@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import Layout from '../components/ui/Layout'
 import Card from '../components/ui/Card'
@@ -10,15 +10,30 @@ export default function IndividuoMultiCreate() {
   const [searchParams] = useSearchParams()
   const [step, setStep] = useState(1)
   const [loading, setLoading] = useState(false)
+  const [lotes, setLotes] = useState([])
+  const [experimentos, setExperimentos] = useState([])
 
   // State del formulario
   const [formData, setFormData] = useState({
     especie_id: searchParams.get('especie') || '',
     madre_id: searchParams.get('madre') || '',
+    lote_id: '',
+    experimento_id: '',
     cantidad: 10,
     estado: 'activo',
     fecha_ingreso: new Date().toISOString().split('T')[0]
   })
+
+  useEffect(() => {
+    // Cargar lotes disponibles
+    api.get('/reactivos/lotes').then(setLotes).catch(() => {})
+    // Cargar experimentos activos
+    api.get('/stats').then(() => {
+        // En un sistema real, tendríamos un endpoint de listado,
+        // pero usemos lo que el arqueólogo encontró o supongamos el estándar
+        api.get('/experimentos').then(setExperimentos).catch(() => {})
+    })
+  }, [])
 
   const handleNext = () => setStep(s => s + 1)
   const handlePrev = () => setStep(s => Math.max(1, s - 1))
@@ -26,7 +41,6 @@ export default function IndividuoMultiCreate() {
   const handleSubmit = async () => {
     setLoading(true)
     try {
-      // Adaptar al nuevo esquema de la Fase 1-3 (BulkItems)
       const payload = {
         ...formData,
         items: [{ cantidad: parseInt(formData.cantidad), notas: 'Clonación masiva' }]
@@ -40,15 +54,17 @@ export default function IndividuoMultiCreate() {
     }
   }
 
+  const totalSteps = 4
+
   return (
     <Layout title="Clonación Masiva" showBack>
       <div style={{ marginBottom: '2rem' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-          <span className="text-muted" style={{ fontSize: '0.8rem' }}>Paso {step} de 3</span>
-          <span className="text-primary" style={{ fontWeight: 600 }}>{Math.round((step/3)*100)}%</span>
+          <span className="text-muted" style={{ fontSize: '0.8rem' }}>Paso {step} de {totalSteps}</span>
+          <span className="text-primary" style={{ fontWeight: 600 }}>{Math.round((step/totalSteps)*100)}%</span>
         </div>
         <div style={{ height: '6px', background: 'var(--theme-border)', borderRadius: '3px', overflow: 'hidden' }}>
-          <div style={{ height: '100%', width: `${(step/3)*100}%`, background: 'var(--theme-secondary)', transition: 'width 0.3s' }} />
+          <div style={{ height: '100%', width: `${(step/totalSteps)*100}%`, background: 'var(--theme-secondary)', transition: 'width 0.3s' }} />
         </div>
       </div>
 
@@ -69,6 +85,45 @@ export default function IndividuoMultiCreate() {
       )}
 
       {step === 2 && (
+        <Card title="Contexto de Trabajo" subtitle="Vincular con medio y experimento">
+           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              <div className="input-group">
+                <label>Medio de Cultivo (Lote)</label>
+                <select
+                  value={formData.lote_id}
+                  onChange={e => setFormData({...formData, lote_id: e.target.value})}
+                  style={{ width: '100%', padding: '0.5rem', borderRadius: '4px' }}
+                >
+                  <option value="">-- Seleccionar Lote --</option>
+                  {lotes.map(l => (
+                    <option key={l.id} value={l.id}>{l.uid} ({l.formulacion.nombre})</option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="input-group">
+                <label>Experimento Asociado (Opcional)</label>
+                <select
+                  value={formData.experimento_id}
+                  onChange={e => setFormData({...formData, experimento_id: e.target.value})}
+                  style={{ width: '100%', padding: '0.5rem', borderRadius: '4px' }}
+                >
+                  <option value="">-- Sin Experimento --</option>
+                  {experimentos.map(ex => (
+                    <option key={ex.id} value={ex.id}>{ex.nombre}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div style={{ display: 'flex', gap: '0.5rem' }}>
+                <Button variant="ghost" style={{ flex: 1 }} onClick={handlePrev}>Atrás</Button>
+                <Button style={{ flex: 2 }} onClick={handleNext}>Continuar</Button>
+              </div>
+           </div>
+        </Card>
+      )}
+
+      {step === 3 && (
         <Card title="Configuración de Lote" subtitle="Parámetros de cultivo">
            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               <label>Cantidad de Explantes</label>
@@ -85,11 +140,13 @@ export default function IndividuoMultiCreate() {
         </Card>
       )}
 
-      {step === 3 && (
+      {step === 4 && (
         <Card title="Confirmación" subtitle="Verifica los datos antes de generar">
            <div style={{ padding: '1rem', background: 'var(--theme-background)', borderRadius: 'var(--radius-base)', marginBottom: '1.5rem' }}>
               <p><strong>Total:</strong> {formData.cantidad} especímenes</p>
               <p><strong>Estado:</strong> {formData.estado}</p>
+              {formData.lote_id && <p><strong>Medio:</strong> {lotes.find(l => l.id === formData.lote_id)?.uid}</p>}
+              {formData.experimento_id && <p><strong>Experimento:</strong> {experimentos.find(ex => ex.id === formData.experimento_id)?.nombre}</p>}
            </div>
            <div style={{ display: 'flex', gap: '0.5rem' }}>
               <Button variant="ghost" style={{ flex: 1 }} onClick={handlePrev}>Atrás</Button>

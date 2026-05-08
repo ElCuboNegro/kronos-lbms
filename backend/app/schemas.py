@@ -172,6 +172,7 @@ class EspecieListItem(BaseModel):
 
 class EspecimenCreate(BaseModel):
     uid: str
+    lote_id: Optional[UUID] = None
     contenedor_uid: Optional[str] = None
     especie: str
     especie_id: Optional[UUID] = None
@@ -218,9 +219,12 @@ class EspecimenBulkItem(BaseModel):
 class MoverContenedorRequest(BaseModel):
     especimen_ids: list[UUID]
     destino_contenedor_uid: str
+    lote_id: Optional[UUID] = None
     notas: Optional[str] = None
 
 class EspecimenBulkRequest(BaseModel):
+    lote_id: Optional[UUID] = None
+    experimento_id: Optional[UUID] = None
     especie_id: UUID
     linea_id: Optional[UUID] = None
     variegacion_id: Optional[UUID] = None
@@ -236,6 +240,7 @@ class EspecimenBulkRequest(BaseModel):
 class EspecimenOut(BaseModel):
     id: UUID
     uid: str
+    lote_id: Optional[UUID] = None
     contenedor_uid: Optional[str] = None
     especie: str
     especie_id: Optional[UUID] = None
@@ -261,6 +266,7 @@ class EspecimenOut(BaseModel):
 class EspecimenListItem(BaseModel):
     id: UUID
     uid: str
+    lote_id: Optional[UUID] = None
     contenedor_uid: Optional[str] = None
     especie: str
     especie_id: Optional[UUID] = None
@@ -676,6 +682,7 @@ class GaleriaFotoOut(BaseModel):
     fecha: date
     especimen_id: UUID
     especimen_uid: str
+    lote_id: Optional[UUID] = None
     model_config = {"from_attributes": True}
 
 
@@ -689,6 +696,7 @@ class ImprimirRequest(BaseModel):
 
 class ScanContenedor(BaseModel):
     contenedor_uid: str
+    lote_id: Optional[UUID] = None
     especimenes: list[EspecimenOut]
     model_config = {"from_attributes": True}
 
@@ -798,6 +806,7 @@ class LotePreparadoCreate(BaseModel):
 class LotePreparadoOut(BaseModel):
     id: UUID
     uid: str
+    lote_id: Optional[UUID] = None
     formulacion: FormulacionOut
     preparado_por_nombre: str
     fecha_preparacion: datetime
