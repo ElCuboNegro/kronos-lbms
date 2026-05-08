@@ -155,3 +155,18 @@ def _get_full(id: UUID, db: Session) -> schemas.EspecimenOut:
 def _especimen_out(esp: models.Especimen) -> schemas.EspecimenOut:
     """Mapeo compatible con el servicio."""
     return SpecimenService.map_to_out(esp)
+
+@router.patch("/{id}/coordenadas")
+def actualizar_coordenadas(
+    id: UUID,
+    coordenadas: dict[str, float],
+    db: Session = Depends(get_db),
+    _=Depends(auth.get_current_user)
+):
+    """Actualiza la posición física de un espécimen dentro de su contenedor."""
+    esp = db.query(models.Especimen).filter(models.Especimen.id == id).first()
+    if not esp:
+        raise HTTPException(status_code=404, detail="Espécimen no encontrado")
+    esp.coordenadas = coordenadas
+    db.commit()
+    return {"status": "ok", "coordenadas": esp.coordenadas}

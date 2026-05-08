@@ -8,8 +8,9 @@ const COLORES = ['none', 'blanco', 'crema', 'amarillo', 'mint']
 const SUSTRATOS_BASE = ['vitro', 'sphagnum', 'akadama', 'perlita', 'mezcla', 'tierra', 'otro']
 const CONTENEDORES = ['frasco_vitro', 'maceta', 'bolsa', 'bandeja', 'otro']
 
-export default function RegistroEvolucionForm({ especimenId, protocolos = [], onSaved, onCancel, initialStep = 0 }) {
+export default function RegistroEvolucionForm({ especimenId, contenedorUid, protocolos = [], onSaved, onCancel, initialStep = 0 }) {
   const [sustratos, setSustratos] = useState([])
+  const [step, setStep] = useState(initialStep)
   const [form, setForm] = useState({
     protocolo_clonacion_id: '',
     altura_cm: '', ancho_hoja_max_cm: '', largo_hoja_max_cm: '',
@@ -31,8 +32,6 @@ export default function RegistroEvolucionForm({ especimenId, protocolos = [], on
 
   useEffect(() => {
     api.get('/sustratos').then(setSustratos).catch(() => {})
-
-    // Si empezamos en paso de fotos, crear el registro base inmediatamente
     if (initialStep === 2 && !registroId) {
       guardarMedidas()
     }
@@ -49,7 +48,6 @@ export default function RegistroEvolucionForm({ especimenId, protocolos = [], on
       const payload = {
         protocolo_clonacion_id: form.protocolo_clonacion_id || undefined,
         sustrato_id: form.sustrato_id || undefined,
-        sustrato: form.sustrato || undefined,
         notas: form.notas || undefined,
         altura_cm: num(form.altura_cm),
         ancho_hoja_max_cm: num(form.ancho_hoja_max_cm),
@@ -60,8 +58,9 @@ export default function RegistroEvolucionForm({ especimenId, protocolos = [], on
         num_nodos: int(form.num_nodos),
         diametro_tallo_mm: num(form.diametro_tallo_mm),
         porcentaje_variegacion: num(form.porcentaje_variegacion),
-        patron_variegacion: form.patron_variegacion,
-        color_variegacion: form.color_variegacion,
+        patron_variegacion: form.patron_variegacion !== 'none' ? form.patron_variegacion : undefined,
+        color_variegacion: form.color_variegacion !== 'none' ? form.color_variegacion : undefined,
+        sustrato: form.sustrato || undefined,
         tipo_contenedor: form.tipo_contenedor || undefined,
         diametro_contenedor_cm: num(form.diametro_contenedor_cm),
         temperatura_c: num(form.temperatura_c),
@@ -71,193 +70,118 @@ export default function RegistroEvolucionForm({ especimenId, protocolos = [], on
         luz_lux: num(form.luz_lux),
         conductividad_ec: num(form.conductividad_ec),
         npk: form.npk || undefined,
-        ppm: num(form.ppm),
+        ppm: num(form.ppm)
       }
-      const reg = await api.post(`/especimenes/${especimenId}/evolucion`, payload)
-      setRegistroId(reg.id)
-    } catch (err) { setError(err.message) }
-    finally { setLoading(false) }
+
+      let res;
+      if (contenedorUid) {
+        res = await api.post(`/especimenes/contenedores/${contenedorUid}/evolucion`, payload)
+        setRegistroId(res[0].id) // Usamos el ID del primero para subir las fotos y sincronizar
+      } else {
+        res = await api.post(`/especimenes/${especimenId}/evolucion`, payload)
+        setRegistroId(res.id)
+      }
+      setStep(2)
+    } catch (e) {
+      setError(e.message)
+    } finally {
+      setLoading(false)
+    }
   }
 
-  async function capturarFoto(angulo, file) {
-    if (!registroId) { setError("Guarda primero los datos."); return }
-    const preview = URL.createObjectURL(file)
-    setFotos(f => ({ ...f, [angulo]: { file, preview } }))
+  async function handleFileChange(angulo, file) {
+    if (!file) return
+    const reader = new FileReader()
+    reader.onloadend = () => {
+      setFotos(prev => ({ ...prev, [angulo]: { file, preview: reader.result } }))
+      subirFoto(angulo, file)
+    }
+    reader.readAsDataURL(file)
+  }
+
+  async function subirFoto(angulo, file) {
     setUploadingAngulo(angulo)
+    const formData = new FormData()
+    formData.append('file', file)
     try {
-      const fd = new FormData()
-      fd.append('file', file)
-      const token = localStorage.getItem('token')
-      const res = await fetch(`/api/especimenes/${especimenId}/evolucion/${registroId}/fotos/${angulo}`, {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${token}` },
-        body: fd,
-      })
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
-        throw new Error(data.detail || "Error al subir fotografía");
-      }
-    } catch (err) {
-      setError(`Fallo en foto ${ANGULO_LABEL[angulo]}: ${err.message}`)
-    } finally { setUploadingAngulo(null) }
-  }
+      const endpoint = contenedorUid
+        ? `/especimenes/evolucion/${registroId}/fotos/${angulo}/bulk-contenedor`
+        : `/especimenes/evolucion/${registroId}/fotos/${angulo}`
 
-  function triggerCamera(angulo) {
-    if (!fileRefs.current[angulo]) return
-    fileRefs.current[angulo].click()
+      await api.post(endpoint, formData, { headers: { 'Content-Type': 'multipart/form-data' } })
+    } catch (e) {
+      alert(`Error subiendo foto (${angulo}): ` + e.message)
+    } finally {
+      setUploadingAngulo(null)
+    }
   }
 
   return (
-    <div style={{position:'fixed',inset:0,background:'#000c',display:'flex',alignItems:'flex-end',zIndex:2000}}>
-      <div style={{background:'var(--theme-surface)',borderRadius:'16px 16px 0 0',padding:'1.5rem',width:'100%',maxHeight:'90dvh',overflowY:'auto',display:'flex',flexDirection:'column'}}>
-        <div className="page-header" style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'1.25rem'}}>
-          <h3 className="page-title" style={{color:'var(--theme-primary)',margin:0,fontSize:'1.1rem'}}>{!registroId ? 'Nuevo registro de evolución' : 'Añadir Fotografías'}</h3>
-          <button style={{background:'none',border:'none',color:'var(--theme-secondary)',fontSize:'1.2rem',cursor:'pointer'}} onClick={!registroId ? onCancel : onSaved}>✕</button>
+    <div style={{ padding: '1rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <h3 style={{ margin: 0 }}>{contenedorUid ? `Registro Grupal: ${contenedorUid}` : 'Nuevo Registro de Evolución'}</h3>
+        <div style={{ display: 'flex', gap: '0.5rem' }}>
+           <span className={`badge ${step === 1 ? 'badge--primary' : 'badge--outline'}`}>1. Medidas</span>
+           <span className={`badge ${step === 2 ? 'badge--primary' : 'badge--outline'}`}>2. Fotos</span>
         </div>
-
-        {!registroId ? (
-          <div style={{display:'flex',flexDirection:'column',gap:'1.25rem', paddingBottom: '2rem'}}>
-            <Section title="Morfología y Variegación">
-              <Row2>
-                <Num label="Altura (cm)" value={form.altura_cm} onChange={v => set('altura_cm', v)} min="0" />
-                <Num label="Ø Tallo (mm)" value={form.diametro_tallo_mm} onChange={v => set('diametro_tallo_mm', v)} min="0" />
-              </Row2>
-              <Row2>
-                <Num label="Ancho hoja (cm)" value={form.ancho_hoja_max_cm} onChange={v => set('ancho_hoja_max_cm', v)} min="0" />
-                <Num label="Largo hoja (cm)" value={form.largo_hoja_max_cm} onChange={v => set('largo_hoja_max_cm', v)} min="0" />
-              </Row2>
-              <Row3>
-                <Num label="Hojas" value={form.num_hojas} onChange={v => set('num_hojas', v)} min="0" />
-                <Num label="Brotes" value={form.num_brotes} onChange={v => set('num_brotes', v)} min="0" />
-                <Num label="Nodos" value={form.num_nodos} onChange={v => set('num_nodos', v)} min="0" />
-              </Row3>
-              <Row3>
-                <Num label="% Varieg." value={form.porcentaje_variegacion} onChange={v => set('porcentaje_variegacion', v)} min="0" max="100" />
-                <Sel label="Patrón" value={form.patron_variegacion} onChange={v => set('patron_variegacion', v)} options={PATRONES} />
-                <Sel label="Color" value={form.color_variegacion} onChange={v => set('color_variegacion', v)} options={COLORES} />
-              </Row3>
-            </Section>
-
-            <Section title="Condiciones Ambientales">
-              <Row2>
-                <Num label="Temp (°C)" value={form.temperatura_c} onChange={v => set('temperatura_c', v)} min="-20" max="60" />
-                <Num label="Humedad Rel. (%)" value={form.humedad_relativa_pct} onChange={v => set('humedad_relativa_pct', v)} min="0" max="100" />
-              </Row2>
-              <Row2>
-                <Num label="PH Sustrato" value={form.ph_sustrato} onChange={v => set('ph_sustrato', v)} min="0" max="14" />
-                <Num label="Hum. Sustrato (%)" value={form.humedad_sustrato_pct} onChange={v => set('humedad_sustrato_pct', v)} min="0" max="100" />
-              </Row2>
-              <Row2>
-                <Num label="Luz (lux)" value={form.luz_lux} onChange={v => set('luz_lux', v)} min="0" />
-                <Num label="Conductividad EC" value={form.conductividad_ec} onChange={v => set('conductividad_ec', v)} min="0" />
-              </Row2>
-              <Row2>
-                <Txt label="NPK" value={form.npk} onChange={v => set('npk', v)} placeholder="20-20-20" />
-                <Num label="Nutrición (PPM)" value={form.ppm} onChange={v => set('ppm', v)} min="0" />
-              </Row2>
-              <div style={{display:'flex',flexDirection:'column',gap:4,flex:1}}>
-                <label style={{color:'var(--theme-secondary)',fontSize:'0.75rem',fontWeight:600}}>Notas y observaciones</label>
-                <textarea style={{background:'var(--theme-background)',border:'1px solid var(--theme-border)',borderRadius:8,padding:'0.65rem 0.8rem',color:'var(--theme-text)',fontSize:'0.95rem',outline:'none',width:'100%',boxSizing:'border-box', minHeight: 80}} value={form.notas} onChange={e => set('notas', e.target.value)} />
-              </div>
-            </Section>
-
-            <Section title="Contenedor y Protocolo">
-              <div style={{display:'flex',flexDirection:'column',gap:4,flex:1}}>
-                <label style={{color:'var(--theme-secondary)',fontSize:'0.75rem',fontWeight:600}}>Formulación de Sustrato</label>
-                <select style={{background:'var(--theme-background)',border:'1px solid var(--theme-border)',borderRadius:8,padding:'0.65rem 0.8rem',color:'var(--theme-text)',fontSize:'0.95rem',outline:'none',width:'100%',boxSizing:'border-box'}} value={form.sustrato_id} onChange={e => set('sustrato_id', e.target.value)}>
-                  <option value="">— Seleccionar formulación —</option>
-                  {sustratos.map(su => <option key={su.id} value={su.id}>{su.codigo_formulacion} - {su.nombre}</option>)}
-                </select>
-              </div>
-              <Row2>
-                <Sel label="Tipo Sustrato" value={form.sustrato} onChange={v => set('sustrato', v)} options={SUSTRATOS_BASE} />
-                <Sel label="Contenedor" value={form.tipo_contenedor} onChange={v => set('tipo_contenedor', v)} options={CONTENEDORES} />
-              </Row2>
-              <div style={{display:'flex',flexDirection:'column',gap:4,flex:1}}>
-                <label style={{color:'var(--theme-secondary)',fontSize:'0.75rem',fontWeight:600}}>Protocolo aplicado</label>
-                <select style={{background:'var(--theme-background)',border:'1px solid var(--theme-border)',borderRadius:8,padding:'0.65rem 0.8rem',color:'var(--theme-text)',fontSize:'0.95rem',outline:'none',width:'100%',boxSizing:'border-box'}} value={form.protocolo_clonacion_id} onChange={e => set('protocolo_clonacion_id', e.target.value)}>
-                  <option value="">Ninguno / Observación</option>
-                  {protocolos.map(p => <option key={p.id} value={p.id}>{p.nombre} (v{p.version})</option>)}
-                </select>
-              </div>
-            </Section>
-
-            {error && <p style={{color:'var(--error)',fontSize:'0.85rem',margin:0}}>{error}</p>}
-
-            <div style={{display:'flex',gap:10,marginTop:10}}>
-              <button type="button" style={{flex:1,background:'var(--theme-primary)',border:'none',borderRadius:10,color:'#fff',padding:'1rem',fontSize:'1rem',fontWeight:700,cursor:'pointer'}} onClick={guardarMedidas} disabled={loading}>
-                {loading ? 'Guardando…' : 'Guardar y Continuar a Fotos'}
-              </button>
-            </div>
-          </div>
-        ) : (
-          <div style={{display:'flex',flexDirection:'column',gap:'1.25rem', paddingBottom: '2rem'}}>
-            <Section title="Fotografías (Opcional)">
-              <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10}}>
-                {ANGULOS.map(ang => (
-                  <div key={ang} style={{aspectRatio:'1',background:'var(--theme-background)',borderRadius:12,border:'1px dashed var(--theme-border)',overflow:'hidden',cursor:'pointer'}} onClick={() => !uploadingAngulo && triggerCamera(ang)}>
-                    <input type="file" accept="image/*" capture="environment" style={{display:'none'}}
-                      ref={el => fileRefs.current[ang] = el}
-                      onChange={e => e.target.files[0] && capturarFoto(ang, e.target.files[0])}
-                    />
-                    {fotos[ang] ? (
-                      <img src={fotos[ang].preview} style={{width:'100%',height:'100%',objectFit:'cover'}} />
-                    ) : (
-                      <div style={{height:'100%',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:6}}>
-                        {uploadingAngulo === ang ? '⌛' : <><span style={{fontSize:'1.5rem'}}>📷</span><span style={{color:'var(--theme-primary)',fontSize:'0.75rem'}}>{ANGULO_LABEL[ang]}</span></>}
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </Section>
-            <div style={{display:'flex',gap:10,marginTop:10}}>
-              <button type="button" style={{width:'100%',background:'var(--theme-primary)',border:'none',borderRadius:10,color:'#fff',padding:'1rem',fontSize:'1rem',fontWeight:700,cursor:'pointer'}} onClick={onSaved}>Finalizar Registro</button>
-            </div>
-          </div>
-        )}
       </div>
-    </div>
-  )
-}
 
-function Section({ title, children }) {
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem', marginBottom: '0.5rem' }}>
-      <h4 className="text-secondary" style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1, margin: 0 }}>{title}</h4>
-      {children}
-    </div>
-  )
-}
+      {step === 1 && (
+        <>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
+             <div className="input-group">
+                <label>Num Hojas</label>
+                <input type="number" value={form.num_hojas} onChange={e => set('num_hojas', e.target.value)} />
+             </div>
+             <div className="input-group">
+                <label>Num Brotes</label>
+                <input type="number" value={form.num_brotes} onChange={e => set('num_brotes', e.target.value)} />
+             </div>
+          </div>
+          <div className="input-group">
+             <label>Notas del grupo</label>
+             <textarea value={form.notas} onChange={e => set('notas', e.target.value)} rows={3} placeholder="Describa el estado general..." />
+          </div>
+          <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1rem' }}>
+             <button className="btn btn--ghost" onClick={onCancel} style={{ flex: 1 }}>Cancelar</button>
+             <button className="btn btn--primary" onClick={guardarMedidas} disabled={loading} style={{ flex: 2 }}>
+               {loading ? 'Guardando...' : 'Siguiente: Tomar Fotos'}
+             </button>
+          </div>
+        </>
+      )}
 
-function Row2({ children }) { return <div className="grid-2">{children}</div> }
-function Row3({ children }) { return <div className="grid-2" style={{ gridTemplateColumns: '1fr 1fr 1fr' }}>{children}</div> }
-
-function Num({ label, value, onChange, min, max }) {
-  return (
-    <div className="form-group" style={{ marginBottom: 0 }}>
-      <label>{label}</label>
-      <input type="number" step="0.1" min={min} max={max} value={value} onChange={e => onChange(e.target.value)} placeholder="—" />
-    </div>
-  )
-}
-
-function Txt({ label, value, onChange, placeholder }) {
-  return (
-    <div className="form-group" style={{ marginBottom: 0 }}>
-      <label>{label}</label>
-      <input type="text" value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder || "—"} />
-    </div>
-  )
-}
-
-function Sel({ label, value, onChange, options }) {
-  return (
-    <div className="form-group" style={{ marginBottom: 0 }}>
-      <label>{label}</label>
-      <select value={value} onChange={e => onChange(e.target.value)}>
-        {options.map(o => <option key={o} value={o}>{o}</option>)}
-      </select>
+      {step === 2 && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+           <p className="text-muted" style={{ fontSize: '0.9rem' }}>La foto se aplicará a TODOS los sujetos del contenedor.</p>
+           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))', gap: '0.5rem' }}>
+             {ANGULOS.map(ang => (
+               <div key={ang} onClick={() => fileRefs.current[ang].click()} style={{
+                 aspectRatio: '1', border: '2px dashed var(--theme-border)', borderRadius: '8px',
+                 display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+                 cursor: 'pointer', position: 'relative', overflow: 'hidden',
+                 background: fotos[ang] ? 'none' : 'var(--theme-surface)'
+               }}>
+                 {fotos[ang] ? (
+                   <img src={fotos[ang].preview} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                 ) : (
+                   <>
+                     <span style={{ fontSize: '1.5rem' }}>📷</span>
+                     <span style={{ fontSize: '0.7rem' }}>{ANGULO_LABEL[ang]}</span>
+                   </>
+                 )}
+                 {uploadingAngulo === ang && (
+                   <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white' }}>
+                     ⏳
+                   </div>
+                 )}
+                 <input type="file" ref={el => fileRefs.current[ang] = el} onChange={e => handleFileChange(ang, e.target.files[0])} style={{ display: 'none' }} accept="image/*" />
+               </div>
+             ))}
+           </div>
+           <button className="btn btn--secondary" onClick={onSaved} style={{ marginTop: '1rem' }}>Finalizar Registro</button>
+        </div>
+      )}
     </div>
   )
 }

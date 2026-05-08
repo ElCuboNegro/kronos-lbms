@@ -189,3 +189,74 @@ def ver_foto_evolucion(
         if p.exists():
             return FileResponse(p)
     raise HTTPException(status_code=404, detail="Foto no encontrada")
+
+@router.post("/contenedores/{uid}/evolucion", response_model=list[schemas.RegistroEvolucionOut])
+def crear_registro_grupal(
+    uid: str,
+    payload: schemas.RegistroEvolucionCreate,
+    db: Session = Depends(get_db),
+    user: models.Usuario = Depends(auth.get_current_user)
+):
+    """Crea registros de evolución para TODOS los especímenes de un contenedor."""
+    especimenes = db.query(models.Especimen).filter(models.Especimen.contenedor_uid == uid).all()
+    if not especimenes:
+        raise HTTPException(status_code=404, detail="Contenedor vacío o no encontrado")
+
+    registros = []
+    for esp in especimenes:
+        reg = models.RegistroEvolucion(
+            **payload.model_dump(exclude_unset=True),
+            especimen_id=esp.id,
+            registrado_por_id=user.id
+        )
+        db.add(reg)
+        registros.append(reg)
+
+    db.commit()
+    for r in registros: db.refresh(r)
+    return [_reg_out(r) for r in registros]
+
+@router.post("/evolucion/{registro_id}/fotos/{angulo}/bulk-contenedor")
+async def subir_foto_grupal(
+    registro_id: UUID,
+    angulo: str,
+    file: UploadFile = File(...),
+    db: Session = Depends(get_db),
+    user: models.Usuario = Depends(auth.get_current_user)
+):
+    """Sincroniza una foto a todos los registros del mismo contenedor creados en el mismo lote."""
+    # 1. Obtener el registro base
+    reg_base = db.query(models.RegistroEvolucion).get(registro_id)
+    if not reg_base: raise HTTPException(status_code=404, detail="Registro no encontrado")
+
+    # 2. Guardar el archivo físicamente una sola vez
+    if angulo not in ANGULOS: raise HTTPException(status_code=400, detail="Ángulo inválido")
+    if file.content_type not in ALLOWED: raise HTTPException(status_code=400, detail="Formato no permitido")
+
+    ext = Path(file.filename).suffix
+    filename = f"{reg_base.especimen_id}_{angulo}_{int(datetime.now().timestamp())}{ext}"
+    target = UPLOADS / filename
+    target.parent.mkdir(parents=True, exist_ok=True)
+
+    with target.open("wb") as buffer:
+        shutil.copyfileobj(file.file, buffer)
+
+    url = f"/especimenes/evolucion/fotos/{filename}"
+
+    # 3. Buscar registros hermanos (mismo contenedor, misma fecha/hora aproximada)
+    # Para simplificar, buscamos los creados por el mismo usuario en los últimos 2 minutos
+    # que pertenezcan a especímenes del mismo contenedor.
+    esp_base = db.query(models.Especimen).get(reg_base.especimen_id)
+    siblings = db.query(models.RegistroEvolucion).join(models.Especimen).filter(
+        models.Especimen.contenedor_uid == esp_base.contenedor_uid,
+        models.RegistroEvolucion.registrado_por_id == user.id,
+        models.RegistroEvolucion.fecha >= reg_base.fecha
+    ).all()
+
+    for reg in siblings:
+        fotos = dict(reg.fotos or {})
+        fotos[angulo] = url
+        reg.fotos = fotos
+
+    db.commit()
+    return {"status": "ok", "url": url, "synced_count": len(siblings)}

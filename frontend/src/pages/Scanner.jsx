@@ -1,162 +1,112 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { api } from '../api/client'
-import QRScanner from '../components/QRScanner'
-import { ReactivoForm } from './ReactivosList'
+import Layout from '../components/ui/Layout'
+import Card from '../components/ui/Card'
+import Button from '../components/ui/Button'
+import RegistroEvolucionForm from '../components/RegistroEvolucionForm'
 
 export default function Scanner() {
   const navigate = useNavigate()
-  const [scanning, setScanning] = useState(true)
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
-  const [lastScan, setLastScan] = useState('')
+  const [uid, setUid] = useState('')
   const [scanResult, setScanResult] = useState(null)
+  const [loading, setLoading] = useState(false)
+  const [showBulkEvo, setShowBulkEvo] = useState(false)
+  const inputRef = useRef(null)
 
-  async function handleResult(qrText) {
-    setScanning(false)
+  useEffect(() => {
+    if (inputRef.current) inputRef.current.focus()
+  }, [])
+
+  const handleScan = async (e) => {
+    e.preventDefault()
+    if (!uid) return
     setLoading(true)
-    setError('')
-    setLastScan(qrText)
     try {
-      const result = await api.get(`/scan/${encodeURIComponent(qrText)}`)
-      if (['especimen', 'elemento', 'lote', 'reactivo', 'sustrato', 'contenedor'].includes(result.tipo)) {
-        setScanResult(result)
-      } else {
-        setError('QR no reconocido por el sistema')
-      }
-    } catch (err) {
-      setError(err.message)
+      const res = await api.get(`/scan/${uid}`)
+      setScanResult(res)
+    } catch (e) {
+      alert("Error al escanear: " + e.message)
     } finally {
       setLoading(false)
     }
   }
 
-  const isUnknownUid = error && (error.toLowerCase().includes('no encontrado') || error.toLowerCase().includes('no reconocido')) && lastScan?.startsWith('UID:')
-  const uidClean = isUnknownUid ? lastScan.substring(4) : ''
-
-  const isUnknownReactivo = error && (error.toLowerCase().includes('no encontrado') || error.toLowerCase().includes('no reconocido')) && !lastScan?.startsWith('UID:') && !lastScan?.startsWith('CONT-') && !lastScan?.startsWith('SUST-') && !lastScan?.startsWith('REAC-')
-
-  const [showReactivoForm, setShowReactivoForm] = useState(false)
-
   const reset = () => {
+    setUid('')
     setScanResult(null)
-    setError('')
-    setScanning(true)
-    setLastScan('')
-    setShowReactivoForm(false)
+    setShowBulkEvo(false)
+    setTimeout(() => inputRef.current?.focus(), 100)
   }
 
-  if (showReactivoForm) {
+  if (showBulkEvo) {
     return (
-       <ReactivoForm
-          initialCode={lastScan}
-          onSaved={() => navigate('/reactivos')}
-          onCancel={reset}
-       />
+      <Layout title="Registro Grupal" showBack>
+        <Card>
+          <RegistroEvolucionForm
+            contenedorUid={scanResult.contenedor.contenedor_uid}
+            onSaved={() => {
+              alert("Registro grupal completado con éxito.")
+              reset()
+            }}
+            onCancel={() => setShowBulkEvo(false)}
+          />
+        </Card>
+      </Layout>
     )
   }
 
   return (
-    <div className="page-container" style={{display:'flex',flexDirection:'column',gap:'1.25rem',alignItems:'center',minHeight:'80dvh',justifyContent:'center'}}>
-      <h2 className="page-title" style={{color:'var(--theme-primary)',margin:0,fontSize:'1.3rem',position:'absolute',top:'1.5rem',left:'1.5rem'}}>Escanear etiqueta</h2>
+    <Layout title="Escanear Código">
+      {!scanResult ? (
+        <Card title="Esperando Código" subtitle="Escanee un QR o ingrese un UID manual">
+          <form onSubmit={handleScan} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            <input
+              ref={inputRef}
+              type="text"
+              value={uid}
+              onChange={(e) => setUid(e.target.value)}
+              placeholder="UID:XXXX-XXXX"
+              style={{ padding: '1rem', fontSize: '1.2rem', textAlign: 'center', borderRadius: '8px', border: '2px solid var(--theme-border)' }}
+            />
+            <Button type="submit" disabled={loading}>
+              {loading ? 'Buscando...' : '🔎 Resolver Código'}
+            </Button>
+          </form>
+        </Card>
+      ) : (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          <Card title="Resultado del Escaneo" subtitle={scanResult.tipo.toUpperCase()}>
+            <div style={{ padding: '1rem', background: 'var(--theme-background)', borderRadius: '8px', marginBottom: '1rem' }}>
+              {scanResult.tipo === 'especimen' && (
+                <p><strong>Espécimen:</strong> {scanResult.especimen.uid} ({scanResult.especimen.especie})</p>
+              )}
+              {scanResult.tipo === 'contenedor' && (
+                <p><strong>Contenedor:</strong> {scanResult.contenedor.contenedor_uid} ({scanResult.contenedor.especimenes.length} especímenes)</p>
+              )}
+              {scanResult.tipo === 'lote' && (
+                <p><strong>Lote:</strong> {scanResult.lote.uid} ({scanResult.lote.formulacion.nombre})</p>
+              )}
+            </div>
 
-      {scanning && !loading && !error && (
-        <QRScanner
-          onResult={handleResult}
-          onError={(msg) => { setError(msg); setScanning(false) }}
-        />
-      )}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+               <Button onClick={() => {
+                 if (scanResult.tipo === 'especimen') navigate(`/especimen/${scanResult.especimen.uid}`)
+                 else if (scanResult.tipo === 'contenedor') navigate(`/contenedores?c=${scanResult.contenedor.contenedor_uid}`)
+                 else if (scanResult.tipo === 'lote') navigate('/reactivos')
+               }}>Ver Ficha Completa</Button>
 
-      {loading && <p style={{color:'var(--theme-secondary)',fontSize:'1rem'}}>Identificando…</p>}
+               {scanResult.tipo === 'contenedor' && (
+                 <Button variant="secondary" onClick={() => setShowBulkEvo(true)}>
+                   📸 Foto Grupal (Todo el Frasco)
+                 </Button>
+               )}
 
-      {scanResult && (
-        <div className="card" style={{ width: '100%', maxWidth: 320, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-          <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>
-            {scanResult.tipo === 'especimen' && '🌿'}
-            {scanResult.tipo === 'elemento' && '🔧'}
-            {scanResult.tipo === 'lote' && '📦'}
-            {scanResult.tipo === 'reactivo' && '🧪'}
-            {scanResult.tipo === 'sustrato' && '🪨'}
-            {scanResult.tipo === 'contenedor' && '🗃️'}
-          </div>
-          <h3 style={{ color: 'var(--theme-text)', margin: '0 0 0.5rem', textAlign: 'center', fontSize: '1.2rem' }}>
-            {scanResult.tipo === 'especimen' && scanResult.especimen.especie}
-            {scanResult.tipo === 'elemento' && scanResult.elemento.descripcion}
-            {scanResult.tipo === 'lote' && scanResult.lote.formulacion.nombre}
-            {scanResult.tipo === 'reactivo' && scanResult.reactivo.nombre}
-            {scanResult.tipo === 'sustrato' && scanResult.sustrato.nombre}
-            {scanResult.tipo === 'contenedor' && `Contenedor (${scanResult.contenedor.especimenes.length} elementos)`}
-          </h3>
-          <p className="font-mono" style={{ color: 'var(--theme-primary)', margin: '0 0 1.5rem', fontSize: '0.9rem' }}>
-            UID: {
-              scanResult.tipo === 'especimen' ? scanResult.especimen.uid :
-              scanResult.tipo === 'elemento' ? scanResult.elemento.element_id :
-              scanResult.tipo === 'lote' ? scanResult.lote.uid :
-              scanResult.tipo === 'reactivo' ? `STOCK-${scanResult.reactivo.id.substring(0,8)}` :
-              scanResult.tipo === 'sustrato' ? `SUST-${scanResult.sustrato.codigo_formulacion}` :
-              scanResult.contenedor.contenedor_uid
-            }
-          </p>
-
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10, width: '100%', marginBottom: '1rem' }}>
-            <button className="btn btn--primary btn--block" onClick={() => {
-              if (scanResult.tipo === 'especimen') navigate(`/especimen/${scanResult.especimen.uid || scanResult.especimen.id}`)
-              else if (scanResult.tipo === 'elemento') navigate(`/elemento/${scanResult.elemento.element_id || scanResult.elemento.id}`)
-              else if (scanResult.tipo === 'lote') navigate('/lotes')
-              else if (scanResult.tipo === 'reactivo') navigate('/reactivos')
-              else if (scanResult.tipo === 'sustrato') navigate('/lab')
-              else if (scanResult.tipo === 'contenedor') navigate(`/contenedores?c=${scanResult.contenedor.contenedor_uid}`)
-            }}>
-              Ver Inventario / Ficha
-            </button>
-            {scanResult.tipo === 'especimen' && (
-              <div style={{ display: "flex", flexDirection: "column", gap: 10, width: "100%" }}>
-                <button className="btn btn--accent btn--block" onClick={() => navigate(`/especimen/${scanResult.especimen.uid || scanResult.especimen.id}?quick=foto`)}>
-                  📸 Añadir Foto / Evo
-                </button>
-                <div style={{ display: 'flex', gap: 8 }}>
-                  <button className="btn btn--secondary" style={{ flex: 1 }} onClick={() => navigate(`/nuevo-individuo?madre=${scanResult.especimen.id}&especie=${scanResult.especimen.especie_id}`)}>
-                    🌱 Nuevo Explante
-                  </button>
-                  <button className="btn btn--secondary" style={{ flex: 1, fontSize: '0.8rem' }} onClick={() => navigate(`/nuevo-lote?madre=${scanResult.especimen.id}&especie=${scanResult.especimen.especie_id}`)}>
-                    🧬 Clonación Masiva
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
-
-          <button className="btn btn--ghost btn--block" onClick={reset}>Escanear otro</button>
+               <Button variant="ghost" onClick={reset}>Escanear Otro</Button>
+            </div>
+          </Card>
         </div>
       )}
-
-      {error && (
-        <div style={{display:'flex',flexDirection:'column',alignItems:'center',gap:12}}>
-          <p style={{color:'var(--error)',margin:0,textAlign:'center'}}>{error}</p>
-
-          {isUnknownUid && (
-            <button
-              className="btn btn--secondary btn--block"
-              onClick={() => navigate(`/nuevo-individuo?uid=${encodeURIComponent(uidClean)}`)}
-            >
-              Registrar este espécimen
-            </button>
-          )}
-
-          {isUnknownReactivo && (
-            <button
-              className="btn btn--secondary btn--block"
-              onClick={() => setShowReactivoForm(true)}
-            >
-              Registrar en Inventario de Reactivos
-            </button>
-          )}
-
-          <button className="btn btn--primary btn--block" onClick={reset}>
-            Reintentar
-          </button>
-        </div>
-      )}
-    </div>
+    </Layout>
   )
 }

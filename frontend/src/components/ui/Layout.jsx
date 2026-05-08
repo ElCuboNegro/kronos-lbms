@@ -1,4 +1,4 @@
-import VoiceController from './VoiceController'
+import VoiceController from '../VoiceController'
 import { useNavigate, useLocation } from 'react-router-dom'
 
 export default function Layout({ children, title, showBack = false }) {
