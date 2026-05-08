@@ -24,7 +24,7 @@ export default function Scanner() {
     setError('')
     setLastScan(qrText)
     try {
-      const result = await api.get(\`/scan/\${encodeURIComponent(qrText)}\`)
+      const result = await api.get(`/scan/${encodeURIComponent(qrText)}`)
       if (['especimen', 'elemento', 'lote', 'reactivo', 'sustrato', 'contenedor'].includes(result.tipo)) {
         setScanResult(result)
       } else {
@@ -117,38 +117,38 @@ export default function Scanner() {
                 {scanResult.tipo === 'lote' && scanResult.lote.formulacion.nombre}
                 {scanResult.tipo === 'reactivo' && scanResult.reactivo.nombre}
                 {scanResult.tipo === 'sustrato' && scanResult.sustrato.nombre}
-                {scanResult.tipo === 'contenedor' && \`Contenedor: \${scanResult.contenedor.contenedor_uid}\`}
+                {scanResult.tipo === 'contenedor' && `Contenedor: ${scanResult.contenedor.contenedor_uid}`}
               </h3>
               <p className="font-mono text-muted" style={{ fontSize: '0.85rem', margin: 0 }}>
                 {scanResult.tipo === 'especimen' ? scanResult.especimen.uid :
                  scanResult.tipo === 'elemento' ? scanResult.elemento.element_id :
                  scanResult.tipo === 'lote' ? scanResult.lote.uid :
-                 scanResult.tipo === 'reactivo' ? \`STOCK-\${scanResult.reactivo.id.substring(0,8)}\` :
-                 scanResult.tipo === 'sustrato' ? \`SUST-\${scanResult.sustrato.codigo_formulacion}\` :
+                 scanResult.tipo === 'reactivo' ? `STOCK-${scanResult.reactivo.id.substring(0,8)}` :
+                 scanResult.tipo === 'sustrato' ? `SUST-${scanResult.sustrato.codigo_formulacion}` :
                  scanResult.contenedor.contenedor_uid}
               </p>
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem', width: '100%' }}>
                <Button onClick={() => {
-                 if (scanResult.tipo === 'especimen') navigate(\`/especimen/\${scanResult.especimen.uid}\`)
-                 else if (scanResult.tipo === 'elemento') navigate(\`/elemento/\${scanResult.elemento.element_id || scanResult.elemento.id}\`)
+                 if (scanResult.tipo === 'especimen') navigate(`/especimen/${scanResult.especimen.uid}`)
+                 else if (scanResult.tipo === 'elemento') navigate(`/elemento/${scanResult.elemento.element_id || scanResult.elemento.id}`)
                  else if (scanResult.tipo === 'lote') navigate('/reactivos')
                  else if (scanResult.tipo === 'reactivo') navigate('/reactivos')
                  else if (scanResult.tipo === 'sustrato') navigate('/lab')
-                 else if (scanResult.tipo === 'contenedor') navigate(\`/contenedores?c=\${scanResult.contenedor.contenedor_uid}\`)
+                 else if (scanResult.tipo === 'contenedor') navigate(`/contenedores?c=${scanResult.contenedor.contenedor_uid}`)
                }}>Ver Ficha / Inventario</Button>
 
                {scanResult.tipo === 'especimen' && (
                  <>
-                   <Button variant="secondary" onClick={() => navigate(\`/especimen/\${scanResult.especimen.uid}?quick=foto\`)}>
+                   <Button variant="secondary" onClick={() => navigate(`/especimen/${scanResult.especimen.uid}?quick=foto`)}>
                      📸 Añadir Foto / Evolución
                    </Button>
                    <div style={{ display: 'flex', gap: '0.5rem' }}>
-                     <Button variant="ghost" style={{ flex: 1 }} onClick={() => navigate(\`/nuevo-individuo?madre=\${scanResult.especimen.id}&especie=\${scanResult.especimen.especie_id}\`)}>
+                     <Button variant="ghost" style={{ flex: 1 }} onClick={() => navigate(`/nuevo-individuo?madre=${scanResult.especimen.id}&especie=${scanResult.especimen.especie_id}`)}>
                        🌱 Nuevo Explante
                      </Button>
-                     <Button variant="ghost" style={{ flex: 1, fontSize: '0.8rem' }} onClick={() => navigate(\`/nuevo-lote?madre=\${scanResult.especimen.id}&especie=\${scanResult.especimen.especie_id}\`)}>
+                     <Button variant="ghost" style={{ flex: 1, fontSize: '0.8rem' }} onClick={() => navigate(`/nuevo-lote?madre=${scanResult.especimen.id}&especie=${scanResult.especimen.especie_id}`)}>
                        🧬 Clonación Masiva
                      </Button>
                    </div>
@@ -172,7 +172,7 @@ export default function Scanner() {
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
               {isUnknownUid && (
-                <Button variant="secondary" onClick={() => navigate(\`/nuevo-individuo?uid=\${encodeURIComponent(uidClean)}\`)}>
+                <Button variant="secondary" onClick={() => navigate(`/nuevo-individuo?uid=${encodeURIComponent(uidClean)}`)}>
                   Registrar este espécimen
                 </Button>
               )}
