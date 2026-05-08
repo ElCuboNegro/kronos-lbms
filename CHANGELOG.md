@@ -1,3 +1,10 @@
+# [1.15.0](https://github.com/ElCuboNegro/kronos-lbms/compare/v1.14.0...v1.15.0) (2026-05-08)
+
+
+### Features
+
+* **frontend:** add integrated dilution calculator with DB support ([a8b696a](https://github.com/ElCuboNegro/kronos-lbms/commit/a8b696a8a951052f3a0224e0835122c42501e431))
+
 # [1.14.0](https://github.com/ElCuboNegro/kronos-lbms/compare/v1.13.0...v1.14.0) (2026-05-04)
 
 
