@@ -34,11 +34,21 @@ async function request(method, path, body) {
     return
   }
 
-  const data = res.headers.get('content-type')?.includes('application/json')
-    ? await res.json()
-    : await res.text()
+  const isJson = res.headers.get('content-type')?.includes('application/json')
+  const data = isJson ? await res.json() : await res.text()
 
-  if (!res.ok) throw new Error(data?.detail || 'Error del servidor')
+  if (!res.ok) {
+    if (res.status === 404 && !isJson) {
+      throw new Error('Endpoint no encontrado (404). Verifica que la URL del servidor sea correcta y apunte a la API.')
+    }
+    if (res.status === 502) {
+      throw new Error('Servidor fuera de línea (502 Bad Gateway). Intentando reconectar...')
+    }
+    if (res.status === 504) {
+      throw new Error('Tiempo de espera agotado (504 Gateway Timeout).')
+    }
+    throw new Error(data?.detail || `Error del servidor (${res.status})`)
+  }
   return data
 }
 

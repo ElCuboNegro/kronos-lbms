@@ -56,9 +56,9 @@ def por_id(element_id: str, db: Session = Depends(get_db), _=Depends(auth.get_cu
     return _elemento_out(el)
 
 
-@router.get("/{id}", response_model=schemas.ElementoOut)
-def obtener(id: UUID, db: Session = Depends(get_db), _=Depends(auth.get_current_user)):
-    return _get_full(id, db)
+@router.get("/{id_or_element_id}", response_model=schemas.ElementoOut)
+def obtener(id_or_element_id: str, db: Session = Depends(get_db), _=Depends(auth.get_current_user)):
+    return _get_full(id_or_element_id, db)
 
 
 @router.patch("/{id}", response_model=schemas.ElementoOut)
@@ -73,13 +73,17 @@ def actualizar(id: UUID, payload: schemas.ElementoUpdate,
     return _get_full(id, db)
 
 
-def _get_full(id: UUID, db: Session) -> schemas.ElementoOut:
-    el = (
+def _get_full(id_or_element_id, db: Session) -> schemas.ElementoOut:
+    query = (
         db.query(models.Elemento)
         .options(joinedload(models.Elemento.eventos).joinedload(models.Evento.usuario))
-        .filter(models.Elemento.id == id)
-        .first()
     )
+    try:
+        parsed_id = UUID(str(id_or_element_id))
+        el = query.filter(models.Elemento.id == parsed_id).first()
+    except ValueError:
+        el = query.filter(models.Elemento.element_id == id_or_element_id).first()
+
     if not el:
         raise HTTPException(status_code=404, detail="Elemento no encontrado")
     return _elemento_out(el)

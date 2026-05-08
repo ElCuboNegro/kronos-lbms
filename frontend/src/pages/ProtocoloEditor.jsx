@@ -36,6 +36,9 @@ export default function ProtocoloEditor() {
           materiales: data.materiales || [],
           pasos: data.pasos || []
         })
+        if (id && id.length > 20 && data.codigo) {
+           navigate(`/protocolos/${data.codigo}`, { replace: true })
+        }
       })
     } else if (draft) {
       // Nuevo desde AI draft

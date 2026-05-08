@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useNavigate, useSearchParams } from 'react-router-dom'
+import { useNavigate, useSearchParams, useParams } from 'react-router-dom'
 import { api } from '../api/client'
 
 const ESTADO_COLOR = {
@@ -9,28 +9,38 @@ const ESTADO_COLOR = {
 
 export default function EspecimenesList() {
   const navigate = useNavigate()
+  const { especie_slug } = useParams()
   const [params] = useSearchParams()
   const [items, setItems] = useState([])
   const [loading, setLoading] = useState(true)
   const [especieInfo, setEspecieInfo] = useState(null)
   const [lineaInfo, setLineaInfo] = useState(null)
 
-  const especieId = params.get('especie')
+  const especieParam = especie_slug || params.get('especie')
   const lineaId = params.get('linea')
 
   useEffect(() => {
-    fetchItems()
-    if (especieId) api.get(`/especies/${especieId}`).then(setEspecieInfo).catch(() => {})
-    // Note: We don't have a direct /lineas/:id but EspecieDetail shows them.
-  }, [especieId, lineaId])
+    async function init() {
+      let resolvedEspecieId = null;
+      if (especieParam) {
+        try {
+          const esp = await api.get(`/especies/${especieParam}`)
+          setEspecieInfo(esp)
+          resolvedEspecieId = esp.id
+        } catch (e) { console.error(e) }
+      }
+      await fetchItems(resolvedEspecieId)
+    }
+    init()
+  }, [especieParam, lineaId])
 
-  async function fetchItems() {
+  async function fetchItems(resolvedEspecieId) {
     setLoading(true)
     try {
       const data = await api.get('/especimenes')
       // Filtro básico en frontend por ahora
       let filtered = data
-      if (especieId) filtered = filtered.filter(i => i.especie_id === especieId)
+      if (resolvedEspecieId) filtered = filtered.filter(i => i.especie_id === resolvedEspecieId)
       if (lineaId) filtered = filtered.filter(i => i.linea_id === lineaId)
       setItems(filtered)
     } finally {

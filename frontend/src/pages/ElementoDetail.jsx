@@ -12,7 +12,15 @@ export default function ElementoDetail() {
 
   async function fetchEl() {
     setLoading(true)
-    try { setEl(await api.get(`/elementos/${id}`)) }
+    try {
+      const data = await api.get(`/elementos/${id}`)
+      setEl(data)
+
+      // Redirección canónica si se accede por UUID
+      if (id && id.length > 20 && data.element_id) {
+        navigate(`/elemento/${data.element_id}`, { replace: true })
+      }
+    }
     finally { setLoading(false) }
   }
 

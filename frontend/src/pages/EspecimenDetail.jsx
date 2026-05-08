@@ -5,6 +5,7 @@ import EventoForm from '../components/EventoForm'
 import RegistroEvolucionForm from '../components/RegistroEvolucionForm'
 import MapPicker from '../components/MapPicker'
 import AuthImg from '../components/AuthImg'
+import AddFotosModal from '../components/AddFotosModal'
 
 const ESTADO_BADGE = {
   activo: 'badge--success', en_experimento: 'badge--warning',
@@ -13,54 +14,88 @@ const ESTADO_BADGE = {
 const ANGULO_LABEL = { arriba: '↑', frente: '●', atras: '○', izquierda: '←', derecha: '→' }
 
 export default function EspecimenDetail() {
-  const { id } = useParams()
+  const { id, lote, indice, reg_index } = useParams()
   const location = useLocation()
   const navigate = useNavigate()
   const [params] = useSearchParams()
   const [esp, setEsp] = useState(location.state?.data || null)
   const [registros, setRegistros] = useState([])
   const [protocolos, setProtocolos] = useState([])
-  const [tab, setTab] = useState('info') // info | evolucion | eventos
+  const [tab, setTab] = useState(reg_index ? 'evolucion' : 'info') // info | evolucion | eventos
   const [showEvento, setShowEvento] = useState(false)
   const [showEvolucion, setShowEvolucion] = useState(false)
   const [evolutionStep, setEvolutionStep] = useState(0)
+  const [addingFotosFor, setAddingFotosFor] = useState(null)
   const [showEdit, setShowEdit] = useState(false)
   const [printing, setPrinting] = useState(false)
   const [loading, setLoading] = useState(!esp)
   const [especieData, setEspecieData] = useState(null)
 
+  // Reconstruir UID si se usan rutas semánticas
+  let queryId = id || (lote && indice ? `${lote}-${indice.padStart(2, '0')}` : null)
+
+  // Autocompletar el '-01' si el usuario introdujo solo el código del lote en la ruta corta
+  if (queryId && !queryId.includes('-0') && queryId.split('-').length === 3) {
+    queryId = `${queryId}-01`
+  }
+
   async function fetchEsp() {
+    if (!queryId) return
     setLoading(true)
     try {
-      const data = await api.get(`/especimenes/${id}`)
+      const data = await api.get(`/especimenes/${queryId}`)
       setEsp(data)
+
+      // Redirección canónica: si el usuario entró por UUID, moverlo a la ruta semántica
+      if (id && data.uid) {
+        const parts = data.uid.split('-')
+        if (parts.length >= 4) {
+          const lotePart = parts.slice(0, 3).join('-')
+          const indexPart = parseInt(parts[3], 10)
+          navigate(`/especimen/${lotePart}/${indexPart}${reg_index ? `/evolucion/${reg_index}` : ''}`, { replace: true })
+        }
+      }
     }
     finally { setLoading(false) }
   }
 
   async function fetchRegistros() {
-    try { setRegistros(await api.get(`/especimenes/${id}/evolucion`)) }
+    if (!esp?.id) return
+    try { setRegistros(await api.get(`/especimenes/${esp.id}/evolucion`)) }
     catch { }
   }
 
   useEffect(() => {
+    if (esp && id && esp.uid) {
+      const parts = esp.uid.split('-')
+      if (parts.length >= 4) {
+        const lotePart = parts.slice(0, 3).join('-')
+        const indexPart = parseInt(parts[3], 10)
+        navigate(`/especimen/${lotePart}/${indexPart}${reg_index ? `/evolucion/${reg_index}` : ''}`, { replace: true })
+      }
+    }
+  }, [esp, id, navigate, reg_index])
+
+  useEffect(() => {
     if (!esp) {
        fetchEsp()
-    } else if (esp.especie_id && !especieData) {
-       api.get(`/especies/${esp.especie_id}`).then(setEspecieData).catch(() => {})
+    } else {
+       if (esp.especie_id && !especieData) {
+         api.get(`/especies/${esp.especie_id}`).then(setEspecieData).catch(() => {})
+       }
+       fetchRegistros()
     }
-    fetchRegistros()
     api.get('/protocolos').then(setProtocolos).catch(() => {})
 
     if (params.get('quick') === 'foto') {
       setEvolutionStep(2)
       setShowEvolucion(true)
     }
-  }, [id, params, esp])
+  }, [queryId, params, esp])
 
   async function imprimir() {
     setPrinting(true)
-    try { await api.post(`/printer/imprimir/${id}`) }
+    try { await api.post(`/printer/imprimir/${esp.id}`) }
     catch (e) { alert(e.message) }
     finally { setPrinting(false) }
   }
@@ -77,7 +112,14 @@ export default function EspecimenDetail() {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
           <div>
             <span className={`badge ${ESTADO_BADGE[esp.estado] || 'badge--outline'}`} style={{ marginBottom: '0.5rem' }}>{esp.estado.replace('_', ' ')}</span>
-            <h2 className="page-title text-primary" style={{ fontStyle: 'italic', marginBottom: '0.2rem' }}>{esp.especie}</h2>
+            <h2
+              className="page-title text-primary"
+              style={{ fontStyle: 'italic', marginBottom: '0.2rem', cursor: esp.especie_id ? 'pointer' : 'default', textDecoration: esp.especie_id ? 'underline' : 'none' }}
+              onClick={() => esp.especie_id && navigate(`/especies/${esp.especie_codigo || esp.especie_id}`)}
+              title={esp.especie_id ? "Ir a la ficha de la especie" : ""}
+            >
+              {esp.especie}
+            </h2>
             {esp.linea_nombre && (
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginTop: '0.2rem' }}>
                 <span className="text-secondary" style={{ fontSize: '0.9rem' }}>{esp.linea_nombre}</span>
@@ -170,7 +212,7 @@ export default function EspecimenDetail() {
           <button className="btn btn--ghost btn--block" onClick={() => setShowEvolucion(true)}>+ Nuevo registro</button>
           {registros.length === 0
             ? <p className="text-muted text-center" style={{ padding: '2rem 0' }}>Sin registros aún</p>
-            : registros.map(r => <RegistroCard key={r.id} r={r} />)
+            : registros.map(r => <RegistroCard key={r.id} r={r} onAddFotos={() => setAddingFotosFor(r)} />)
           }
         </div>
       )}
@@ -200,6 +242,14 @@ export default function EspecimenDetail() {
         <EventoForm especimenId={esp.id}
           onSaved={() => { setShowEvento(false); fetchEsp() }}
           onCancel={() => setShowEvento(false)} />
+      )}
+      {addingFotosFor && (
+        <AddFotosModal
+          especimenId={esp.id}
+          registro={addingFotosFor}
+          onSaved={() => { setAddingFotosFor(null); fetchRegistros() }}
+          onCancel={() => setAddingFotosFor(null)}
+        />
       )}
       {showEdit && (
         <EditEspecimenSheet esp={esp}
@@ -285,7 +335,7 @@ function FotosRow({ fotos }) {
   )
 }
 
-function RegistroCard({ r }) {
+function RegistroCard({ r, onAddFotos }) {
   const [open, setOpen] = useState(false)
   return (
     <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
@@ -301,6 +351,9 @@ function RegistroCard({ r }) {
           {tieneCondiciones(r) && <CondicionesGrid r={r} />}
           {r.fotos && Object.keys(r.fotos).length > 0 && <FotosRow fotos={r.fotos} />}
           {r.notas && <p className="text-muted" style={{ fontSize: '0.9rem', margin: 0, fontStyle: 'italic', borderLeft: '2px solid var(--theme-border)', paddingLeft: '0.5rem' }}>"{r.notas}"</p>}
+          <button className="btn btn--outline" style={{ marginTop: '0.5rem' }} onClick={onAddFotos}>
+            📸 {(r.fotos && Object.keys(r.fotos).length > 0) ? 'Añadir / Editar Fotos' : 'Añadir Fotos'}
+          </button>
         </div>
       )}
     </div>

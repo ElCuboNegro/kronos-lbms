@@ -157,6 +157,7 @@ class Protocolo(Base):
     __tablename__ = "protocolos"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    codigo = Column(String(50), unique=True, index=True, nullable=True)
     nombre = Column(String(255), nullable=False)
     tipo = Column(String(50), nullable=False)
     version = Column(String(20), nullable=False, default="1.0")
@@ -196,6 +197,7 @@ class Experimento(Base):
     __tablename__ = "experimentos"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    codigo = Column(String(50), unique=True, index=True, nullable=True)
     nombre = Column(String(255), nullable=False)
     hipotesis = Column(Text, nullable=True)
     protocolo_id = Column(UUID(as_uuid=True), ForeignKey("protocolos.id"), nullable=True)

@@ -53,3 +53,17 @@ def obtener_sustrato(id: UUID, db: Session = Depends(get_db), _=Depends(auth.get
     if not s:
         raise HTTPException(status_code=404, detail="Sustrato no encontrado")
     return s
+
+@router.patch("/{id}", response_model=schemas.SustratoOut)
+def actualizar_sustrato(id: UUID, payload: schemas.SustratoUpdate, db: Session = Depends(get_db), _=Depends(auth.get_current_user)):
+    s = db.query(models.Sustrato).filter(models.Sustrato.id == id).first()
+    if not s:
+        raise HTTPException(status_code=404, detail="Sustrato no encontrado")
+
+    data = payload.model_dump(exclude_unset=True)
+    for k, v in data.items():
+        setattr(s, k, v)
+
+    db.commit()
+    db.refresh(s)
+    return obtener_sustrato(id, db)

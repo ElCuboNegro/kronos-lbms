@@ -108,9 +108,14 @@ def _query_exp(db: Session):
     )
 
 
-@router.get("/{id}", response_model=schemas.ExperimentoOut)
-def obtener(id: UUID, db: Session = Depends(get_db), _=Depends(auth.get_current_user)):
-    exp = _query_exp(db).filter(models.Experimento.id == id).first()
+@router.get("/{id_or_code}", response_model=schemas.ExperimentoOut)
+def obtener(id_or_code: str, db: Session = Depends(get_db), _=Depends(auth.get_current_user)):
+    try:
+        parsed_id = UUID(str(id_or_code))
+        exp = _query_exp(db).filter(models.Experimento.id == parsed_id).first()
+    except ValueError:
+        exp = _query_exp(db).filter(models.Experimento.codigo.ilike(id_or_code)).first()
+
     if not exp:
         raise HTTPException(status_code=404, detail="Experimento no encontrado")
     return _exp_out(exp)
