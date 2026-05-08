@@ -1,14 +1,23 @@
 from contextlib import asynccontextmanager
-from fastapi import FastAPI
+import os
+import json
+from pathlib import Path
+from datetime import datetime, timezone
+
+from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
-from app.database import engine, Base, get_db
 from sqlalchemy.orm import Session
 from sqlalchemy import func
+
+from app.database import engine, Base, get_db
 from app.limiter import limiter
-from app.routers import auth as auth_router, especimenes, elementos, eventos, scan, especies, protocolos, experimentos, evolucion, printer, sustratos, reactivos
-from fastapi import Depends
+from app.routers import (
+    auth as auth_router, especimenes, elementos, eventos, scan,
+    especies, protocolos, experimentos, evolucion, printer,
+    sustratos, reactivos, science
+)
 from app import models, auth
 
 
@@ -23,8 +32,6 @@ app = FastAPI(title="Seymour-OS API", version="1.1.3", lifespan=lifespan)
 
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
-
-import os
 
 ALLOWED_ORIGINS = [
     "http://localhost",
@@ -56,20 +63,16 @@ app.include_router(printer.router)
 app.include_router(scan.router)
 app.include_router(sustratos.router)
 app.include_router(reactivos.router)
+app.include_router(science.router)
 
 
 @app.get("/health")
 def health():
     return {"status": "ok"}
 
-import os
-import json
-from pathlib import Path
-from datetime import datetime
 
 @app.get("/app/release-info")
 def release_info():
-    # En el futuro esto puede venir de una DB o archivo de configuración
     return {
         "version": "1.1.3",
         "required": False,
@@ -90,7 +93,7 @@ def receive_telemetry(payload: dict):
     log_file = TELEMETRY_DIR / "frontend_crashes.jsonl"
     with log_file.open("a", encoding="utf-8") as f:
         for log in logs:
-            log["received_at"] = datetime.utcnow().isoformat()
+            log["received_at"] = datetime.now(timezone.utc).isoformat()
             f.write(json.dumps(log) + "\n")
 
     return {"status": "ok", "saved": len(logs)}
