@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { api } from '../api/client'
+import AuthImg from '../components/AuthImg'
 
 export default function EspecieDetail() {
-  const { id } = useParams()
+  const { id, tab: tabParam } = useParams()
   const navigate = useNavigate()
   const [especie, setEspecie] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -12,13 +13,28 @@ export default function EspecieDetail() {
   const [activeLinea, setActiveLinea] = useState(null)
   const [activeLineaConfig, setActiveLineaConfig] = useState(null)
   const [activeVarConfig, setActiveVarConfig] = useState(null)
-  const [activeTab, setActiveTab] = useState('ficha')
+
+  const activeTab = tabParam ? tabParam.toLowerCase() : 'ficha'
 
   async function fetchEspecie() {
     setLoading(true)
-    try { setEspecie(await api.get(`/especies/${id}`)) }
+    try {
+      const data = await api.get(`/especies/${id}`)
+      setEspecie(data)
+
+      // Redirección canónica: si el usuario entró por UUID, moverlo al código/slug
+      if (id && id.length > 20 && data.codigo) {
+        navigate(`/especies/${data.codigo}${tabParam ? `/${tabParam}` : ''}`, { replace: true })
+      }
+    }
     finally { setLoading(false) }
   }
+
+  useEffect(() => {
+    if (especie && id && id.length > 20 && especie.codigo) {
+      navigate(`/especies/${especie.codigo}${tabParam ? `/${tabParam}` : ''}`, { replace: true })
+    }
+  }, [especie, id, navigate, tabParam])
 
   useEffect(() => { fetchEspecie() }, [id])
 
@@ -46,8 +62,8 @@ export default function EspecieDetail() {
       </div>
 
       {/* Tabs */}
-      <div style={{display:'flex',gap:0,borderBottom:'1px solid var(--theme-border)',marginBottom:4}}>
-        {['ficha', 'lineas', 'experimentos', 'protocolos', 'sustratos'].map(tab => {
+      <div style={{display:'flex',gap:0,borderBottom:'1px solid var(--theme-border)',marginBottom:4, overflowX:'auto'}}>
+        {['ficha', 'lineas', 'individuos', 'experimentos', 'protocolos', 'sustratos', 'galeria'].map(tab => {
           const isActive = activeTab === tab;
           return (
             <button
@@ -61,11 +77,12 @@ export default function EspecieDetail() {
                 fontSize:'0.82rem',
                 cursor:'pointer',
                 marginBottom:-1,
-                fontWeight: isActive ? 600 : 400
+                fontWeight: isActive ? 600 : 400,
+                whiteSpace: 'nowrap'
               }}
-              onClick={() => setActiveTab(tab)}
+              onClick={() => navigate(`/especies/${id}/${tab}`, { replace: true })}
             >
-              {{ ficha: 'Ficha', lineas: `Líneas (${especie.lineas.length})`, experimentos: 'Experimentos', protocolos: 'Protocolos', sustratos: 'Sustratos' }[tab]}
+              {{ ficha: 'Ficha', lineas: `Líneas (${especie.lineas.length})`, individuos: `Individuos (${especie.total_individuos})`, experimentos: 'Experimentos', protocolos: 'Protocolos', sustratos: 'Sustratos', galeria: 'Galería' }[tab]}
             </button>
           )
         })}
@@ -92,32 +109,26 @@ export default function EspecieDetail() {
                   onAddVar={() => setActiveLinea(linea)}
                   onEditConfig={() => setActiveLineaConfig(linea)}
                   onEditVarConfig={(v) => setActiveVarConfig(v)}
-                  onVerIndividuos={() => navigate(`/especimenes?linea=${linea.id}`)}
+                  onVerIndividuos={() => navigate(`/especies/${id}/individuos?linea=${linea.id}`, { replace: true })}
                 />
               ))
           }
-          <div style={{display:'flex',gap:8,marginTop:8}}>
-            <button className="btn btn--ghost" onClick={() => navigate(`/especimenes?especie=${id}`)}>
-              Ver todos los individuos ({especie.total_individuos})
-            </button>
-            <button className="btn btn--primary" onClick={() => navigate(`/nuevo-individuo?especie=${id}`)}>
-              + Individuo
-            </button>
-            <button className="btn btn--secondary" onClick={() => navigate(`/nuevo-lote?especie=${id}`)}>
-              + Lotes
-            </button>
-          </div>
         </div>
+      )}
+
+      {/* Individuos */}
+      {activeTab === 'individuos' && (
+        <IndividuosPanel especieId={especie.id} navigate={navigate} />
       )}
 
       {/* Experimentos */}
       {activeTab === 'experimentos' && (
-        <ExperimentosPanel especieId={id} navigate={navigate} />
+        <ExperimentosPanel especieId={especie.id} navigate={navigate} />
       )}
 
       {/* Protocolos */}
       {activeTab === 'protocolos' && (
-        <ProtocolosPanel especieId={id} navigate={navigate} />
+        <ProtocolosPanel especieId={especie.id} navigate={navigate} />
       )}
 
       {/* Sustratos */}
@@ -125,9 +136,14 @@ export default function EspecieDetail() {
         <SustratosPanel navigate={navigate} />
       )}
 
+      {/* Galeria */}
+      {activeTab === 'galeria' && (
+        <GaleriaPanel especieId={especie.id} navigate={navigate} />
+      )}
+
       {showLineaForm && (
         <LineaForm
-          especieId={id}
+          especieId={especie.id}
           onSaved={() => { setShowLineaForm(false); fetchEspecie() }}
           onCancel={() => setShowLineaForm(false)}
         />
@@ -428,7 +444,7 @@ function ExperimentosPanel({ especieId, navigate }) {
       {!data || data.length === 0
         ? <p style={{color:'var(--theme-text-muted)',fontSize:'0.9rem',margin:0}}>No hay experimentos registrados con especímenes de esta especie.</p>
         : data.map(exp => (
-            <div key={exp.id} className="tile" onClick={() => navigate(`/experimentos/${exp.id}`)}>
+            <div key={exp.id} className="tile" onClick={() => navigate(`/experimentos/${exp.codigo || exp.id}`)}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                 <span style={{color:'var(--theme-primary)',fontWeight:600,fontSize:'0.92rem'}}>{exp.nombre}</span>
                 <span className={`badge ${exp.estado === "activo" ? "badge--success" : exp.estado === "pausado" ? "badge--warning" : exp.estado === "cancelado" ? "badge--danger" : "badge--outline"}`}>
@@ -852,3 +868,115 @@ function Field({ label, value, onChange, textarea, required }) {
 }
 
 // ── Styles ─────────────────────────────────────────────────────────────────────
+
+// ── Galeria Panel ──────────────────────────────────────────────────────────────
+
+function GaleriaPanel({ especieId, navigate }) {
+  const [fotos, setFotos] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    api.get(`/especies/${especieId}/galeria`)
+      .then(setFotos)
+      .catch(() => setFotos([]))
+      .finally(() => setLoading(false))
+  }, [especieId])
+
+  if (loading) return <p style={{color:'var(--theme-text-muted)',fontSize:'0.9rem',margin:0}}>Cargando galería…</p>
+
+  return (
+    <div style={{display:'flex',flexDirection:'column',gap:8}}>
+      <h3 style={{color:'var(--theme-primary)',margin:0,fontSize:'1rem'}}>Galería de Especímenes</h3>
+      {!fotos || fotos.length === 0
+        ? <p style={{color:'var(--theme-text-muted)',fontSize:'0.9rem',margin:0}}>Aún no hay fotos subidas para esta especie.</p>
+        : (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '8px' }}>
+            {fotos.map((f, i) => (
+              <div
+                key={i}
+                style={{ position: 'relative', aspectRatio: '1', borderRadius: '8px', overflow: 'hidden', cursor: 'pointer', border: '1px solid var(--theme-border)' }}
+                onClick={() => navigate(`/especimen/${f.especimen_id}`)}
+              >
+                <AuthImg
+                  url={`${f.url}?t=${Date.now()}`}
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                  alt={f.angulo}
+                />
+                <div style={{
+                  position: 'absolute', bottom: 0, left: 0, right: 0, background: 'rgba(0,0,0,0.6)',
+                  padding: '4px', display: 'flex', flexDirection: 'column',
+                  color: 'white', fontSize: '0.6rem'
+                }}>
+                  <span style={{ fontWeight: 'bold' }}>{f.especimen_uid.split('-')[1] || f.especimen_uid}</span>
+                  <span style={{ color: 'var(--theme-secondary)' }}>{f.angulo}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        )
+      }
+    </div>
+  )
+}
+
+// ── Individuos Panel ─────────────────────────────────────────────────────────
+
+const ESTADO_COLOR = {
+  activo: 'var(--theme-primary)', en_experimento: '#b07d1e',
+  archivado: 'var(--theme-text-muted)', contaminado: 'var(--error)',
+}
+
+function IndividuosPanel({ especieId, navigate }) {
+  const [items, setItems] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  // Use URLSearchParams directly if we want to read ?linea=... inside the tab
+  const params = new URLSearchParams(window.location.search);
+  const lineaId = params.get('linea');
+
+  useEffect(() => {
+    api.get('/especimenes')
+      .then(data => {
+        let filtered = data.filter(i => i.especie_id === especieId)
+        if (lineaId) filtered = filtered.filter(i => i.linea_id === lineaId)
+        setItems(filtered)
+      })
+      .catch(() => setItems([]))
+      .finally(() => setLoading(false))
+  }, [especieId, lineaId])
+
+  if (loading) return <p style={{color:'var(--theme-text-muted)',fontSize:'0.9rem',margin:0}}>Cargando especímenes…</p>
+
+  return (
+    <div style={{display:'flex',flexDirection:'column',gap:8}}>
+      <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+        <div>
+           <h3 style={{color:'var(--theme-primary)',margin:0,fontSize:'1rem'}}>Individuos y Lotes</h3>
+           {lineaId && <p style={{color:'var(--theme-secondary)',margin:0,fontSize:'0.8rem'}}>Filtrado por línea</p>}
+        </div>
+        <div style={{display:'flex',gap:8}}>
+           <button className="btn btn--secondary" onClick={() => navigate(`/nuevo-lote?especie=${especieId}`)}>+ Lotes</button>
+           <button className="btn btn--primary" onClick={() => navigate(`/nuevo-individuo?especie=${especieId}`)}>+ Individuo</button>
+        </div>
+      </div>
+
+      {!items || items.length === 0
+        ? <p style={{color:'var(--theme-text-muted)',fontSize:'0.9rem',margin:0}}>No hay individuos registrados.</p>
+        : (
+          <div style={{display:'flex',flexDirection:'column',gap:8, marginTop: 4}}>
+            {items.map(i => (
+              <div key={i.id} className="card" style={{cursor:'pointer', margin: 0}} onClick={() => navigate(`/especimen/${i.id}`)}>
+                <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:4}}>
+                  <span style={{color:'var(--theme-primary)',fontWeight:'bold',fontFamily:'monospace', fontSize:'0.9rem'}}>{i.uid}</span>
+                  <span style={{ borderRadius:20,padding:'0.1rem 0.5rem',fontSize:'0.6rem',color:'#fff',textTransform:'uppercase',fontWeight:600, background: ESTADO_COLOR[i.estado] || '#555' }}>{i.estado.replace('_', ' ')}</span>
+                </div>
+                {i.linea_nombre && <p style={{color:'var(--theme-secondary)',margin:'2px 0',fontSize:'0.8rem'}}>Línea: {i.linea_nombre}</p>}
+                <p style={{color:'var(--theme-text-muted)',margin:'2px 0 0',fontSize:'0.75rem'}}>Ingreso: {new Date(i.fecha_ingreso).toLocaleDateString()}</p>
+              </div>
+            ))}
+          </div>
+        )
+      }
+    </div>
+  )
+}

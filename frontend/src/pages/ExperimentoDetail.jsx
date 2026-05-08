@@ -16,7 +16,12 @@ export default function ExperimentoDetail() {
     try {
       const e = await api.get(`/experimentos/${id}`)
       setExp(e)
-      const res = await api.get(`/experimentos/${id}/resultados`)
+
+      if (id && id.length > 20 && e.codigo) {
+         navigate(`/experimentos/${e.codigo}`, { replace: true })
+      }
+
+      const res = await api.get(`/experimentos/${e.id}/resultados`)
       setResultados(res)
     }
     finally { setLoading(false) }
@@ -83,8 +88,25 @@ export default function ExperimentoDetail() {
       </div>
 
       <div style={{background:'var(--theme-surface)',padding:'1rem',borderRadius:12}}>
-         <h4 style={{color:'var(--theme-secondary)',fontSize:'0.75rem',fontWeight:700,textTransform:'uppercase',letterSpacing:1,margin:'0 0 8px 0'}}>Especímenes en estudio</h4>
-         <p style={{color:'var(--theme-text-muted)',textAlign:'center',padding:'2rem'}}>Próximamente: Lista de individuos vinculados.</p>
+         <h4 style={{color:'var(--theme-secondary)',fontSize:'0.75rem',fontWeight:700,textTransform:'uppercase',letterSpacing:1,margin:'0 0 8px 0'}}>Especímenes en estudio ({exp.especimenes?.length || 0})</h4>
+         {(!exp.especimenes || exp.especimenes.length === 0) ? (
+           <p style={{color:'var(--theme-text-muted)',textAlign:'center',padding:'1rem 0',fontSize:'0.9rem'}}>No hay especímenes vinculados a este experimento.</p>
+         ) : (
+           <div style={{display:'flex',flexDirection:'column',gap:8,marginTop:10}}>
+             {exp.especimenes.map(esp => (
+               <div key={esp.id} className="tile" onClick={() => navigate(`/especimen/${esp.uid || esp.id}`)}>
+                 <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start'}}>
+                    <span className="text-primary" style={{fontWeight:700,fontSize:'0.92rem'}}>{esp.uid}</span>
+                    <span className="badge badge--outline">{esp.estado}</span>
+                 </div>
+                 <div style={{display:'flex',gap:12,marginTop:2,fontSize:'0.8rem',flexWrap:'wrap'}}>
+                    <span style={{color:'var(--theme-text)',fontStyle:'italic'}}>{esp.especie}</span>
+                    {esp.linea_nombre && <span style={{color:'var(--theme-text-muted)'}}>{esp.linea_nombre}</span>}
+                 </div>
+               </div>
+             ))}
+           </div>
+         )}
       </div>
     </div>
   )

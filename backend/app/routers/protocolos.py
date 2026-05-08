@@ -98,9 +98,9 @@ def crear(payload: schemas.ProtocoloCreate, db: Session = Depends(get_db),
     return _get_full(proto.id, db)
 
 
-@router.get("/{id}", response_model=schemas.ProtocoloOut)
-def obtener(id: UUID, db: Session = Depends(get_db), _=Depends(auth.get_current_user)):
-    return _get_full(id, db)
+@router.get("/{id_or_code}", response_model=schemas.ProtocoloOut)
+def obtener(id_or_code: str, db: Session = Depends(get_db), _=Depends(auth.get_current_user)):
+    return _get_full(id_or_code, db)
 
 
 @router.patch("/{id}", response_model=schemas.ProtocoloOut)
@@ -154,20 +154,25 @@ def agregar_validacion(
     )
 
 
-def _get_full(id: UUID, db: Session) -> schemas.ProtocoloOut:
-    proto = (
+def _get_full(id_or_code, db: Session) -> schemas.ProtocoloOut:
+    query = (
         db.query(models.Protocolo)
         .options(
             joinedload(models.Protocolo.validaciones).joinedload(models.ValidacionProtocolo.usuario)
         )
-        .filter(models.Protocolo.id == id)
-        .first()
     )
+    try:
+        parsed_id = UUID(str(id_or_code))
+        proto = query.filter(models.Protocolo.id == parsed_id).first()
+    except ValueError:
+        proto = query.filter(models.Protocolo.codigo.ilike(id_or_code)).first()
+
     if not proto:
         raise HTTPException(status_code=404, detail="Protocolo no encontrado")
 
     return schemas.ProtocoloOut(
         id=proto.id,
+        codigo=proto.codigo,
         nombre=proto.nombre,
         tipo=proto.tipo,
         version=proto.version,

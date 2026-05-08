@@ -81,6 +81,31 @@ def obtener_formulacion(id: UUID, db: Session = Depends(get_db), _=Depends(auth.
         raise HTTPException(status_code=404, detail="Formulación no encontrada")
     return f
 
+@router.patch("/formulaciones/{id}", response_model=schemas.FormulacionOut)
+def actualizar_formulacion(id: UUID, payload: schemas.FormulacionUpdate, db: Session = Depends(get_db), _=Depends(auth.get_current_user)):
+    f = db.query(models.Formulacion).filter(models.Formulacion.id == id).first()
+    if not f:
+        raise HTTPException(status_code=404, detail="Formulación no encontrada")
+
+    data = payload.model_dump(exclude_unset=True)
+    componentes_data = data.pop('componentes', None)
+
+    for k, v in data.items():
+        setattr(f, k, v)
+
+    if componentes_data is not None:
+        # Reemplazar componentes: borrar anteriores y crear nuevos
+        db.query(models.FormulacionComponente).filter(models.FormulacionComponente.formulacion_id == id).delete()
+        for comp in componentes_data:
+            if not comp.get('reactivo_id') and not comp.get('formulacion_ingrediente_id'):
+                raise HTTPException(status_code=422, detail="Cada componente debe especificar un reactivo o una formulación origen")
+            c = models.FormulacionComponente(formulacion_id=f.id, **comp)
+            db.add(c)
+
+    db.commit()
+    db.refresh(f)
+    return obtener_formulacion(id, db)
+
 # ── Lotes Preparados (Batch Tracking) ──────────────────────────────────────
 
 @router.get("/lotes", response_model=list[schemas.LotePreparadoOut])

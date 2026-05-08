@@ -133,6 +133,17 @@ export default function IndividuoCreate() {
         catch { /* impresora offline no bloquea */ }
       }
 
+      // Navegación semántica: /especimen/LOTE/INDICE
+      if (ind.uid) {
+        const parts = ind.uid.split('-')
+        if (parts.length >= 4) {
+          const lotePart = parts.slice(0, 3).join('-')
+          const indexPart = parseInt(parts[3], 10)
+          navigate(`/especimen/${lotePart}/${indexPart}`)
+          return
+        }
+      }
+
       navigate(`/especimen/${ind.id}`)
     } catch (err) { setError(err.message) }
     finally { setLoading(false) }

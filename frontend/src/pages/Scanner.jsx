@@ -100,8 +100,8 @@ export default function Scanner() {
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10, width: '100%', marginBottom: '1rem' }}>
             <button className="btn btn--primary btn--block" onClick={() => {
-              if (scanResult.tipo === 'especimen') navigate(`/especimen/${scanResult.especimen.id}`)
-              else if (scanResult.tipo === 'elemento') navigate(`/elemento/${scanResult.elemento.id}`)
+              if (scanResult.tipo === 'especimen') navigate(`/especimen/${scanResult.especimen.uid || scanResult.especimen.id}`)
+              else if (scanResult.tipo === 'elemento') navigate(`/elemento/${scanResult.elemento.element_id || scanResult.elemento.id}`)
               else if (scanResult.tipo === 'lote') navigate('/lotes')
               else if (scanResult.tipo === 'reactivo') navigate('/reactivos')
               else if (scanResult.tipo === 'sustrato') navigate('/lab')
@@ -111,7 +111,7 @@ export default function Scanner() {
             </button>
             {scanResult.tipo === 'especimen' && (
               <>
-                <button className="btn btn--accent btn--block" onClick={() => navigate(`/especimen/${scanResult.especimen.id}?quick=foto`)}>
+                <button className="btn btn--accent btn--block" onClick={() => navigate(`/especimen/${scanResult.especimen.uid || scanResult.especimen.id}?quick=foto`)}>
                   📸 Añadir Foto / Evo
                 </button>
                 <button className="btn btn--secondary btn--block" onClick={() => navigate(`/nuevo-lote?madre=${scanResult.especimen.id}&especie=${scanResult.especimen.especie_id}`)}>

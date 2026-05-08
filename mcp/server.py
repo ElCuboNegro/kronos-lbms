@@ -133,6 +133,32 @@ class ListProtocolosInput(BaseModel):
     model_config = ConfigDict(str_strip_whitespace=True)
     tipo: Optional[str] = Field(default=None, description="Tipo: extraccion_meristema, propagacion_in_vitro, desinfeccion, subcultivo, enraizamiento, aclimatacion, otro")
 
+class ListReactivosInput(BaseModel):
+    model_config = ConfigDict(str_strip_whitespace=True)
+    buscar: Optional[str] = Field(default=None, description="Filtro de texto por nombre de reactivo")
+
+class UpdateFormulacionInput(BaseModel):
+    model_config = ConfigDict(str_strip_whitespace=True)
+    formulacion_id: str = Field(..., description="UUID de la formulación")
+    nombre: Optional[str] = Field(default=None)
+    descripcion: Optional[str] = Field(default=None)
+    procedimiento: Optional[str] = Field(default=None)
+    volumen_base_l: Optional[float] = Field(default=None)
+    caducidad_dias: Optional[int] = Field(default=None)
+    componentes: Optional[list[dict[str, Any]]] = Field(default=None, description="Lista de componentes con reactivo_id o formulacion_ingrediente_id y cantidad_base")
+
+class UpdateSustratoInput(BaseModel):
+    model_config = ConfigDict(str_strip_whitespace=True)
+    sustrato_id: str = Field(..., description="UUID del sustrato")
+    nombre: Optional[str] = Field(default=None)
+    descripcion: Optional[str] = Field(default=None)
+    ph_teorico: Optional[float] = Field(default=None)
+    conductividad_teorica: Optional[float] = Field(default=None)
+    componentes: Optional[list[dict[str, Any]]] = Field(default=None)
+
+class SustratoIdInput(BaseModel):
+    model_config = ConfigDict(str_strip_whitespace=True)
+    sustrato_id: str = Field(..., description="UUID del sustrato")
 
 # ── Tools: Especies ───────────────────────────────────────────────────────────
 
@@ -399,6 +425,115 @@ async def lbms_list_protocolos(params: ListProtocolosInput) -> str:
         return _err(e)
 
 
+# ── Tools: Laboratorio (Reactivos, Formulaciones, Sustratos) ─────────────────
+
+@mcp.tool(
+    name="lbms_list_reactivos",
+    annotations={"title": "Listar reactivos", "readOnlyHint": True, "destructiveHint": False}
+)
+async def lbms_list_reactivos(params: ListReactivosInput) -> str:
+    """Lista todos los reactivos en el inventario.
+
+    Returns:
+        str: JSON lista de reactivos.
+    """
+    try:
+        data = await _api("GET", "/reactivos")
+        if params.buscar:
+            q = params.buscar.lower()
+            data = [r for r in data if q in r.get("nombre", "").lower()]
+        return json.dumps(data, indent=2, ensure_ascii=False, default=str)
+    except Exception as e:
+        return _err(e)
+
+
+@mcp.tool(
+    name="lbms_list_formulaciones",
+    annotations={"title": "Listar formulaciones (recetas)", "readOnlyHint": True, "destructiveHint": False}
+)
+async def lbms_list_formulaciones() -> str:
+    """Lista todas las formulaciones (recetas) registradas.
+
+    Returns:
+        str: JSON lista de formulaciones con sus componentes.
+    """
+    try:
+        return json.dumps(await _api("GET", "/reactivos/formulaciones"),
+                          indent=2, ensure_ascii=False, default=str)
+    except Exception as e:
+        return _err(e)
+
+
+@mcp.tool(
+    name="lbms_update_formulacion",
+    annotations={"title": "Actualizar formulación", "readOnlyHint": False, "destructiveHint": False}
+)
+async def lbms_update_formulacion(params: UpdateFormulacionInput) -> str:
+    """Actualiza una formulación existente (nombre, descripción o componentes).
+
+    Returns:
+        str: JSON de la formulación actualizada.
+    """
+    try:
+        patch = params.model_dump(exclude_unset=True, exclude={"formulacion_id"})
+        result = await _api("PATCH", f"/reactivos/formulaciones/{params.formulacion_id}", json=patch)
+        return json.dumps(result, indent=2, ensure_ascii=False, default=str)
+    except Exception as e:
+        return _err(e)
+
+
+@mcp.tool(
+    name="lbms_list_sustratos",
+    annotations={"title": "Listar sustratos", "readOnlyHint": True, "destructiveHint": False}
+)
+async def lbms_list_sustratos() -> str:
+    """Lista todos los sustratos (mezclas, agares) registrados.
+
+    Returns:
+        str: JSON lista de sustratos.
+    """
+    try:
+        return json.dumps(await _api("GET", "/sustratos"),
+                          indent=2, ensure_ascii=False, default=str)
+    except Exception as e:
+        return _err(e)
+
+
+@mcp.tool(
+    name="lbms_get_sustrato",
+    annotations={"title": "Obtener detalle de sustrato", "readOnlyHint": True, "destructiveHint": False}
+)
+async def lbms_get_sustrato(params: SustratoIdInput) -> str:
+    """Obtiene el detalle completo de un sustrato.
+
+    Returns:
+        str: JSON con el sustrato.
+    """
+    try:
+        return json.dumps(await _api("GET", f"/sustratos/{params.sustrato_id}"),
+                          indent=2, ensure_ascii=False, default=str)
+    except Exception as e:
+        return _err(e)
+
+
+@mcp.tool(
+    name="lbms_update_sustrato",
+    annotations={"title": "Actualizar sustrato", "readOnlyHint": False, "destructiveHint": False}
+)
+async def lbms_update_sustrato(params: UpdateSustratoInput) -> str:
+    """Actualiza la información de un sustrato (nombre, descripción, pH, EC).
+
+    Returns:
+        str: JSON del sustrato actualizado.
+    """
+    try:
+        patch = params.model_dump(exclude_unset=True, exclude={"sustrato_id"})
+        result = await _api("PATCH", f"/sustratos/{params.sustrato_id}", json=patch)
+        return json.dumps(result, indent=2, ensure_ascii=False, default=str)
+    except Exception as e:
+        return _err(e)
+
+
 # ── Entry point ───────────────────────────────────────────────────────────────
 
 if __name__ == "__main__":
@@ -410,3 +545,33 @@ if __name__ == "__main__":
         )
         sys.exit(1)
     mcp.run()
+
+# ── Tools: Science & Calculations ───────────────────────────────────────────
+
+class MolarityInput(BaseModel):
+    molarity: float = Field(..., description="Target molarity (M)")
+    volume_l: float = Field(..., description="Target volume in liters (L)")
+    molecular_weight: float = Field(..., description="Molecular weight of the substance (g/mol)")
+
+class DilutionInput(BaseModel):
+    c1: float = Field(..., description="Initial concentration")
+    c2: float = Field(..., description="Final concentration")
+    v2: float = Field(..., description="Final volume")
+
+@mcp.tool()
+async def science_calculate_molarity(params: MolarityInput) -> str:
+    """Calculates the mass required for a specific molarity and volume."""
+    try:
+        res = await _api("POST", "/science/calculate/molarity", json=params.model_dump())
+        return json.dumps(res, indent=2)
+    except Exception as e:
+        return _err(e)
+
+@mcp.tool()
+async def science_calculate_dilution(params: DilutionInput) -> str:
+    """Calculates V1 required for a C1V1 dilution."""
+    try:
+        res = await _api("POST", "/science/calculate/dilution", json=params.model_dump())
+        return json.dumps(res, indent=2)
+    except Exception as e:
+        return _err(e)

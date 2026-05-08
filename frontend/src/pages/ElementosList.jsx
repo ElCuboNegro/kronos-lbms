@@ -34,7 +34,7 @@ export default function ElementosList() {
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           {elementos.map(el => (
-            <div key={el.id} className="card" style={{ padding: '1rem', cursor: 'pointer', margin: 0 }} onClick={() => navigate(`/elemento/${el.id}`)}>
+            <div key={el.id} className="card" style={{ padding: '1rem', cursor: 'pointer', margin: 0 }} onClick={() => navigate(`/elemento/${el.element_id || el.id}`)}>
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <span className="text-primary" style={{ fontWeight: 600, fontSize: '0.95rem' }}>{el.descripcion}</span>
                 <span className="badge badge--outline font-mono">{el.element_id}</span>
