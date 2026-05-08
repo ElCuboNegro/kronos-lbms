@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { api } from '../api/client'
-import Layout from '../components/ui/Layout'
 import Card from '../components/ui/Card'
 import Button from '../components/ui/Button'
 import ContainerMap from '../components/ContainerMap'
@@ -40,7 +39,7 @@ export default function ContenedoresManager() {
   }, [containerId, refreshKey])
 
   return (
-    <Layout title="Gestión de Contenedores" showBack>
+
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
         <Card>
           <div className="input-group">
@@ -95,6 +94,6 @@ export default function ContenedoresManager() {
 
         {loading && <p className="text-center text-muted">Buscando frasco...</p>}
       </div>
-    </Layout>
+
   )
 }

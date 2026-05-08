@@ -216,7 +216,7 @@ def crear_registro_grupal(
     for r in registros: db.refresh(r)
     return [_reg_out(r) for r in registros]
 
-@router.post("/evolucion/{registro_id}/fotos/{angulo}/bulk-contenedor")
+@router.post("/evolucion-grupal/{registro_id}/fotos/{angulo}")
 async def subir_foto_grupal(
     registro_id: UUID,
     angulo: str,

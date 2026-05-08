@@ -55,6 +55,11 @@ def resolver_qr(
             return schemas.ScanResult(tipo="lote", lote=_map_lote(lote))
         raise HTTPException(status_code=404, detail=f"Lote Preparado con UID '{qr_data}' no encontrado")
 
+    if "-JAR-" in qr_data:
+        especimenes = db.query(models.Especimen).options(joinedload(models.Especimen.linea_rel), joinedload(models.Especimen.variegacion_rel)).filter(models.Especimen.contenedor_uid == qr_data).all()
+        if especimenes:
+            return schemas.ScanResult(tipo="contenedor", contenedor={"contenedor_uid": qr_data, "especimenes": [SpecimenService.map_to_out(e) for e in especimenes]})
+
     if qr_data.startswith("CONT-"):
         especimenes = db.query(models.Especimen).options(
             joinedload(models.Especimen.linea_rel),

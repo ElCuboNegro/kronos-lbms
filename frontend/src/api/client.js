@@ -8,22 +8,28 @@ function getToken() {
   return localStorage.getItem('token')
 }
 
-async function request(method, path, body) {
-  const headers = { 'Content-Type': 'application/json' }
+async function request(method, path, body, options = {}) {
+  const isFormData = body instanceof FormData
+  const headers = options.headers || {}
+
+  if (!isFormData && !headers['Content-Type']) {
+    headers['Content-Type'] = 'application/json'
+  }
+
   const token = getToken()
-  if (token) headers['Authorization'] = `Bearer ${token}`
+  if (token) headers['Authorization'] = "Bearer " + token
 
   const base = getBaseUrl()
   let res;
   try {
-    res = await fetch(`${base}${path}`, {
+    res = await fetch(base + path, {
       method,
       headers,
-      body: body !== undefined ? JSON.stringify(body) : undefined,
+      body: isFormData ? body : (body !== undefined ? JSON.stringify(body) : undefined),
     })
   } catch (err) {
     if (err.name === 'TypeError' && err.message.includes('fetch')) {
-      throw new Error('Error de conexión con el servidor (Revisa tu red o CORS).')
+      throw new Error('Error de conexión con el servidor.')
     }
     throw err;
   }
@@ -38,58 +44,23 @@ async function request(method, path, body) {
   const data = isJson ? await res.json() : await res.text()
 
   if (!res.ok) {
-    if (res.status === 404 && !isJson) {
-      throw new Error('Endpoint no encontrado (404). Verifica que la URL del servidor sea correcta y apunte a la API.')
-    }
-    if (res.status === 502) {
-      throw new Error('Servidor fuera de línea (502 Bad Gateway). Intentando reconectar...')
-    }
-    if (res.status === 504) {
-      throw new Error('Tiempo de espera agotado (504 Gateway Timeout).')
-    }
-    throw new Error(data?.detail || `Error del servidor (${res.status})`)
+    throw new Error(data?.detail || "Error " + res.status)
   }
   return data
 }
 
 export const api = {
   get: (path) => request('GET', path),
-  post: (path, body) => request('POST', path, body),
-  patch: (path, body) => request('PATCH', path, body),
-
+  post: (path, body, options) => request('POST', path, body, options),
+  patch: (path, body, options) => request('PATCH', path, body, options),
   login: async (email, password) => {
     const form = new URLSearchParams({ username: email, password })
-    const base = getBaseUrl()
-    let res;
-    try {
-      res = await fetch(`${base}/auth/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: form,
-      })
-    } catch (err) {
-      if (err.name === 'TypeError' && err.message.includes('fetch')) {
-        throw new Error('Error de conexión con el servidor (Revisa tu red o CORS).')
-      }
-      throw err;
-    }
-
-    if (res.status === 502) {
-      throw new Error('Servidor fuera de línea o reiniciándose (502 Bad Gateway)')
-    }
-
-    let data;
-    try {
-      const isJson = res.headers.get('content-type')?.includes('application/json');
-      if (!isJson) {
-        throw new Error('La URL del servidor es incorrecta (respondió con HTML en lugar de JSON). Verifica que apunte al Backend (ej. puerto 8001) y no al Frontend.');
-      }
-      data = await res.json()
-    } catch (err) {
-      throw new Error(err.message || 'Respuesta inválida del servidor')
-    }
-
-    if (!res.ok) throw new Error(data?.detail || 'Credenciales incorrectas')
-    return data
-  },
+    const res = await fetch(getBaseUrl() + "/auth/login", {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: form,
+    })
+    if (!res.ok) throw new Error('Credenciales incorrectas')
+    return await res.json()
+  }
 }

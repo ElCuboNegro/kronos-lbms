@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import Layout from '../components/ui/Layout'
 import Card from '../components/ui/Card'
 import Button from '../components/ui/Button'
 import { api } from '../api/client'
@@ -13,7 +12,6 @@ export default function IndividuoMultiCreate() {
   const [lotes, setLotes] = useState([])
   const [experimentos, setExperimentos] = useState([])
 
-  // State del formulario
   const [formData, setFormData] = useState({
     especie_id: searchParams.get('especie') || '',
     madre_id: searchParams.get('madre') || '',
@@ -25,14 +23,8 @@ export default function IndividuoMultiCreate() {
   })
 
   useEffect(() => {
-    // Cargar lotes disponibles
     api.get('/reactivos/lotes').then(setLotes).catch(() => {})
-    // Cargar experimentos activos
-    api.get('/stats').then(() => {
-        // En un sistema real, tendríamos un endpoint de listado,
-        // pero usemos lo que el arqueólogo encontró o supongamos el estándar
-        api.get('/experimentos').then(setExperimentos).catch(() => {})
-    })
+    api.get('/experimentos').then(setExperimentos).catch(() => {})
   }, [])
 
   const handleNext = () => setStep(s => s + 1)
@@ -57,7 +49,7 @@ export default function IndividuoMultiCreate() {
   const totalSteps = 4
 
   return (
-    <Layout title="Clonación Masiva" showBack>
+    <>
       <div style={{ marginBottom: '2rem' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
           <span className="text-muted" style={{ fontSize: '0.8rem' }}>Paso {step} de {totalSteps}</span>
@@ -89,35 +81,21 @@ export default function IndividuoMultiCreate() {
            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               <div className="input-group">
                 <label>Medio de Cultivo (Lote)</label>
-                <select
-                  value={formData.lote_id}
-                  onChange={e => setFormData({...formData, lote_id: e.target.value})}
-                  style={{ width: '100%', padding: '0.5rem', borderRadius: '4px' }}
-                >
+                <select value={formData.lote_id} onChange={e => setFormData({...formData, lote_id: e.target.value})} style={{ width: '100%', padding: '0.5rem' }}>
                   <option value="">-- Seleccionar Lote --</option>
-                  {lotes.map(l => (
-                    <option key={l.id} value={l.id}>{l.uid} ({l.formulacion.nombre})</option>
-                  ))}
+                  {lotes.map(l => <option key={l.id} value={l.id}>{l.uid}</option>)}
                 </select>
               </div>
-
               <div className="input-group">
-                <label>Experimento Asociado (Opcional)</label>
-                <select
-                  value={formData.experimento_id}
-                  onChange={e => setFormData({...formData, experimento_id: e.target.value})}
-                  style={{ width: '100%', padding: '0.5rem', borderRadius: '4px' }}
-                >
+                <label>Experimento (Opcional)</label>
+                <select value={formData.experimento_id} onChange={e => setFormData({...formData, experimento_id: e.target.value})} style={{ width: '100%', padding: '0.5rem' }}>
                   <option value="">-- Sin Experimento --</option>
-                  {experimentos.map(ex => (
-                    <option key={ex.id} value={ex.id}>{ex.nombre}</option>
-                  ))}
+                  {experimentos.map(ex => <option key={ex.id} value={ex.id}>{ex.nombre}</option>)}
                 </select>
               </div>
-
               <div style={{ display: 'flex', gap: '0.5rem' }}>
-                <Button variant="ghost" style={{ flex: 1 }} onClick={handlePrev}>Atrás</Button>
-                <Button style={{ flex: 2 }} onClick={handleNext}>Continuar</Button>
+                <Button variant="ghost" onClick={handlePrev}>Atrás</Button>
+                <Button onClick={handleNext}>Continuar</Button>
               </div>
            </div>
         </Card>
@@ -126,36 +104,27 @@ export default function IndividuoMultiCreate() {
       {step === 3 && (
         <Card title="Configuración de Lote" subtitle="Parámetros de cultivo">
            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-              <label>Cantidad de Explantes</label>
+              <label>Cantidad</label>
               <input type="number" value={formData.cantidad} onChange={e => setFormData({...formData, cantidad: e.target.value})} />
-
-              <label>Fecha de Registro</label>
-              <input type="date" value={formData.fecha_ingreso} onChange={e => setFormData({...formData, fecha_ingreso: e.target.value})} />
-
               <div style={{ display: 'flex', gap: '0.5rem' }}>
-                <Button variant="ghost" style={{ flex: 1 }} onClick={handlePrev}>Atrás</Button>
-                <Button style={{ flex: 2 }} onClick={handleNext}>Revisar Lote</Button>
+                <Button variant="ghost" onClick={handlePrev}>Atrás</Button>
+                <Button onClick={handleNext}>Revisar</Button>
               </div>
            </div>
         </Card>
       )}
 
       {step === 4 && (
-        <Card title="Confirmación" subtitle="Verifica los datos antes de generar">
-           <div style={{ padding: '1rem', background: 'var(--theme-background)', borderRadius: 'var(--radius-base)', marginBottom: '1.5rem' }}>
-              <p><strong>Total:</strong> {formData.cantidad} especímenes</p>
-              <p><strong>Estado:</strong> {formData.estado}</p>
-              {formData.lote_id && <p><strong>Medio:</strong> {lotes.find(l => l.id === formData.lote_id)?.uid}</p>}
-              {formData.experimento_id && <p><strong>Experimento:</strong> {experimentos.find(ex => ex.id === formData.experimento_id)?.nombre}</p>}
+        <Card title="Confirmación" subtitle="Verifica los datos">
+           <div style={{ padding: '1rem', background: 'var(--theme-background)', marginBottom: '1.5rem' }}>
+              <p>Total: {formData.cantidad} especímenes</p>
            </div>
            <div style={{ display: 'flex', gap: '0.5rem' }}>
-              <Button variant="ghost" style={{ flex: 1 }} onClick={handlePrev}>Atrás</Button>
-              <Button style={{ flex: 2 }} onClick={handleSubmit} disabled={loading}>
-                {loading ? 'Generando...' : '🔥 Iniciar Producción'}
-              </Button>
+              <Button variant="ghost" onClick={handlePrev}>Atrás</Button>
+              <Button onClick={handleSubmit} disabled={loading}>{loading ? 'Generando...' : '🔥 Iniciar'}</Button>
            </div>
         </Card>
       )}
-    </Layout>
+    </>
   )
 }

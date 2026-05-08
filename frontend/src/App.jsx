@@ -1,3 +1,4 @@
+import VoiceController from './components/VoiceController'
 import './theme.css'
 import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom'
 import { useEffect } from 'react'
@@ -116,6 +117,7 @@ function Layout({ children }) {
           <button style={{ background: 'none', border: 'none', color: 'var(--theme-text-muted)', fontSize: '0.8rem', cursor: 'pointer', padding: 0 }} onClick={() => { logout(); navigate('/login') }}>Salir</button>
         </div>
       </header>
+      <VoiceController />
       <main style={{ flex: 1, overflowY: 'auto', paddingBottom: '90px' }}>{children}</main>
       <nav style={{
         position: 'fixed',
