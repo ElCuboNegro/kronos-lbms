@@ -20,4 +20,16 @@ jobs:
         uses: anthropics/claude-code-action@beta
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-
+          mcp_config: |
+            {
+              "mcpServers": {
+                "playwright": {
+                  "command": "npx",
+                  "args": [
+                    "@playwright/mcp@latest",
+                    "--allowed-origins",
+                    "localhost:3000"
+                  ]
+                }
+              }
+            }
