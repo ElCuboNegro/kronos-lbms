@@ -102,6 +102,7 @@ export default function ExperimentoDetail() {
                  <div style={{display:'flex',gap:12,marginTop:2,fontSize:'0.8rem',flexWrap:'wrap'}}>
                     <span style={{color:'var(--theme-text)',fontStyle:'italic'}}>{esp.especie}</span>
                     {esp.linea_nombre && <span style={{color:'var(--theme-text-muted)'}}>{esp.linea_nombre}</span>}
+                    {(() => { const m = esp.notas?.match(/(\d+)\s*semillas?/i); return m ? <span style={{color:'var(--theme-primary)',fontWeight:600}}>🌱 {m[1]} semillas</span> : null })()}
                  </div>
                </div>
              ))}

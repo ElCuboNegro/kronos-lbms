@@ -275,6 +275,7 @@ class EspecimenListItem(BaseModel):
     variegacion_nombre: Optional[str] = None
     estado: str
     fecha_ingreso: date
+    notas: Optional[str] = None
     model_config = {"from_attributes": True}
 
 

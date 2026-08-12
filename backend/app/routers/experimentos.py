@@ -21,7 +21,8 @@ def _exp_out(exp: models.Experimento) -> schemas.ExperimentoOut:
             linea_nombre=e.linea_rel.nombre if e.linea_rel else None,
             variegacion_nombre=e.variegacion_rel.nombre if e.variegacion_rel else None,
             estado=e.estado,
-            fecha_ingreso=e.fecha_ingreso
+            fecha_ingreso=e.fecha_ingreso,
+            notas=e.notas
         ))
 
     return schemas.ExperimentoOut(
