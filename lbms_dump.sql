@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict r8m68CF5hZq2kqNcAyfSQVCL7UllT449lHYaWmmu09dnoRHqSXhH63sJwyExtMa
+\restrict AIoNZqdzAwnq0fCg6TJxkigS3W5jXAeeT8GmDThUkfNsamJgVhijJSbrzQbNqIr
 
 -- Dumped from database version 16.14
 -- Dumped by pg_dump version 16.14
@@ -18,6 +18,121 @@ SET xmloption = content;
 SET client_min_messages = warning;
 SET row_security = off;
 
+ALTER TABLE IF EXISTS ONLY public.variegaciones DROP CONSTRAINT IF EXISTS variegaciones_linea_id_fkey;
+ALTER TABLE IF EXISTS ONLY public.validaciones_protocolo DROP CONSTRAINT IF EXISTS validaciones_protocolo_usuario_id_fkey;
+ALTER TABLE IF EXISTS ONLY public.validaciones_protocolo DROP CONSTRAINT IF EXISTS validaciones_protocolo_protocolo_id_fkey;
+ALTER TABLE IF EXISTS ONLY public.validaciones_protocolo DROP CONSTRAINT IF EXISTS validaciones_protocolo_experimento_id_fkey;
+ALTER TABLE IF EXISTS ONLY public.sustratos DROP CONSTRAINT IF EXISTS sustratos_lote_id_fkey;
+ALTER TABLE IF EXISTS ONLY public.sustratos DROP CONSTRAINT IF EXISTS sustratos_formulacion_id_fkey;
+ALTER TABLE IF EXISTS ONLY public.resultados_investigacion DROP CONSTRAINT IF EXISTS resultados_investigacion_registrado_por_id_fkey;
+ALTER TABLE IF EXISTS ONLY public.resultados_investigacion DROP CONSTRAINT IF EXISTS resultados_investigacion_experimento_id_fkey;
+ALTER TABLE IF EXISTS ONLY public.registros_evolucion DROP CONSTRAINT IF EXISTS registros_evolucion_sustrato_id_fkey;
+ALTER TABLE IF EXISTS ONLY public.registros_evolucion DROP CONSTRAINT IF EXISTS registros_evolucion_registrado_por_id_fkey;
+ALTER TABLE IF EXISTS ONLY public.registros_evolucion DROP CONSTRAINT IF EXISTS registros_evolucion_protocolo_clonacion_id_fkey;
+ALTER TABLE IF EXISTS ONLY public.registros_evolucion DROP CONSTRAINT IF EXISTS registros_evolucion_especimen_id_fkey;
+ALTER TABLE IF EXISTS ONLY public.protocolos DROP CONSTRAINT IF EXISTS protocolos_creado_por_id_fkey;
+ALTER TABLE IF EXISTS ONLY public.lotes_preparados DROP CONSTRAINT IF EXISTS lotes_preparados_preparado_por_id_fkey;
+ALTER TABLE IF EXISTS ONLY public.lotes_preparados DROP CONSTRAINT IF EXISTS lotes_preparados_formulacion_id_fkey;
+ALTER TABLE IF EXISTS ONLY public.lineas DROP CONSTRAINT IF EXISTS lineas_especie_id_fkey;
+ALTER TABLE IF EXISTS ONLY public.formulacion_componentes DROP CONSTRAINT IF EXISTS formulacion_componentes_reactivo_id_fkey;
+ALTER TABLE IF EXISTS ONLY public.formulacion_componentes DROP CONSTRAINT IF EXISTS formulacion_componentes_formulacion_ingrediente_id_fkey;
+ALTER TABLE IF EXISTS ONLY public.formulacion_componentes DROP CONSTRAINT IF EXISTS formulacion_componentes_formulacion_id_fkey;
+ALTER TABLE IF EXISTS ONLY public.experimentos DROP CONSTRAINT IF EXISTS experimentos_variegacion_id_fkey;
+ALTER TABLE IF EXISTS ONLY public.experimentos DROP CONSTRAINT IF EXISTS experimentos_responsable_id_fkey;
+ALTER TABLE IF EXISTS ONLY public.experimentos DROP CONSTRAINT IF EXISTS experimentos_protocolo_id_fkey;
+ALTER TABLE IF EXISTS ONLY public.experimentos DROP CONSTRAINT IF EXISTS experimentos_operador_id_fkey;
+ALTER TABLE IF EXISTS ONLY public.experimentos DROP CONSTRAINT IF EXISTS experimentos_linea_id_fkey;
+ALTER TABLE IF EXISTS ONLY public.experimentos DROP CONSTRAINT IF EXISTS experimentos_especie_id_fkey;
+ALTER TABLE IF EXISTS ONLY public.experimentos DROP CONSTRAINT IF EXISTS experimentos_director_id_fkey;
+ALTER TABLE IF EXISTS ONLY public.experimento_especimen DROP CONSTRAINT IF EXISTS experimento_especimen_experimento_id_fkey;
+ALTER TABLE IF EXISTS ONLY public.experimento_especimen DROP CONSTRAINT IF EXISTS experimento_especimen_especimen_id_fkey;
+ALTER TABLE IF EXISTS ONLY public.experimento_elemento DROP CONSTRAINT IF EXISTS experimento_elemento_experimento_id_fkey;
+ALTER TABLE IF EXISTS ONLY public.experimento_elemento DROP CONSTRAINT IF EXISTS experimento_elemento_elemento_id_fkey;
+ALTER TABLE IF EXISTS ONLY public.eventos DROP CONSTRAINT IF EXISTS eventos_usuario_id_fkey;
+ALTER TABLE IF EXISTS ONLY public.eventos DROP CONSTRAINT IF EXISTS eventos_experimento_id_fkey;
+ALTER TABLE IF EXISTS ONLY public.eventos DROP CONSTRAINT IF EXISTS eventos_especimen_id_fkey;
+ALTER TABLE IF EXISTS ONLY public.eventos DROP CONSTRAINT IF EXISTS eventos_elemento_id_fkey;
+ALTER TABLE IF EXISTS ONLY public.eventos DROP CONSTRAINT IF EXISTS eventos_ejecutado_por_id_fkey;
+ALTER TABLE IF EXISTS ONLY public.especimenes DROP CONSTRAINT IF EXISTS especimenes_variegacion_id_fkey;
+ALTER TABLE IF EXISTS ONLY public.especimenes DROP CONSTRAINT IF EXISTS especimenes_padre_id_fkey;
+ALTER TABLE IF EXISTS ONLY public.especimenes DROP CONSTRAINT IF EXISTS especimenes_madre_id_fkey;
+ALTER TABLE IF EXISTS ONLY public.especimenes DROP CONSTRAINT IF EXISTS especimenes_lote_id_fkey;
+ALTER TABLE IF EXISTS ONLY public.especimenes DROP CONSTRAINT IF EXISTS especimenes_linea_id_fkey;
+ALTER TABLE IF EXISTS ONLY public.especimenes DROP CONSTRAINT IF EXISTS especimenes_especie_id_fkey;
+DROP INDEX IF EXISTS public.ix_variegaciones_linea_id;
+DROP INDEX IF EXISTS public.ix_validaciones_protocolo_protocolo_id;
+DROP INDEX IF EXISTS public.ix_usuarios_email;
+DROP INDEX IF EXISTS public.ix_resultados_investigacion_fecha;
+DROP INDEX IF EXISTS public.ix_resultados_investigacion_experimento_id;
+DROP INDEX IF EXISTS public.ix_registros_evolucion_fecha;
+DROP INDEX IF EXISTS public.ix_registros_evolucion_especimen_id;
+DROP INDEX IF EXISTS public.ix_reg_evol_fecha;
+DROP INDEX IF EXISTS public.ix_reg_evol_especimen;
+DROP INDEX IF EXISTS public.ix_reactivos_codigo_barras;
+DROP INDEX IF EXISTS public.ix_protocolos_codigo;
+DROP INDEX IF EXISTS public.ix_lineas_especie_id;
+DROP INDEX IF EXISTS public.ix_experimentos_codigo;
+DROP INDEX IF EXISTS public.ix_eventos_timestamp;
+DROP INDEX IF EXISTS public.ix_eventos_experimento_id;
+DROP INDEX IF EXISTS public.ix_eventos_especimen_id;
+DROP INDEX IF EXISTS public.ix_eventos_elemento_id;
+DROP INDEX IF EXISTS public.ix_especimenes_variegacion_id;
+DROP INDEX IF EXISTS public.ix_especimenes_uid;
+DROP INDEX IF EXISTS public.ix_especimenes_padre_id;
+DROP INDEX IF EXISTS public.ix_especimenes_madre_id;
+DROP INDEX IF EXISTS public.ix_especimenes_lote_id;
+DROP INDEX IF EXISTS public.ix_especimenes_linea_id;
+DROP INDEX IF EXISTS public.ix_especimenes_especie_id;
+DROP INDEX IF EXISTS public.ix_especimenes_contenedor_uid;
+DROP INDEX IF EXISTS public.ix_especies_nombre_cientifico;
+DROP INDEX IF EXISTS public.ix_elementos_element_id;
+ALTER TABLE IF EXISTS ONLY public.variegaciones DROP CONSTRAINT IF EXISTS variegaciones_pkey;
+ALTER TABLE IF EXISTS ONLY public.variegaciones DROP CONSTRAINT IF EXISTS variegaciones_linea_id_nombre_key;
+ALTER TABLE IF EXISTS ONLY public.validaciones_protocolo DROP CONSTRAINT IF EXISTS validaciones_protocolo_pkey;
+ALTER TABLE IF EXISTS ONLY public.usuarios DROP CONSTRAINT IF EXISTS usuarios_pkey;
+ALTER TABLE IF EXISTS ONLY public.sustratos DROP CONSTRAINT IF EXISTS sustratos_pkey;
+ALTER TABLE IF EXISTS ONLY public.sustratos DROP CONSTRAINT IF EXISTS sustratos_codigo_formulacion_key;
+ALTER TABLE IF EXISTS ONLY public.resultados_investigacion DROP CONSTRAINT IF EXISTS resultados_investigacion_pkey;
+ALTER TABLE IF EXISTS ONLY public.registros_evolucion DROP CONSTRAINT IF EXISTS registros_evolucion_pkey;
+ALTER TABLE IF EXISTS ONLY public.reactivos DROP CONSTRAINT IF EXISTS reactivos_pkey;
+ALTER TABLE IF EXISTS ONLY public.protocolos DROP CONSTRAINT IF EXISTS protocolos_pkey;
+ALTER TABLE IF EXISTS ONLY public.lotes_preparados DROP CONSTRAINT IF EXISTS lotes_preparados_uid_key;
+ALTER TABLE IF EXISTS ONLY public.lotes_preparados DROP CONSTRAINT IF EXISTS lotes_preparados_pkey;
+ALTER TABLE IF EXISTS ONLY public.lineas DROP CONSTRAINT IF EXISTS lineas_pkey;
+ALTER TABLE IF EXISTS ONLY public.lineas DROP CONSTRAINT IF EXISTS lineas_especie_id_nombre_key;
+ALTER TABLE IF EXISTS ONLY public.formulaciones DROP CONSTRAINT IF EXISTS formulaciones_pkey;
+ALTER TABLE IF EXISTS ONLY public.formulaciones DROP CONSTRAINT IF EXISTS formulaciones_codigo_referencia_key;
+ALTER TABLE IF EXISTS ONLY public.formulacion_componentes DROP CONSTRAINT IF EXISTS formulacion_componentes_pkey;
+ALTER TABLE IF EXISTS ONLY public.experimentos DROP CONSTRAINT IF EXISTS experimentos_pkey;
+ALTER TABLE IF EXISTS ONLY public.experimento_especimen DROP CONSTRAINT IF EXISTS experimento_especimen_pkey;
+ALTER TABLE IF EXISTS ONLY public.experimento_elemento DROP CONSTRAINT IF EXISTS experimento_elemento_pkey;
+ALTER TABLE IF EXISTS ONLY public.eventos DROP CONSTRAINT IF EXISTS eventos_pkey;
+ALTER TABLE IF EXISTS ONLY public.especimenes DROP CONSTRAINT IF EXISTS especimenes_pkey;
+ALTER TABLE IF EXISTS ONLY public.especies DROP CONSTRAINT IF EXISTS especies_pkey;
+ALTER TABLE IF EXISTS ONLY public.especies DROP CONSTRAINT IF EXISTS especies_codigo_key;
+ALTER TABLE IF EXISTS ONLY public.elementos DROP CONSTRAINT IF EXISTS elementos_pkey;
+ALTER TABLE IF EXISTS ONLY public.alembic_version DROP CONSTRAINT IF EXISTS alembic_version_pkc;
+DROP TABLE IF EXISTS public.variegaciones;
+DROP TABLE IF EXISTS public.validaciones_protocolo;
+DROP TABLE IF EXISTS public.usuarios;
+DROP TABLE IF EXISTS public.sustratos;
+DROP TABLE IF EXISTS public.resultados_investigacion;
+DROP TABLE IF EXISTS public.registros_evolucion;
+DROP TABLE IF EXISTS public.reactivos;
+DROP TABLE IF EXISTS public.protocolos;
+DROP TABLE IF EXISTS public.lotes_preparados;
+DROP TABLE IF EXISTS public.lineas;
+DROP TABLE IF EXISTS public.formulaciones;
+DROP TABLE IF EXISTS public.formulacion_componentes;
+DROP TABLE IF EXISTS public.experimentos;
+DROP TABLE IF EXISTS public.experimento_especimen;
+DROP TABLE IF EXISTS public.experimento_elemento;
+DROP TABLE IF EXISTS public.eventos;
+DROP TABLE IF EXISTS public.especimenes;
+DROP TABLE IF EXISTS public.especies;
+DROP TABLE IF EXISTS public.elementos;
+DROP TABLE IF EXISTS public.alembic_version;
+-- *not* dropping schema, since initdb creates it
 --
 -- Name: public; Type: SCHEMA; Schema: -; Owner: lbms
 --
@@ -545,6 +660,15 @@ c4f91e34-8074-41c2-ab8e-1a4fdc0c9f97	observacion	Revisión día 9 (13-ago-2026):
 05a24395-c67f-4d2e-8d82-19ab1197f813	observacion	Revisión día 9 (13-ago-2026): sin contaminación; sin germinación aún. Frascos limpios.	\N	\N	46049ce3-b84b-4a30-aa58-9336bc4ebf6a	40a58428-7a27-4462-87f1-4d4f07443de9	\N	2026-08-13 00:00:00	{"dia": 9, "revision": "contaminacion+germinacion", "resultado": "sin_contaminacion", "germinacion": "sin_germinacion"}
 494819e6-e414-46ae-81eb-0a05115d6962	sanitizacion	Desinfeccion de las SEMILLAS de cilantro (coriandro) antes de la siembra del 11-ago-2026. Secuencia completa: (1) lavado con detergente, (2) alcohol/etanol al 70% por 60 s, (3) clorox (hipoclorito) al 2% de trabajo (producto 10% segun empaque, dilucion 1:5) + Tween por 5 min, (4) 3 enjuagues en agua destilada. Coincide con la familia DESINF (detergente -> etanol -> hipoclorito+Tween -> enjuagues).	\N	\N	b2a0a1c8-e4ab-4b02-9aab-419476620339	8cc2b2f5-da3a-4369-bec2-4194ff37d379	\N	2026-08-11 00:00:00	{"aditivo": "Tween", "agentes": ["hipoclorito (clorox)", "etanol (alcohol)"], "objetos": ["semillas"], "enjuagues": {"medio": "agua destilada", "numero": 3}, "secuencia": [{"paso": 1, "accion": "lavado", "agente": "detergente"}, {"paso": 2, "agente": "etanol (alcohol)", "tiempo_seg": 60, "concentracion_pct": 70}, {"paso": 3, "agente": "hipoclorito (clorox) + Tween", "tiempo_min": 5, "concentracion_trabajo_pct": 2}, {"paso": 4, "accion": "enjuague", "agente": "agua destilada", "repeticiones": 3}], "clorox_dilucion": "1:5 (1 parte clorox 10% + 4 de agua)", "clorox_tiempo_min": 5, "protocolo_familia": "DESINF-02", "alcohol_tiempo_seg": 60, "protocolo_completo": true, "alcohol_concentracion_pct": 70, "clorox_concentracion_trabajo_pct": 2, "clorox_concentracion_producto_pct": 10, "clorox_concentracion_producto_fuente": "empaque"}
 c2f64248-87fe-40df-b43c-840786d8cf77	observacion	Revisión día 2 (13-ago-2026): sin contaminación; sin germinación aún. Frascos limpios.	\N	\N	b2a0a1c8-e4ab-4b02-9aab-419476620339	40a58428-7a27-4462-87f1-4d4f07443de9	\N	2026-08-13 00:00:00	{"dia": 2, "revision": "contaminacion+germinacion", "resultado": "sin_contaminacion", "germinacion": "sin_germinacion"}
+b7eaf369-ddf5-46e7-a80a-128674ae4233	observacion	Revisión día 14 (18-ago-2026): inicio de germinación. Zinnia envase #3 (ZINN-260807-033753-003): germinó 1 semilla con 1 raíz (sin hoja aún).	8cc3967d-9b1b-47f1-9dde-9bf122a8308d	\N	7caad194-7a33-4727-87ff-09b5cd60fcc2	40a58428-7a27-4462-87f1-4d4f07443de9	\N	2026-08-18 00:00:00	{"dia": 14, "envase": 3, "detalle": {"hojas": 0, "raices": 1}, "revision": "germinacion", "germinacion": "iniciada", "semillas_germinadas": 1}
+2110c0e3-1324-4210-835d-c7a6f1fe61a6	observacion	Revisión día 14 (18-ago-2026): inicio de germinación. Gitana envase #5 (GITA-260807-033754-005): 1 semilla germinada con 2 hojas.	ffee70c3-bcb9-4697-8b6b-e03e4fa62557	\N	34c7e6bc-bb6f-4f12-86ba-ea533a7509e4	40a58428-7a27-4462-87f1-4d4f07443de9	\N	2026-08-18 00:00:00	{"dia": 14, "envase": 5, "detalle": {"hojas": 2, "raices": 0}, "revision": "germinacion", "germinacion": "iniciada", "semillas_germinadas": 1}
+9a0e2559-5927-4a09-8b69-e0272212958e	observacion	Revisión día 14 (18-ago-2026): inicio de germinación. Gitana envase #6 (GITA-260807-033754-006): 1 semilla germinada con 1 raíz y 1 hoja.	4fcb4832-e017-4e3d-b3c7-015973897517	\N	34c7e6bc-bb6f-4f12-86ba-ea533a7509e4	40a58428-7a27-4462-87f1-4d4f07443de9	\N	2026-08-18 00:00:00	{"dia": 14, "envase": 6, "detalle": {"hojas": 1, "raices": 1}, "revision": "germinacion", "germinacion": "iniciada", "semillas_germinadas": 1}
+56f60e66-92bb-444d-b2bd-250e1224e290	observacion	Revisión día 16 (20-ago-2026): Zinnia envase #3 (ZINN-260807-033753-003) sigue creciendo; plántula en desarrollo tras germinar el 18-ago.	8cc3967d-9b1b-47f1-9dde-9bf122a8308d	\N	7caad194-7a33-4727-87ff-09b5cd60fcc2	40a58428-7a27-4462-87f1-4d4f07443de9	\N	2026-08-20 00:00:00	{"dia": 16, "envase": 3, "estado": "creciendo", "revision": "seguimiento_crecimiento", "germinacion": "en_desarrollo"}
+0a1f5412-9abe-4607-aff4-f89f0715e6d1	observacion	Revisión día 16 (20-ago-2026): Gitana envase #2 (GITA-260807-033754-002) germinó 1 semilla.	2d9eae3f-0093-40d3-83b3-76809074ffc4	\N	34c7e6bc-bb6f-4f12-86ba-ea533a7509e4	40a58428-7a27-4462-87f1-4d4f07443de9	\N	2026-08-20 00:00:00	{"dia": 16, "envase": 2, "revision": "germinacion", "germinacion": "iniciada", "semillas_germinadas": 1}
+cb493017-ba23-44a1-8ab7-070d9ce4b312	observacion	Revisión día 16 (20-ago-2026): Gitana envase #5 (GITA-260807-033754-005) sigue creciendo; 1 semilla germinada.	ffee70c3-bcb9-4697-8b6b-e03e4fa62557	\N	34c7e6bc-bb6f-4f12-86ba-ea533a7509e4	40a58428-7a27-4462-87f1-4d4f07443de9	\N	2026-08-20 00:00:00	{"dia": 16, "envase": 5, "estado": "creciendo", "revision": "seguimiento_crecimiento", "germinacion": "en_desarrollo", "semillas_germinadas": 1}
+74a647dd-1151-47cd-9413-c75eb881bbfc	observacion	Revisión día 16 (20-ago-2026): Gitana envase #6 (GITA-260807-033754-006) sigue creciendo; 1 semilla germinada.	4fcb4832-e017-4e3d-b3c7-015973897517	\N	34c7e6bc-bb6f-4f12-86ba-ea533a7509e4	40a58428-7a27-4462-87f1-4d4f07443de9	\N	2026-08-20 00:00:00	{"dia": 16, "envase": 6, "estado": "creciendo", "revision": "seguimiento_crecimiento", "germinacion": "en_desarrollo", "semillas_germinadas": 1}
+5996f6f0-2363-4bea-8a1b-d9a3751d524b	observacion	Revisión (20-ago-2026): SOSPECHA de contaminación bacteriana en la tanda de mostaza (EXP-GERM-MOSB). Aspecto: bacteria blanca (colonia blanquecina/mucosa). Sin germinación registrada. Pendiente de confirmar alcance (¿los 6 frascos o algunos?) y si la tanda se pierde.	\N	\N	b4065b21-0085-4a4c-b703-2bcd64b72204	40a58428-7a27-4462-87f1-4d4f07443de9	\N	2026-08-20 00:00:00	{"aspecto": "blanca", "revision": "contaminacion", "confirmado": false, "germinacion": "sin_germinacion", "contaminacion": "sospecha", "alcance_frascos": "por_confirmar", "tipo_contaminante": "bacteriana"}
+e601c84e-7877-4dfc-b499-58b3da819e1a	sanitizacion	Desinfeccion de las SEMILLAS de mostaza (MOSB) con alcohol y clorox, segun protocolo DESINF-02 (base hipoclorito): etanol 70% + clorox (hipoclorito 2% de trabajo) + Tween, con enjuagues en agua destilada. Mismo metodo que boca de dragon y coriandro; distinto al de zinnia/gitana (agua oxigenada). Parametros exactos (tiempos/volumenes) no dictados en detalle.	\N	\N	b4065b21-0085-4a4c-b703-2bcd64b72204	40a58428-7a27-4462-87f1-4d4f07443de9	\N	2026-08-13 00:00:00	{"agente": "alcohol (etanol 70%) + clorox (hipoclorito 2%)", "objetos": ["semillas"], "protocolo": "DESINF-02", "detalle_parametros": "no_especificado"}
 \.
 
 
@@ -742,6 +866,11 @@ COPY public.registros_evolucion (id, especimen_id, registrado_por_id, protocolo_
 
 COPY public.resultados_investigacion (id, experimento_id, titulo, tipo, descripcion, datos, archivos, registrado_por_id, fecha) FROM stdin;
 b555e514-bc8d-444a-a8e8-67cfaecefd94	24aa6644-2223-4e8a-b71a-3c2ec44a7240	Siembra contaminada (hongos y bacterias) - resultado final	conclusion	La siembra de pimenton se contamino con hongos y bacterias; la tanda se perdio. Resultado final del experimento de germinacion.	{"desenlace": "siembra perdida por contaminacion", "contaminantes": ["hongos", "bacterias"]}	\N	8cc2b2f5-da3a-4369-bec2-4194ff37d379	2026-08-07 00:00:00
+7192bea1-429e-481a-8f7b-88ff3d29a5a4	b4065b21-0085-4a4c-b703-2bcd64b72204	Hipótesis: el método de desinfección afecta la germinación (agua oxigenada vs alcohol+clorox)	hipotesis	Observación (24-ago-2026): las semillas desinfectadas con agua oxigenada 3% germinaron (zinnia y gitana), mientras que las desinfectadas con alcohol 70% + clorox 2% (protocolo DESINF-02) no han germinado (boca de dragón, coriandro y mostaza); la mostaza además presenta sospecha de contaminación bacteriana blanca. HIPÓTESIS: el método de desinfección influye en la germinación, a favor del agua oxigenada. CONFOUNDER: el agua oxigenada solo se probó en zinnia y gitana, que son el mismo género (Zinnia), por lo que aún no se separa el efecto del método del efecto de la especie. PRUEBA PROPUESTA: lavar una misma especie con ambos métodos y comparar. Estado: NO confirmada.	{"estado": "no_confirmada", "confounder": "agua oxigenada solo probada en género Zinnia (zinnia y gitana); no se separa método vs especie", "prueba_propuesta": "lavar una misma especie con ambos métodos y comparar germinación", "fecha_observacion": "2026-08-24", "grupo_agua_oxigenada": {"metodo": "peróxido de hidrógeno (agua oxigenada) 3%, 24 h", "resultado": "germinación", "experimentos": ["EXP-GERM-ZINN", "EXP-GERM-GITA"]}, "grupo_alcohol_clorox": {"metodo": "etanol 70% + clorox (hipoclorito) 2% — DESINF-02", "resultado": "sin germinación; MOSB con sospecha de contaminación bacteriana blanca", "experimentos": ["EXP-GERM-BOCA", "EXP-GERM-CORI", "EXP-GERM-MOSB"]}}	\N	40a58428-7a27-4462-87f1-4d4f07443de9	2026-08-24 00:00:00
+ea2110aa-694f-4303-94ac-c83908434af1	b2a0a1c8-e4ab-4b02-9aab-419476620339	Hipótesis: el método de desinfección afecta la germinación (agua oxigenada vs alcohol+clorox)	hipotesis	Observación (24-ago-2026): las semillas desinfectadas con agua oxigenada 3% germinaron (zinnia y gitana), mientras que las desinfectadas con alcohol 70% + clorox 2% (protocolo DESINF-02) no han germinado (boca de dragón, coriandro y mostaza); la mostaza además presenta sospecha de contaminación bacteriana blanca. HIPÓTESIS: el método de desinfección influye en la germinación, a favor del agua oxigenada. CONFOUNDER: el agua oxigenada solo se probó en zinnia y gitana, que son el mismo género (Zinnia), por lo que aún no se separa el efecto del método del efecto de la especie. PRUEBA PROPUESTA: lavar una misma especie con ambos métodos y comparar. Estado: NO confirmada.	{"estado": "no_confirmada", "confounder": "agua oxigenada solo probada en género Zinnia (zinnia y gitana); no se separa método vs especie", "prueba_propuesta": "lavar una misma especie con ambos métodos y comparar germinación", "fecha_observacion": "2026-08-24", "grupo_agua_oxigenada": {"metodo": "peróxido de hidrógeno (agua oxigenada) 3%, 24 h", "resultado": "germinación", "experimentos": ["EXP-GERM-ZINN", "EXP-GERM-GITA"]}, "grupo_alcohol_clorox": {"metodo": "etanol 70% + clorox (hipoclorito) 2% — DESINF-02", "resultado": "sin germinación; MOSB con sospecha de contaminación bacteriana blanca", "experimentos": ["EXP-GERM-BOCA", "EXP-GERM-CORI", "EXP-GERM-MOSB"]}}	\N	40a58428-7a27-4462-87f1-4d4f07443de9	2026-08-24 00:00:00
+524eee3c-d5de-484b-a5de-96406b027f71	7caad194-7a33-4727-87ff-09b5cd60fcc2	Hipótesis: el método de desinfección afecta la germinación (agua oxigenada vs alcohol+clorox)	hipotesis	Observación (24-ago-2026): las semillas desinfectadas con agua oxigenada 3% germinaron (zinnia y gitana), mientras que las desinfectadas con alcohol 70% + clorox 2% (protocolo DESINF-02) no han germinado (boca de dragón, coriandro y mostaza); la mostaza además presenta sospecha de contaminación bacteriana blanca. HIPÓTESIS: el método de desinfección influye en la germinación, a favor del agua oxigenada. CONFOUNDER: el agua oxigenada solo se probó en zinnia y gitana, que son el mismo género (Zinnia), por lo que aún no se separa el efecto del método del efecto de la especie. PRUEBA PROPUESTA: lavar una misma especie con ambos métodos y comparar. Estado: NO confirmada.	{"estado": "no_confirmada", "confounder": "agua oxigenada solo probada en género Zinnia (zinnia y gitana); no se separa método vs especie", "prueba_propuesta": "lavar una misma especie con ambos métodos y comparar germinación", "fecha_observacion": "2026-08-24", "grupo_agua_oxigenada": {"metodo": "peróxido de hidrógeno (agua oxigenada) 3%, 24 h", "resultado": "germinación", "experimentos": ["EXP-GERM-ZINN", "EXP-GERM-GITA"]}, "grupo_alcohol_clorox": {"metodo": "etanol 70% + clorox (hipoclorito) 2% — DESINF-02", "resultado": "sin germinación; MOSB con sospecha de contaminación bacteriana blanca", "experimentos": ["EXP-GERM-BOCA", "EXP-GERM-CORI", "EXP-GERM-MOSB"]}}	\N	40a58428-7a27-4462-87f1-4d4f07443de9	2026-08-24 00:00:00
+7551d6fc-eb59-4664-abd6-556aa7683f75	34c7e6bc-bb6f-4f12-86ba-ea533a7509e4	Hipótesis: el método de desinfección afecta la germinación (agua oxigenada vs alcohol+clorox)	hipotesis	Observación (24-ago-2026): las semillas desinfectadas con agua oxigenada 3% germinaron (zinnia y gitana), mientras que las desinfectadas con alcohol 70% + clorox 2% (protocolo DESINF-02) no han germinado (boca de dragón, coriandro y mostaza); la mostaza además presenta sospecha de contaminación bacteriana blanca. HIPÓTESIS: el método de desinfección influye en la germinación, a favor del agua oxigenada. CONFOUNDER: el agua oxigenada solo se probó en zinnia y gitana, que son el mismo género (Zinnia), por lo que aún no se separa el efecto del método del efecto de la especie. PRUEBA PROPUESTA: lavar una misma especie con ambos métodos y comparar. Estado: NO confirmada.	{"estado": "no_confirmada", "confounder": "agua oxigenada solo probada en género Zinnia (zinnia y gitana); no se separa método vs especie", "prueba_propuesta": "lavar una misma especie con ambos métodos y comparar germinación", "fecha_observacion": "2026-08-24", "grupo_agua_oxigenada": {"metodo": "peróxido de hidrógeno (agua oxigenada) 3%, 24 h", "resultado": "germinación", "experimentos": ["EXP-GERM-ZINN", "EXP-GERM-GITA"]}, "grupo_alcohol_clorox": {"metodo": "etanol 70% + clorox (hipoclorito) 2% — DESINF-02", "resultado": "sin germinación; MOSB con sospecha de contaminación bacteriana blanca", "experimentos": ["EXP-GERM-BOCA", "EXP-GERM-CORI", "EXP-GERM-MOSB"]}}	\N	40a58428-7a27-4462-87f1-4d4f07443de9	2026-08-24 00:00:00
+4101ee01-80f3-4696-bcae-0483d26ee48e	46049ce3-b84b-4a30-aa58-9336bc4ebf6a	Hipótesis: el método de desinfección afecta la germinación (agua oxigenada vs alcohol+clorox)	hipotesis	Observación (24-ago-2026): las semillas desinfectadas con agua oxigenada 3% germinaron (zinnia y gitana), mientras que las desinfectadas con alcohol 70% + clorox 2% (protocolo DESINF-02) no han germinado (boca de dragón, coriandro y mostaza); la mostaza además presenta sospecha de contaminación bacteriana blanca. HIPÓTESIS: el método de desinfección influye en la germinación, a favor del agua oxigenada. CONFOUNDER: el agua oxigenada solo se probó en zinnia y gitana, que son el mismo género (Zinnia), por lo que aún no se separa el efecto del método del efecto de la especie. PRUEBA PROPUESTA: lavar una misma especie con ambos métodos y comparar. Estado: NO confirmada.	{"estado": "no_confirmada", "confounder": "agua oxigenada solo probada en género Zinnia (zinnia y gitana); no se separa método vs especie", "prueba_propuesta": "lavar una misma especie con ambos métodos y comparar germinación", "fecha_observacion": "2026-08-24", "grupo_agua_oxigenada": {"metodo": "peróxido de hidrógeno (agua oxigenada) 3%, 24 h", "resultado": "germinación", "experimentos": ["EXP-GERM-ZINN", "EXP-GERM-GITA"]}, "grupo_alcohol_clorox": {"metodo": "etanol 70% + clorox (hipoclorito) 2% — DESINF-02", "resultado": "sin germinación; MOSB con sospecha de contaminación bacteriana blanca", "experimentos": ["EXP-GERM-BOCA", "EXP-GERM-CORI", "EXP-GERM-MOSB"]}}	\N	40a58428-7a27-4462-87f1-4d4f07443de9	2026-08-24 00:00:00
 \.
 
 
@@ -1517,5 +1646,5 @@ REVOKE USAGE ON SCHEMA public FROM PUBLIC;
 -- PostgreSQL database dump complete
 --
 
-\unrestrict r8m68CF5hZq2kqNcAyfSQVCL7UllT449lHYaWmmu09dnoRHqSXhH63sJwyExtMa
+\unrestrict AIoNZqdzAwnq0fCg6TJxkigS3W5jXAeeT8GmDThUkfNsamJgVhijJSbrzQbNqIr
 
