@@ -402,6 +402,7 @@ class ValidacionCreate(BaseModel):
 
 class ExperimentoCreate(BaseModel):
     nombre: str
+    codigo: Optional[str] = None   # si None, se autogenera desde el nombre (slug)
     hipotesis: Optional[str] = None
     protocolo_id: Optional[UUID] = None
     especie_id: Optional[UUID] = None
@@ -461,6 +462,49 @@ class ExperimentoListItem(BaseModel):
     nombre: str
     estado: str
     fecha_inicio: date
+    model_config = {"from_attributes": True}
+
+
+# ── Diseño factorial ──────────────────────────────────────────────────────────
+
+class NivelFactorCreate(BaseModel):
+    etiqueta: str
+    valor_num: Optional[float] = None
+    orden: int = 0
+
+
+class NivelFactorOut(BaseModel):
+    id: UUID
+    etiqueta: str
+    valor_num: Optional[float] = None
+    orden: int
+    model_config = {"from_attributes": True}
+
+
+class FactorCreate(BaseModel):
+    nombre: str
+    unidad: Optional[str] = None
+    tipo: str = "categorico"
+    descripcion: Optional[str] = None
+    niveles: list[NivelFactorCreate] = Field(default_factory=list)
+
+
+class FactorOut(BaseModel):
+    id: UUID
+    nombre: str
+    unidad: Optional[str] = None
+    tipo: str
+    descripcion: Optional[str] = None
+    niveles: list[NivelFactorOut] = Field(default_factory=list)
+    model_config = {"from_attributes": True}
+
+
+class TratamientoOut(BaseModel):
+    id: UUID
+    codigo: str
+    nombre: Optional[str] = None
+    es_control: bool
+    niveles: list[NivelFactorOut] = Field(default_factory=list)
     model_config = {"from_attributes": True}
 
 
