@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict AIoNZqdzAwnq0fCg6TJxkigS3W5jXAeeT8GmDThUkfNsamJgVhijJSbrzQbNqIr
+\restrict QGqouw7I1q7dCIFoLdnc5cg2ZzTjrdJPbym9gVU6akAPqZhDGqfiAKGpfKI1Juc
 
 -- Dumped from database version 16.14
 -- Dumped by pg_dump version 16.14
@@ -18,121 +18,6 @@ SET xmloption = content;
 SET client_min_messages = warning;
 SET row_security = off;
 
-ALTER TABLE IF EXISTS ONLY public.variegaciones DROP CONSTRAINT IF EXISTS variegaciones_linea_id_fkey;
-ALTER TABLE IF EXISTS ONLY public.validaciones_protocolo DROP CONSTRAINT IF EXISTS validaciones_protocolo_usuario_id_fkey;
-ALTER TABLE IF EXISTS ONLY public.validaciones_protocolo DROP CONSTRAINT IF EXISTS validaciones_protocolo_protocolo_id_fkey;
-ALTER TABLE IF EXISTS ONLY public.validaciones_protocolo DROP CONSTRAINT IF EXISTS validaciones_protocolo_experimento_id_fkey;
-ALTER TABLE IF EXISTS ONLY public.sustratos DROP CONSTRAINT IF EXISTS sustratos_lote_id_fkey;
-ALTER TABLE IF EXISTS ONLY public.sustratos DROP CONSTRAINT IF EXISTS sustratos_formulacion_id_fkey;
-ALTER TABLE IF EXISTS ONLY public.resultados_investigacion DROP CONSTRAINT IF EXISTS resultados_investigacion_registrado_por_id_fkey;
-ALTER TABLE IF EXISTS ONLY public.resultados_investigacion DROP CONSTRAINT IF EXISTS resultados_investigacion_experimento_id_fkey;
-ALTER TABLE IF EXISTS ONLY public.registros_evolucion DROP CONSTRAINT IF EXISTS registros_evolucion_sustrato_id_fkey;
-ALTER TABLE IF EXISTS ONLY public.registros_evolucion DROP CONSTRAINT IF EXISTS registros_evolucion_registrado_por_id_fkey;
-ALTER TABLE IF EXISTS ONLY public.registros_evolucion DROP CONSTRAINT IF EXISTS registros_evolucion_protocolo_clonacion_id_fkey;
-ALTER TABLE IF EXISTS ONLY public.registros_evolucion DROP CONSTRAINT IF EXISTS registros_evolucion_especimen_id_fkey;
-ALTER TABLE IF EXISTS ONLY public.protocolos DROP CONSTRAINT IF EXISTS protocolos_creado_por_id_fkey;
-ALTER TABLE IF EXISTS ONLY public.lotes_preparados DROP CONSTRAINT IF EXISTS lotes_preparados_preparado_por_id_fkey;
-ALTER TABLE IF EXISTS ONLY public.lotes_preparados DROP CONSTRAINT IF EXISTS lotes_preparados_formulacion_id_fkey;
-ALTER TABLE IF EXISTS ONLY public.lineas DROP CONSTRAINT IF EXISTS lineas_especie_id_fkey;
-ALTER TABLE IF EXISTS ONLY public.formulacion_componentes DROP CONSTRAINT IF EXISTS formulacion_componentes_reactivo_id_fkey;
-ALTER TABLE IF EXISTS ONLY public.formulacion_componentes DROP CONSTRAINT IF EXISTS formulacion_componentes_formulacion_ingrediente_id_fkey;
-ALTER TABLE IF EXISTS ONLY public.formulacion_componentes DROP CONSTRAINT IF EXISTS formulacion_componentes_formulacion_id_fkey;
-ALTER TABLE IF EXISTS ONLY public.experimentos DROP CONSTRAINT IF EXISTS experimentos_variegacion_id_fkey;
-ALTER TABLE IF EXISTS ONLY public.experimentos DROP CONSTRAINT IF EXISTS experimentos_responsable_id_fkey;
-ALTER TABLE IF EXISTS ONLY public.experimentos DROP CONSTRAINT IF EXISTS experimentos_protocolo_id_fkey;
-ALTER TABLE IF EXISTS ONLY public.experimentos DROP CONSTRAINT IF EXISTS experimentos_operador_id_fkey;
-ALTER TABLE IF EXISTS ONLY public.experimentos DROP CONSTRAINT IF EXISTS experimentos_linea_id_fkey;
-ALTER TABLE IF EXISTS ONLY public.experimentos DROP CONSTRAINT IF EXISTS experimentos_especie_id_fkey;
-ALTER TABLE IF EXISTS ONLY public.experimentos DROP CONSTRAINT IF EXISTS experimentos_director_id_fkey;
-ALTER TABLE IF EXISTS ONLY public.experimento_especimen DROP CONSTRAINT IF EXISTS experimento_especimen_experimento_id_fkey;
-ALTER TABLE IF EXISTS ONLY public.experimento_especimen DROP CONSTRAINT IF EXISTS experimento_especimen_especimen_id_fkey;
-ALTER TABLE IF EXISTS ONLY public.experimento_elemento DROP CONSTRAINT IF EXISTS experimento_elemento_experimento_id_fkey;
-ALTER TABLE IF EXISTS ONLY public.experimento_elemento DROP CONSTRAINT IF EXISTS experimento_elemento_elemento_id_fkey;
-ALTER TABLE IF EXISTS ONLY public.eventos DROP CONSTRAINT IF EXISTS eventos_usuario_id_fkey;
-ALTER TABLE IF EXISTS ONLY public.eventos DROP CONSTRAINT IF EXISTS eventos_experimento_id_fkey;
-ALTER TABLE IF EXISTS ONLY public.eventos DROP CONSTRAINT IF EXISTS eventos_especimen_id_fkey;
-ALTER TABLE IF EXISTS ONLY public.eventos DROP CONSTRAINT IF EXISTS eventos_elemento_id_fkey;
-ALTER TABLE IF EXISTS ONLY public.eventos DROP CONSTRAINT IF EXISTS eventos_ejecutado_por_id_fkey;
-ALTER TABLE IF EXISTS ONLY public.especimenes DROP CONSTRAINT IF EXISTS especimenes_variegacion_id_fkey;
-ALTER TABLE IF EXISTS ONLY public.especimenes DROP CONSTRAINT IF EXISTS especimenes_padre_id_fkey;
-ALTER TABLE IF EXISTS ONLY public.especimenes DROP CONSTRAINT IF EXISTS especimenes_madre_id_fkey;
-ALTER TABLE IF EXISTS ONLY public.especimenes DROP CONSTRAINT IF EXISTS especimenes_lote_id_fkey;
-ALTER TABLE IF EXISTS ONLY public.especimenes DROP CONSTRAINT IF EXISTS especimenes_linea_id_fkey;
-ALTER TABLE IF EXISTS ONLY public.especimenes DROP CONSTRAINT IF EXISTS especimenes_especie_id_fkey;
-DROP INDEX IF EXISTS public.ix_variegaciones_linea_id;
-DROP INDEX IF EXISTS public.ix_validaciones_protocolo_protocolo_id;
-DROP INDEX IF EXISTS public.ix_usuarios_email;
-DROP INDEX IF EXISTS public.ix_resultados_investigacion_fecha;
-DROP INDEX IF EXISTS public.ix_resultados_investigacion_experimento_id;
-DROP INDEX IF EXISTS public.ix_registros_evolucion_fecha;
-DROP INDEX IF EXISTS public.ix_registros_evolucion_especimen_id;
-DROP INDEX IF EXISTS public.ix_reg_evol_fecha;
-DROP INDEX IF EXISTS public.ix_reg_evol_especimen;
-DROP INDEX IF EXISTS public.ix_reactivos_codigo_barras;
-DROP INDEX IF EXISTS public.ix_protocolos_codigo;
-DROP INDEX IF EXISTS public.ix_lineas_especie_id;
-DROP INDEX IF EXISTS public.ix_experimentos_codigo;
-DROP INDEX IF EXISTS public.ix_eventos_timestamp;
-DROP INDEX IF EXISTS public.ix_eventos_experimento_id;
-DROP INDEX IF EXISTS public.ix_eventos_especimen_id;
-DROP INDEX IF EXISTS public.ix_eventos_elemento_id;
-DROP INDEX IF EXISTS public.ix_especimenes_variegacion_id;
-DROP INDEX IF EXISTS public.ix_especimenes_uid;
-DROP INDEX IF EXISTS public.ix_especimenes_padre_id;
-DROP INDEX IF EXISTS public.ix_especimenes_madre_id;
-DROP INDEX IF EXISTS public.ix_especimenes_lote_id;
-DROP INDEX IF EXISTS public.ix_especimenes_linea_id;
-DROP INDEX IF EXISTS public.ix_especimenes_especie_id;
-DROP INDEX IF EXISTS public.ix_especimenes_contenedor_uid;
-DROP INDEX IF EXISTS public.ix_especies_nombre_cientifico;
-DROP INDEX IF EXISTS public.ix_elementos_element_id;
-ALTER TABLE IF EXISTS ONLY public.variegaciones DROP CONSTRAINT IF EXISTS variegaciones_pkey;
-ALTER TABLE IF EXISTS ONLY public.variegaciones DROP CONSTRAINT IF EXISTS variegaciones_linea_id_nombre_key;
-ALTER TABLE IF EXISTS ONLY public.validaciones_protocolo DROP CONSTRAINT IF EXISTS validaciones_protocolo_pkey;
-ALTER TABLE IF EXISTS ONLY public.usuarios DROP CONSTRAINT IF EXISTS usuarios_pkey;
-ALTER TABLE IF EXISTS ONLY public.sustratos DROP CONSTRAINT IF EXISTS sustratos_pkey;
-ALTER TABLE IF EXISTS ONLY public.sustratos DROP CONSTRAINT IF EXISTS sustratos_codigo_formulacion_key;
-ALTER TABLE IF EXISTS ONLY public.resultados_investigacion DROP CONSTRAINT IF EXISTS resultados_investigacion_pkey;
-ALTER TABLE IF EXISTS ONLY public.registros_evolucion DROP CONSTRAINT IF EXISTS registros_evolucion_pkey;
-ALTER TABLE IF EXISTS ONLY public.reactivos DROP CONSTRAINT IF EXISTS reactivos_pkey;
-ALTER TABLE IF EXISTS ONLY public.protocolos DROP CONSTRAINT IF EXISTS protocolos_pkey;
-ALTER TABLE IF EXISTS ONLY public.lotes_preparados DROP CONSTRAINT IF EXISTS lotes_preparados_uid_key;
-ALTER TABLE IF EXISTS ONLY public.lotes_preparados DROP CONSTRAINT IF EXISTS lotes_preparados_pkey;
-ALTER TABLE IF EXISTS ONLY public.lineas DROP CONSTRAINT IF EXISTS lineas_pkey;
-ALTER TABLE IF EXISTS ONLY public.lineas DROP CONSTRAINT IF EXISTS lineas_especie_id_nombre_key;
-ALTER TABLE IF EXISTS ONLY public.formulaciones DROP CONSTRAINT IF EXISTS formulaciones_pkey;
-ALTER TABLE IF EXISTS ONLY public.formulaciones DROP CONSTRAINT IF EXISTS formulaciones_codigo_referencia_key;
-ALTER TABLE IF EXISTS ONLY public.formulacion_componentes DROP CONSTRAINT IF EXISTS formulacion_componentes_pkey;
-ALTER TABLE IF EXISTS ONLY public.experimentos DROP CONSTRAINT IF EXISTS experimentos_pkey;
-ALTER TABLE IF EXISTS ONLY public.experimento_especimen DROP CONSTRAINT IF EXISTS experimento_especimen_pkey;
-ALTER TABLE IF EXISTS ONLY public.experimento_elemento DROP CONSTRAINT IF EXISTS experimento_elemento_pkey;
-ALTER TABLE IF EXISTS ONLY public.eventos DROP CONSTRAINT IF EXISTS eventos_pkey;
-ALTER TABLE IF EXISTS ONLY public.especimenes DROP CONSTRAINT IF EXISTS especimenes_pkey;
-ALTER TABLE IF EXISTS ONLY public.especies DROP CONSTRAINT IF EXISTS especies_pkey;
-ALTER TABLE IF EXISTS ONLY public.especies DROP CONSTRAINT IF EXISTS especies_codigo_key;
-ALTER TABLE IF EXISTS ONLY public.elementos DROP CONSTRAINT IF EXISTS elementos_pkey;
-ALTER TABLE IF EXISTS ONLY public.alembic_version DROP CONSTRAINT IF EXISTS alembic_version_pkc;
-DROP TABLE IF EXISTS public.variegaciones;
-DROP TABLE IF EXISTS public.validaciones_protocolo;
-DROP TABLE IF EXISTS public.usuarios;
-DROP TABLE IF EXISTS public.sustratos;
-DROP TABLE IF EXISTS public.resultados_investigacion;
-DROP TABLE IF EXISTS public.registros_evolucion;
-DROP TABLE IF EXISTS public.reactivos;
-DROP TABLE IF EXISTS public.protocolos;
-DROP TABLE IF EXISTS public.lotes_preparados;
-DROP TABLE IF EXISTS public.lineas;
-DROP TABLE IF EXISTS public.formulaciones;
-DROP TABLE IF EXISTS public.formulacion_componentes;
-DROP TABLE IF EXISTS public.experimentos;
-DROP TABLE IF EXISTS public.experimento_especimen;
-DROP TABLE IF EXISTS public.experimento_elemento;
-DROP TABLE IF EXISTS public.eventos;
-DROP TABLE IF EXISTS public.especimenes;
-DROP TABLE IF EXISTS public.especies;
-DROP TABLE IF EXISTS public.elementos;
-DROP TABLE IF EXISTS public.alembic_version;
--- *not* dropping schema, since initdb creates it
 --
 -- Name: public; Type: SCHEMA; Schema: -; Owner: lbms
 --
@@ -297,11 +182,28 @@ CREATE TABLE public.experimentos (
     variegacion_id uuid,
     config_estandar jsonb,
     notas text,
-    created_at timestamp without time zone
+    created_at timestamp without time zone,
+    tipo_diseno character varying(20)
 );
 
 
 ALTER TABLE public.experimentos OWNER TO lbms;
+
+--
+-- Name: factores_experimentales; Type: TABLE; Schema: public; Owner: lbms
+--
+
+CREATE TABLE public.factores_experimentales (
+    id uuid NOT NULL,
+    experimento_id uuid NOT NULL,
+    nombre character varying(120) NOT NULL,
+    unidad character varying(40),
+    tipo character varying(20) NOT NULL,
+    descripcion text
+);
+
+
+ALTER TABLE public.factores_experimentales OWNER TO lbms;
 
 --
 -- Name: formulacion_componentes; Type: TABLE; Schema: public; Owner: lbms
@@ -376,6 +278,21 @@ CREATE TABLE public.lotes_preparados (
 
 
 ALTER TABLE public.lotes_preparados OWNER TO lbms;
+
+--
+-- Name: niveles_factor; Type: TABLE; Schema: public; Owner: lbms
+--
+
+CREATE TABLE public.niveles_factor (
+    id uuid NOT NULL,
+    factor_id uuid NOT NULL,
+    etiqueta character varying(120) NOT NULL,
+    valor_num double precision,
+    orden integer NOT NULL
+);
+
+
+ALTER TABLE public.niveles_factor OWNER TO lbms;
 
 --
 -- Name: protocolos; Type: TABLE; Schema: public; Owner: lbms
@@ -502,6 +419,34 @@ CREATE TABLE public.sustratos (
 ALTER TABLE public.sustratos OWNER TO lbms;
 
 --
+-- Name: tratamiento_nivel; Type: TABLE; Schema: public; Owner: lbms
+--
+
+CREATE TABLE public.tratamiento_nivel (
+    tratamiento_id uuid NOT NULL,
+    nivel_id uuid NOT NULL
+);
+
+
+ALTER TABLE public.tratamiento_nivel OWNER TO lbms;
+
+--
+-- Name: tratamientos; Type: TABLE; Schema: public; Owner: lbms
+--
+
+CREATE TABLE public.tratamientos (
+    id uuid NOT NULL,
+    experimento_id uuid NOT NULL,
+    codigo character varying(40) NOT NULL,
+    nombre character varying(255),
+    es_control boolean NOT NULL,
+    descripcion text
+);
+
+
+ALTER TABLE public.tratamientos OWNER TO lbms;
+
+--
 -- Name: usuarios; Type: TABLE; Schema: public; Owner: lbms
 --
 
@@ -560,7 +505,7 @@ ALTER TABLE public.variegaciones OWNER TO lbms;
 --
 
 COPY public.alembic_version (version_num) FROM stdin;
-e1a2b3c4d5e6
+a1b2c3d4e5f6
 \.
 
 
@@ -658,6 +603,10 @@ d261a7bf-f3e5-4f3f-acca-74aa4bcb24db	sanitizacion	Desinfeccion de las SEMILLAS d
 be78b93a-3794-438c-abb5-974c2d28b778	observacion	Revisión día 9 (13-ago-2026): sin contaminación; sin germinación aún. Frascos limpios.	\N	\N	7caad194-7a33-4727-87ff-09b5cd60fcc2	40a58428-7a27-4462-87f1-4d4f07443de9	\N	2026-08-13 00:00:00	{"dia": 9, "revision": "contaminacion+germinacion", "resultado": "sin_contaminacion", "germinacion": "sin_germinacion"}
 c4f91e34-8074-41c2-ab8e-1a4fdc0c9f97	observacion	Revisión día 9 (13-ago-2026): sin contaminación; sin germinación aún. Frascos limpios.	\N	\N	34c7e6bc-bb6f-4f12-86ba-ea533a7509e4	40a58428-7a27-4462-87f1-4d4f07443de9	\N	2026-08-13 00:00:00	{"dia": 9, "revision": "contaminacion+germinacion", "resultado": "sin_contaminacion", "germinacion": "sin_germinacion"}
 05a24395-c67f-4d2e-8d82-19ab1197f813	observacion	Revisión día 9 (13-ago-2026): sin contaminación; sin germinación aún. Frascos limpios.	\N	\N	46049ce3-b84b-4a30-aa58-9336bc4ebf6a	40a58428-7a27-4462-87f1-4d4f07443de9	\N	2026-08-13 00:00:00	{"dia": 9, "revision": "contaminacion+germinacion", "resultado": "sin_contaminacion", "germinacion": "sin_germinacion"}
+4e2c4443-d496-41d9-af53-f223201df781	observacion	Revision dia 29 (02-sep-2026): Zinnia Gitana envase #7 (GITA-260807-033754-007) prospero; 1 semilla germinada. Crecimiento lento: ~4 mm (0.4 cm) de altura.	379f171b-82e9-46ce-85e5-8acb680c1614	\N	\N	40a58428-7a27-4462-87f1-4d4f07443de9	\N	2026-09-02 00:00:00	{"dia": 29, "envase": 7, "detalle": {"altura_cm": 0.4, "altura_mm": 4}, "revision": "seguimiento_crecimiento", "germinacion": "prosperada", "semillas_germinadas": 1}
+9f21e97a-18b7-4f52-86bd-27e5264f5e6c	observacion	Revision dia 29 (02-sep-2026): Zinnia Gitana envase #5 (GITA-260807-033754-005) prospero; 1 semilla germinada. Crecimiento lento: ~4 mm (0.4 cm) de altura.	ffee70c3-bcb9-4697-8b6b-e03e4fa62557	\N	\N	40a58428-7a27-4462-87f1-4d4f07443de9	\N	2026-09-02 00:00:00	{"dia": 29, "envase": 5, "detalle": {"altura_cm": 0.4, "altura_mm": 4}, "revision": "seguimiento_crecimiento", "germinacion": "prosperada", "semillas_germinadas": 1}
+4ee10354-30b6-49a2-8beb-d0ae0e165ac8	observacion	Revision dia 29 (02-sep-2026): Zinnia Gitana envase #2 (GITA-260807-033754-002) prospero; 1 semilla germinada. Crecimiento lento: ~4 mm (0.4 cm) de altura.	2d9eae3f-0093-40d3-83b3-76809074ffc4	\N	\N	40a58428-7a27-4462-87f1-4d4f07443de9	\N	2026-09-02 00:00:00	{"dia": 29, "envase": 2, "detalle": {"altura_cm": 0.4, "altura_mm": 4}, "revision": "seguimiento_crecimiento", "germinacion": "prosperada", "semillas_germinadas": 1}
+62e8bb75-2cfa-4de8-9736-da9e8fdd49dd	observacion	Revision (02-sep-2026): Boca de dragon (Antirrhinum majus) prospero; 1 semilla germinada, sin envase numerado. Crecimiento lento: ~4 mm (0.4 cm) de altura.	\N	\N	\N	40a58428-7a27-4462-87f1-4d4f07443de9	\N	2026-09-02 00:00:00	{"envase": null, "detalle": {"altura_cm": 0.4, "altura_mm": 4}, "especie": "Antirrhinum majus", "revision": "seguimiento_crecimiento", "germinacion": "prosperada", "semillas_germinadas": 1}
 494819e6-e414-46ae-81eb-0a05115d6962	sanitizacion	Desinfeccion de las SEMILLAS de cilantro (coriandro) antes de la siembra del 11-ago-2026. Secuencia completa: (1) lavado con detergente, (2) alcohol/etanol al 70% por 60 s, (3) clorox (hipoclorito) al 2% de trabajo (producto 10% segun empaque, dilucion 1:5) + Tween por 5 min, (4) 3 enjuagues en agua destilada. Coincide con la familia DESINF (detergente -> etanol -> hipoclorito+Tween -> enjuagues).	\N	\N	b2a0a1c8-e4ab-4b02-9aab-419476620339	8cc2b2f5-da3a-4369-bec2-4194ff37d379	\N	2026-08-11 00:00:00	{"aditivo": "Tween", "agentes": ["hipoclorito (clorox)", "etanol (alcohol)"], "objetos": ["semillas"], "enjuagues": {"medio": "agua destilada", "numero": 3}, "secuencia": [{"paso": 1, "accion": "lavado", "agente": "detergente"}, {"paso": 2, "agente": "etanol (alcohol)", "tiempo_seg": 60, "concentracion_pct": 70}, {"paso": 3, "agente": "hipoclorito (clorox) + Tween", "tiempo_min": 5, "concentracion_trabajo_pct": 2}, {"paso": 4, "accion": "enjuague", "agente": "agua destilada", "repeticiones": 3}], "clorox_dilucion": "1:5 (1 parte clorox 10% + 4 de agua)", "clorox_tiempo_min": 5, "protocolo_familia": "DESINF-02", "alcohol_tiempo_seg": 60, "protocolo_completo": true, "alcohol_concentracion_pct": 70, "clorox_concentracion_trabajo_pct": 2, "clorox_concentracion_producto_pct": 10, "clorox_concentracion_producto_fuente": "empaque"}
 c2f64248-87fe-40df-b43c-840786d8cf77	observacion	Revisión día 2 (13-ago-2026): sin contaminación; sin germinación aún. Frascos limpios.	\N	\N	b2a0a1c8-e4ab-4b02-9aab-419476620339	40a58428-7a27-4462-87f1-4d4f07443de9	\N	2026-08-13 00:00:00	{"dia": 2, "revision": "contaminacion+germinacion", "resultado": "sin_contaminacion", "germinacion": "sin_germinacion"}
 b7eaf369-ddf5-46e7-a80a-128674ae4233	observacion	Revisión día 14 (18-ago-2026): inicio de germinación. Zinnia envase #3 (ZINN-260807-033753-003): germinó 1 semilla con 1 raíz (sin hoja aún).	8cc3967d-9b1b-47f1-9dde-9bf122a8308d	\N	7caad194-7a33-4727-87ff-09b5cd60fcc2	40a58428-7a27-4462-87f1-4d4f07443de9	\N	2026-08-18 00:00:00	{"dia": 14, "envase": 3, "detalle": {"hojas": 0, "raices": 1}, "revision": "germinacion", "germinacion": "iniciada", "semillas_germinadas": 1}
@@ -669,6 +618,9 @@ cb493017-ba23-44a1-8ab7-070d9ce4b312	observacion	Revisión día 16 (20-ago-2026)
 74a647dd-1151-47cd-9413-c75eb881bbfc	observacion	Revisión día 16 (20-ago-2026): Gitana envase #6 (GITA-260807-033754-006) sigue creciendo; 1 semilla germinada.	4fcb4832-e017-4e3d-b3c7-015973897517	\N	34c7e6bc-bb6f-4f12-86ba-ea533a7509e4	40a58428-7a27-4462-87f1-4d4f07443de9	\N	2026-08-20 00:00:00	{"dia": 16, "envase": 6, "estado": "creciendo", "revision": "seguimiento_crecimiento", "germinacion": "en_desarrollo", "semillas_germinadas": 1}
 5996f6f0-2363-4bea-8a1b-d9a3751d524b	observacion	Revisión (20-ago-2026): SOSPECHA de contaminación bacteriana en la tanda de mostaza (EXP-GERM-MOSB). Aspecto: bacteria blanca (colonia blanquecina/mucosa). Sin germinación registrada. Pendiente de confirmar alcance (¿los 6 frascos o algunos?) y si la tanda se pierde.	\N	\N	b4065b21-0085-4a4c-b703-2bcd64b72204	40a58428-7a27-4462-87f1-4d4f07443de9	\N	2026-08-20 00:00:00	{"aspecto": "blanca", "revision": "contaminacion", "confirmado": false, "germinacion": "sin_germinacion", "contaminacion": "sospecha", "alcance_frascos": "por_confirmar", "tipo_contaminante": "bacteriana"}
 e601c84e-7877-4dfc-b499-58b3da819e1a	sanitizacion	Desinfeccion de las SEMILLAS de mostaza (MOSB) con alcohol y clorox, segun protocolo DESINF-02 (base hipoclorito): etanol 70% + clorox (hipoclorito 2% de trabajo) + Tween, con enjuagues en agua destilada. Mismo metodo que boca de dragon y coriandro; distinto al de zinnia/gitana (agua oxigenada). Parametros exactos (tiempos/volumenes) no dictados en detalle.	\N	\N	b4065b21-0085-4a4c-b703-2bcd64b72204	40a58428-7a27-4462-87f1-4d4f07443de9	\N	2026-08-13 00:00:00	{"agente": "alcohol (etanol 70%) + clorox (hipoclorito 2%)", "objetos": ["semillas"], "protocolo": "DESINF-02", "detalle_parametros": "no_especificado"}
+ea43bda1-29ad-419e-a9f2-8bc644b333ba	observacion	Revision dia 29 (02-sep-2026): Zinnia Gitana envase #4 (GITA-260807-033754-004) prospero; 1 semilla germinada. Crecimiento lento: ~4 mm (0.4 cm) de altura.	b829d795-b025-4d2a-b7db-c680d9393c38	\N	\N	40a58428-7a27-4462-87f1-4d4f07443de9	\N	2026-09-02 00:00:00	{"dia": 29, "envase": 4, "detalle": {"altura_cm": 0.4, "altura_mm": 4}, "revision": "seguimiento_crecimiento", "germinacion": "prosperada", "semillas_germinadas": 1}
+7e1db8a6-a488-4018-971f-d94b17c8ad11	observacion	Revision dia 29 (02-sep-2026): Zinnia Gitana envase #1 (GITA-260807-033754-001) prospero; 1 semilla germinada. Crecimiento lento: ~4 mm (0.4 cm) de altura.	d492ca17-1994-498b-be47-dec03026f0a2	\N	\N	40a58428-7a27-4462-87f1-4d4f07443de9	\N	2026-09-02 00:00:00	{"dia": 29, "envase": 1, "detalle": {"altura_cm": 0.4, "altura_mm": 4}, "revision": "seguimiento_crecimiento", "germinacion": "prosperada", "semillas_germinadas": 1}
+ba5f81b1-8043-48a4-befc-732d026c6f2f	observacion	Revision dia 29 (02-sep-2026): Zinnia envase #3 (ZINN-260807-033753-003) prospero; 1 semilla germinada. Crecimiento lento: ~4 mm (0.4 cm) de altura.	8cc3967d-9b1b-47f1-9dde-9bf122a8308d	\N	\N	40a58428-7a27-4462-87f1-4d4f07443de9	\N	2026-09-02 00:00:00	{"dia": 29, "envase": 3, "detalle": {"altura_cm": 0.4, "altura_mm": 4}, "revision": "seguimiento_crecimiento", "germinacion": "prosperada", "semillas_germinadas": 1}
 \.
 
 
@@ -729,16 +681,24 @@ b2a0a1c8-e4ab-4b02-9aab-419476620339	71540329-11fe-4007-b691-5e030101296a	\N
 -- Data for Name: experimentos; Type: TABLE DATA; Schema: public; Owner: lbms
 --
 
-COPY public.experimentos (id, codigo, nombre, hipotesis, protocolo_id, fecha_inicio, fecha_fin, estado, director_id, operador_id, especie_id, linea_id, variegacion_id, config_estandar, notas, created_at) FROM stdin;
-763e8dbf-ac0c-40f2-a9f3-2e454475d330	EXP-GERM-SIEM	Germinación in vitro — Siempreviva / Flor de paja (14 semillas)	\N	d4baef39-e6bf-4401-aaf6-ac7406de583f	2026-07-29	\N	planificado	40a58428-7a27-4462-87f1-4d4f07443de9	\N	1c6415ec-f735-4d0d-a742-cb15ad817323	\N	\N	{"medio": "MED-GERM-01", "n_semillas": 14, "protocolo_siembra": "SIEMB-01", "protocolo_desinfeccion": "DESINF-02"}	Experimento de germinación de semillas de flor. Desinfección: DESINF-02 (más suave). Siembra: SIEMB-01 en MED-GERM-01 (sin hormonas).	2026-07-29 03:08:38.163545
-24aa6644-2223-4e8a-b71a-3c2ec44a7240	EXP-GERM-PIMT	Germinación in vitro — Pimentón (Capsicum annuum)	\N	d4baef39-e6bf-4401-aaf6-ac7406de583f	2026-08-06	\N	completado	40a58428-7a27-4462-87f1-4d4f07443de9	\N	514ab0ac-e6c9-4c29-b196-680c78b0a97e	\N	\N	{"medio": "MED-GERM-01", "propagacion": "solo semilla", "protocolo_siembra": "SIEMB-01", "protocolo_desinfeccion": "DESINF-02"}	Germinación de semillas de pimentón (propagación SOLO por semilla). Desinfección DESINF-02 (clorox 2% 10-15 min + 3-4 enjuagues). Siembra SIEMB-01 en MED-GERM-01 (sin hormonas).	2026-08-07 03:24:59.264002
-1bc79743-23cc-4249-a38e-41269e0fcbf2	EXP-CAFE-MER	Inducción in vitro — Café (ápice/meristema) — factorial 8 tratamientos	\N	6bb08e7e-6ce9-4e49-845e-785e3cb6d7e7	2026-08-06	\N	planificado	40a58428-7a27-4462-87f1-4d4f07443de9	\N	0e217d16-59cf-49c1-950b-41b8ca80c308	\N	\N	{"medio": "MED-CAFE-01", "manejo": "1 semana en oscuridad; subcultivo cada 4-5 días", "explante": "ápice/meristema", "factorial": {"T1": "testigo BAP 0 / aux 0", "T2": "BAP 1000 µL", "T3": "BAP 1000 + ANA 100 µL", "T4": "BAP 1000 + ANA 500 µL", "T5": "BAP 1000 + AIA 100 µL", "T6": "BAP 1000 + AIA 500 µL", "T7": "BAP 2000 + ANA 100 µL", "T8": "BAP 2000 + AIA 100 µL"}, "pretratamiento": "ácido ascórbico 100 mg/L, remojo 15-30 min (fuera del medio)", "carbon_activado": false}	Factorial de inducción en MED-CAFE-01 (sin carbón activado). Explante: ápice/meristema. Pretratamiento: remojo 15-30 min en ácido ascórbico 100 mg/L (fuera del medio). Manejo: 1 semana en oscuridad para reducir pardeamiento, luego subcultivo cada 4-5 días. Hormonas por tratamiento (µL/L desde stock 1 mg/mL): T1 testigo (0/0); T2 BAP 1000; T3 BAP 1000+ANA 100; T4 BAP 1000+ANA 500; T5 BAP 1000+AIA 100; T6 BAP 1000+AIA 500; T7 BAP 2000+ANA 100; T8 BAP 2000+AIA 100.	2026-08-07 03:24:59.264002
-3c410ae3-8862-462e-b7e4-377df558e57f	EXP-CAFE-VAR	Inducción in vitro — Café (vara floral, tallo raspado) — factorial 8 tratamientos	\N	6bb08e7e-6ce9-4e49-845e-785e3cb6d7e7	2026-08-06	\N	planificado	40a58428-7a27-4462-87f1-4d4f07443de9	\N	0e217d16-59cf-49c1-950b-41b8ca80c308	\N	\N	{"medio": "MED-CAFE-01", "manejo": "1 semana en oscuridad; subcultivo cada 4-5 días", "explante": "vara floral (tallo raspado)", "factorial": {"T1": "testigo BAP 0 / aux 0", "T2": "BAP 1000 µL", "T3": "BAP 1000 + ANA 100 µL", "T4": "BAP 1000 + ANA 500 µL", "T5": "BAP 1000 + AIA 100 µL", "T6": "BAP 1000 + AIA 500 µL", "T7": "BAP 2000 + ANA 100 µL", "T8": "BAP 2000 + AIA 100 µL"}, "pretratamiento": "ácido ascórbico 100 mg/L, remojo 15-30 min (fuera del medio)", "carbon_activado": false, "preparacion_explante": "raspar la superficie del tallo (muy duro) antes de sembrar"}	Factorial de inducción en MED-CAFE-01 (sin carbón activado). Explante: vara floral. El tallo es muy duro: RASPAR la superficie antes de sembrar para favorecer la proliferación. Pretratamiento: remojo 15-30 min en ácido ascórbico 100 mg/L (fuera del medio). Manejo: 1 semana en oscuridad, luego subcultivo cada 4-5 días. Hormonas por tratamiento (µL/L desde stock 1 mg/mL): T1 testigo (0/0); T2 BAP 1000; T3 BAP 1000+ANA 100; T4 BAP 1000+ANA 500; T5 BAP 1000+AIA 100; T6 BAP 1000+AIA 500; T7 BAP 2000+ANA 100; T8 BAP 2000+AIA 100.	2026-08-07 03:24:59.264002
-b4065b21-0085-4a4c-b703-2bcd64b72204	EXP-GERM-MOSB	Germinación in vitro — Mostaza blanca (Sinapis alba)	\N	d4baef39-e6bf-4401-aaf6-ac7406de583f	2026-08-10	\N	activo	40a58428-7a27-4462-87f1-4d4f07443de9	\N	a3d17334-68f5-46f5-9eb0-2b7e978ca902	\N	\N	{"medio": "MED-GERM-01", "fotoperiodo": "16/8", "ph_sustrato": 5.7, "protocolo_siembra": "SIEMB-01", "protocolo_desinfeccion": "DESINF-02"}	Experimento de germinación de semilla de mostaza blanca. Desinfección: DESINF-02 (semilla pequeña, ajustar más suave). Siembra: SIEMB-01 en MED-GERM-01 (sin hormonas). Nº de semillas por definir.	2026-08-11 03:28:02.760715
-b2a0a1c8-e4ab-4b02-9aab-419476620339	EXP-GERM-CORI	Germinación in vitro — Cilantro (Coriandrum sativum)	\N	d4baef39-e6bf-4401-aaf6-ac7406de583f	2026-08-11	\N	activo	40a58428-7a27-4462-87f1-4d4f07443de9	\N	bf6c4bc3-524d-4939-b234-e889dec68cbe	\N	\N	{"medio": "MED-GERM-01", "fotoperiodo": "16/8", "ph_sustrato": 5.7, "protocolo_siembra": "SIEMB-01", "protocolo_desinfeccion": "DESINF-02"}	Experimento de germinación de semilla de cilantro. Siembra 11-ago-2026 (18 frascos, 140 semillas). Desinfección DESINF-02, medio MED-GERM-01 (sin hormonas).	2026-08-14 02:27:00.809644
-7caad194-7a33-4727-87ff-09b5cd60fcc2	EXP-GERM-ZINN	Germinación in vitro — Zinnia (7 semillas)	\N	d4baef39-e6bf-4401-aaf6-ac7406de583f	2026-07-29	\N	activo	40a58428-7a27-4462-87f1-4d4f07443de9	\N	ac88c62b-909b-471f-a585-7adb236941d2	\N	\N	{"medio": "MED-GERM-01", "n_semillas": 7, "fotoperiodo": "16/8", "ph_sustrato": 5.7, "protocolo_siembra": "SIEMB-01", "condiciones_cultivo": {"luz": "misma luz para todas (fotoperiodo, no oscuridad)", "medio": "MS sin hormonas (MED-GERM-01)", "estante": "mismo estante (posición común, temperatura uniforme)", "registrado": "2026-08-12", "fecha_siembra": "2026-08-06"}, "protocolo_desinfeccion": "DESINF-02"}	Experimento de germinación de semillas de flor. Desinfección: DESINF-02 (más suave). Siembra: SIEMB-01 en MED-GERM-01 (sin hormonas).	2026-07-29 03:08:38.163545
-34c7e6bc-bb6f-4f12-86ba-ea533a7509e4	EXP-GERM-GITA	Germinación in vitro — Zinnia Gitana (10 semillas)	\N	d4baef39-e6bf-4401-aaf6-ac7406de583f	2026-07-29	\N	activo	40a58428-7a27-4462-87f1-4d4f07443de9	\N	baf05c4d-6439-4318-bc9f-684830d396e3	\N	\N	{"luz": "REQUIERE luz para germinar (fotoperiodo normal, NO oscuridad)", "medio": "MED-GERM-01", "n_semillas": 10, "fotoperiodo": "16/8", "ph_sustrato": 5.7, "protocolo_siembra": "SIEMB-01", "condiciones_cultivo": {"luz": "misma luz para todas (fotoperiodo, no oscuridad)", "medio": "MS sin hormonas (MED-GERM-01)", "estante": "mismo estante (posición común, temperatura uniforme)", "registrado": "2026-08-12", "fecha_siembra": "2026-08-06"}, "protocolo_desinfeccion": "DESINF-02"}	Experimento de germinación de semillas de flor. Desinfección: DESINF-02 (más suave). Siembra: SIEMB-01 en MED-GERM-01 (sin hormonas). NOTA: requiere LUZ para germinar (fotoperiodo, no oscuridad). Semilla diminuta: manejar en gasa/tul.	2026-07-29 03:08:38.163545
-46049ce3-b84b-4a30-aa58-9336bc4ebf6a	EXP-GERM-BOCA	Germinación in vitro — Boca de dragón / Conejito (35 semillas)	\N	d4baef39-e6bf-4401-aaf6-ac7406de583f	2026-07-29	\N	activo	40a58428-7a27-4462-87f1-4d4f07443de9	\N	e994a941-3f7f-46b2-885b-d874bc40a6b4	\N	\N	{"luz": "REQUIERE luz para germinar (fotoperiodo normal, NO oscuridad)", "medio": "MED-GERM-01", "n_semillas": 35, "fotoperiodo": "16/8", "ph_sustrato": 5.7, "protocolo_siembra": "SIEMB-01", "condiciones_cultivo": {"luz": "misma luz para todas (fotoperiodo, no oscuridad)", "medio": "MS sin hormonas (MED-GERM-01)", "estante": "mismo estante (posición común, temperatura uniforme)", "registrado": "2026-08-12", "fecha_siembra": "2026-08-06"}, "protocolo_desinfeccion": "DESINF-02"}	Experimento de germinación de semillas de flor. Desinfección: DESINF-02 (más suave). Siembra: SIEMB-01 en MED-GERM-01 (sin hormonas). NOTA: requiere LUZ para germinar (fotoperiodo, no oscuridad). Semilla diminuta: manejar en gasa/tul.	2026-07-29 03:08:38.163545
+COPY public.experimentos (id, codigo, nombre, hipotesis, protocolo_id, fecha_inicio, fecha_fin, estado, director_id, operador_id, especie_id, linea_id, variegacion_id, config_estandar, notas, created_at, tipo_diseno) FROM stdin;
+763e8dbf-ac0c-40f2-a9f3-2e454475d330	EXP-GERM-SIEM	Germinación in vitro — Siempreviva / Flor de paja (14 semillas)	\N	d4baef39-e6bf-4401-aaf6-ac7406de583f	2026-07-29	\N	planificado	40a58428-7a27-4462-87f1-4d4f07443de9	\N	1c6415ec-f735-4d0d-a742-cb15ad817323	\N	\N	{"medio": "MED-GERM-01", "n_semillas": 14, "protocolo_siembra": "SIEMB-01", "protocolo_desinfeccion": "DESINF-02"}	Experimento de germinación de semillas de flor. Desinfección: DESINF-02 (más suave). Siembra: SIEMB-01 en MED-GERM-01 (sin hormonas).	2026-07-29 03:08:38.163545	\N
+24aa6644-2223-4e8a-b71a-3c2ec44a7240	EXP-GERM-PIMT	Germinación in vitro — Pimentón (Capsicum annuum)	\N	d4baef39-e6bf-4401-aaf6-ac7406de583f	2026-08-06	\N	completado	40a58428-7a27-4462-87f1-4d4f07443de9	\N	514ab0ac-e6c9-4c29-b196-680c78b0a97e	\N	\N	{"medio": "MED-GERM-01", "propagacion": "solo semilla", "protocolo_siembra": "SIEMB-01", "protocolo_desinfeccion": "DESINF-02"}	Germinación de semillas de pimentón (propagación SOLO por semilla). Desinfección DESINF-02 (clorox 2% 10-15 min + 3-4 enjuagues). Siembra SIEMB-01 en MED-GERM-01 (sin hormonas).	2026-08-07 03:24:59.264002	\N
+1bc79743-23cc-4249-a38e-41269e0fcbf2	EXP-CAFE-MER	Inducción in vitro — Café (ápice/meristema) — factorial 8 tratamientos	\N	6bb08e7e-6ce9-4e49-845e-785e3cb6d7e7	2026-08-06	\N	planificado	40a58428-7a27-4462-87f1-4d4f07443de9	\N	0e217d16-59cf-49c1-950b-41b8ca80c308	\N	\N	{"medio": "MED-CAFE-01", "manejo": "1 semana en oscuridad; subcultivo cada 4-5 días", "explante": "ápice/meristema", "factorial": {"T1": "testigo BAP 0 / aux 0", "T2": "BAP 1000 µL", "T3": "BAP 1000 + ANA 100 µL", "T4": "BAP 1000 + ANA 500 µL", "T5": "BAP 1000 + AIA 100 µL", "T6": "BAP 1000 + AIA 500 µL", "T7": "BAP 2000 + ANA 100 µL", "T8": "BAP 2000 + AIA 100 µL"}, "pretratamiento": "ácido ascórbico 100 mg/L, remojo 15-30 min (fuera del medio)", "carbon_activado": false}	Factorial de inducción en MED-CAFE-01 (sin carbón activado). Explante: ápice/meristema. Pretratamiento: remojo 15-30 min en ácido ascórbico 100 mg/L (fuera del medio). Manejo: 1 semana en oscuridad para reducir pardeamiento, luego subcultivo cada 4-5 días. Hormonas por tratamiento (µL/L desde stock 1 mg/mL): T1 testigo (0/0); T2 BAP 1000; T3 BAP 1000+ANA 100; T4 BAP 1000+ANA 500; T5 BAP 1000+AIA 100; T6 BAP 1000+AIA 500; T7 BAP 2000+ANA 100; T8 BAP 2000+AIA 100.	2026-08-07 03:24:59.264002	\N
+3c410ae3-8862-462e-b7e4-377df558e57f	EXP-CAFE-VAR	Inducción in vitro — Café (vara floral, tallo raspado) — factorial 8 tratamientos	\N	6bb08e7e-6ce9-4e49-845e-785e3cb6d7e7	2026-08-06	\N	planificado	40a58428-7a27-4462-87f1-4d4f07443de9	\N	0e217d16-59cf-49c1-950b-41b8ca80c308	\N	\N	{"medio": "MED-CAFE-01", "manejo": "1 semana en oscuridad; subcultivo cada 4-5 días", "explante": "vara floral (tallo raspado)", "factorial": {"T1": "testigo BAP 0 / aux 0", "T2": "BAP 1000 µL", "T3": "BAP 1000 + ANA 100 µL", "T4": "BAP 1000 + ANA 500 µL", "T5": "BAP 1000 + AIA 100 µL", "T6": "BAP 1000 + AIA 500 µL", "T7": "BAP 2000 + ANA 100 µL", "T8": "BAP 2000 + AIA 100 µL"}, "pretratamiento": "ácido ascórbico 100 mg/L, remojo 15-30 min (fuera del medio)", "carbon_activado": false, "preparacion_explante": "raspar la superficie del tallo (muy duro) antes de sembrar"}	Factorial de inducción en MED-CAFE-01 (sin carbón activado). Explante: vara floral. El tallo es muy duro: RASPAR la superficie antes de sembrar para favorecer la proliferación. Pretratamiento: remojo 15-30 min en ácido ascórbico 100 mg/L (fuera del medio). Manejo: 1 semana en oscuridad, luego subcultivo cada 4-5 días. Hormonas por tratamiento (µL/L desde stock 1 mg/mL): T1 testigo (0/0); T2 BAP 1000; T3 BAP 1000+ANA 100; T4 BAP 1000+ANA 500; T5 BAP 1000+AIA 100; T6 BAP 1000+AIA 500; T7 BAP 2000+ANA 100; T8 BAP 2000+AIA 100.	2026-08-07 03:24:59.264002	\N
+b4065b21-0085-4a4c-b703-2bcd64b72204	EXP-GERM-MOSB	Germinación in vitro — Mostaza blanca (Sinapis alba)	\N	d4baef39-e6bf-4401-aaf6-ac7406de583f	2026-08-10	\N	activo	40a58428-7a27-4462-87f1-4d4f07443de9	\N	a3d17334-68f5-46f5-9eb0-2b7e978ca902	\N	\N	{"medio": "MED-GERM-01", "fotoperiodo": "16/8", "ph_sustrato": 5.7, "protocolo_siembra": "SIEMB-01", "protocolo_desinfeccion": "DESINF-02"}	Experimento de germinación de semilla de mostaza blanca. Desinfección: DESINF-02 (semilla pequeña, ajustar más suave). Siembra: SIEMB-01 en MED-GERM-01 (sin hormonas). Nº de semillas por definir.	2026-08-11 03:28:02.760715	\N
+b2a0a1c8-e4ab-4b02-9aab-419476620339	EXP-GERM-CORI	Germinación in vitro — Cilantro (Coriandrum sativum)	\N	d4baef39-e6bf-4401-aaf6-ac7406de583f	2026-08-11	\N	activo	40a58428-7a27-4462-87f1-4d4f07443de9	\N	bf6c4bc3-524d-4939-b234-e889dec68cbe	\N	\N	{"medio": "MED-GERM-01", "fotoperiodo": "16/8", "ph_sustrato": 5.7, "protocolo_siembra": "SIEMB-01", "protocolo_desinfeccion": "DESINF-02"}	Experimento de germinación de semilla de cilantro. Siembra 11-ago-2026 (18 frascos, 140 semillas). Desinfección DESINF-02, medio MED-GERM-01 (sin hormonas).	2026-08-14 02:27:00.809644	\N
+7caad194-7a33-4727-87ff-09b5cd60fcc2	EXP-GERM-ZINN	Germinación in vitro — Zinnia (7 semillas)	\N	d4baef39-e6bf-4401-aaf6-ac7406de583f	2026-07-29	\N	activo	40a58428-7a27-4462-87f1-4d4f07443de9	\N	ac88c62b-909b-471f-a585-7adb236941d2	\N	\N	{"medio": "MED-GERM-01", "n_semillas": 7, "fotoperiodo": "16/8", "ph_sustrato": 5.7, "protocolo_siembra": "SIEMB-01", "condiciones_cultivo": {"luz": "misma luz para todas (fotoperiodo, no oscuridad)", "medio": "MS sin hormonas (MED-GERM-01)", "estante": "mismo estante (posición común, temperatura uniforme)", "registrado": "2026-08-12", "fecha_siembra": "2026-08-06"}, "protocolo_desinfeccion": "DESINF-02"}	Experimento de germinación de semillas de flor. Desinfección: DESINF-02 (más suave). Siembra: SIEMB-01 en MED-GERM-01 (sin hormonas).	2026-07-29 03:08:38.163545	\N
+34c7e6bc-bb6f-4f12-86ba-ea533a7509e4	EXP-GERM-GITA	Germinación in vitro — Zinnia Gitana (10 semillas)	\N	d4baef39-e6bf-4401-aaf6-ac7406de583f	2026-07-29	\N	activo	40a58428-7a27-4462-87f1-4d4f07443de9	\N	baf05c4d-6439-4318-bc9f-684830d396e3	\N	\N	{"luz": "REQUIERE luz para germinar (fotoperiodo normal, NO oscuridad)", "medio": "MED-GERM-01", "n_semillas": 10, "fotoperiodo": "16/8", "ph_sustrato": 5.7, "protocolo_siembra": "SIEMB-01", "condiciones_cultivo": {"luz": "misma luz para todas (fotoperiodo, no oscuridad)", "medio": "MS sin hormonas (MED-GERM-01)", "estante": "mismo estante (posición común, temperatura uniforme)", "registrado": "2026-08-12", "fecha_siembra": "2026-08-06"}, "protocolo_desinfeccion": "DESINF-02"}	Experimento de germinación de semillas de flor. Desinfección: DESINF-02 (más suave). Siembra: SIEMB-01 en MED-GERM-01 (sin hormonas). NOTA: requiere LUZ para germinar (fotoperiodo, no oscuridad). Semilla diminuta: manejar en gasa/tul.	2026-07-29 03:08:38.163545	\N
+46049ce3-b84b-4a30-aa58-9336bc4ebf6a	EXP-GERM-BOCA	Germinación in vitro — Boca de dragón / Conejito (35 semillas)	\N	d4baef39-e6bf-4401-aaf6-ac7406de583f	2026-07-29	\N	activo	40a58428-7a27-4462-87f1-4d4f07443de9	\N	e994a941-3f7f-46b2-885b-d874bc40a6b4	\N	\N	{"luz": "REQUIERE luz para germinar (fotoperiodo normal, NO oscuridad)", "medio": "MED-GERM-01", "n_semillas": 35, "fotoperiodo": "16/8", "ph_sustrato": 5.7, "protocolo_siembra": "SIEMB-01", "condiciones_cultivo": {"luz": "misma luz para todas (fotoperiodo, no oscuridad)", "medio": "MS sin hormonas (MED-GERM-01)", "estante": "mismo estante (posición común, temperatura uniforme)", "registrado": "2026-08-12", "fecha_siembra": "2026-08-06"}, "protocolo_desinfeccion": "DESINF-02"}	Experimento de germinación de semillas de flor. Desinfección: DESINF-02 (más suave). Siembra: SIEMB-01 en MED-GERM-01 (sin hormonas). NOTA: requiere LUZ para germinar (fotoperiodo, no oscuridad). Semilla diminuta: manejar en gasa/tul.	2026-07-29 03:08:38.163545	\N
+\.
+
+
+--
+-- Data for Name: factores_experimentales; Type: TABLE DATA; Schema: public; Owner: lbms
+--
+
+COPY public.factores_experimentales (id, experimento_id, nombre, unidad, tipo, descripcion) FROM stdin;
 \.
 
 
@@ -816,6 +776,14 @@ COPY public.lotes_preparados (id, uid, formulacion_id, preparado_por_id, fecha_p
 
 
 --
+-- Data for Name: niveles_factor; Type: TABLE DATA; Schema: public; Owner: lbms
+--
+
+COPY public.niveles_factor (id, factor_id, etiqueta, valor_num, orden) FROM stdin;
+\.
+
+
+--
 -- Data for Name: protocolos; Type: TABLE DATA; Schema: public; Owner: lbms
 --
 
@@ -857,6 +825,12 @@ a1441cf2-d7dd-4504-9472-ed98c2cdaad4	\N	Tween-20	\N	\N	\N	\N	\N	gota	[]	Surfacta
 --
 
 COPY public.registros_evolucion (id, especimen_id, registrado_por_id, protocolo_clonacion_id, fecha, altura_cm, ancho_hoja_max_cm, largo_hoja_max_cm, num_hojas, num_brotes, num_hijuelos, num_nodos, diametro_tallo_mm, porcentaje_variegacion, patron_variegacion, color_variegacion, sustrato, sustrato_id, tipo_contenedor, diametro_contenedor_cm, temperatura_c, humedad_relativa_pct, humedad_sustrato_pct, ph_sustrato, luz_lux, conductividad_ec, npk, ppm, fotos, notas) FROM stdin;
+77283d15-cc73-4a43-9bb5-f5b831dbaa14	b829d795-b025-4d2a-b7db-c680d9393c38	40a58428-7a27-4462-87f1-4d4f07443de9	\N	2026-09-02 00:00:00	0.4	\N	\N	\N	1	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	Dia 29. Prospero 1 semilla. Crecimiento lento (~4 mm).
+36148e35-2e15-48b1-a963-17fa3ff58376	d492ca17-1994-498b-be47-dec03026f0a2	40a58428-7a27-4462-87f1-4d4f07443de9	\N	2026-09-02 00:00:00	0.4	\N	\N	\N	1	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	Dia 29. Prospero 1 semilla. Crecimiento lento (~4 mm).
+cc16c01b-0811-4529-ac21-dfcd134a903d	8cc3967d-9b1b-47f1-9dde-9bf122a8308d	40a58428-7a27-4462-87f1-4d4f07443de9	\N	2026-09-02 00:00:00	0.4	\N	\N	\N	1	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	Dia 29. Prospero 1 semilla. Crecimiento lento (~4 mm).
+9bc343b0-f2ef-40ac-b500-9b80bb7693c7	379f171b-82e9-46ce-85e5-8acb680c1614	40a58428-7a27-4462-87f1-4d4f07443de9	\N	2026-09-02 00:00:00	0.4	\N	\N	\N	1	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	Dia 29. Prospero 1 semilla. Crecimiento lento (~4 mm).
+e510143e-a9f6-4b22-adfc-8689bf9baeab	ffee70c3-bcb9-4697-8b6b-e03e4fa62557	40a58428-7a27-4462-87f1-4d4f07443de9	\N	2026-09-02 00:00:00	0.4	\N	\N	\N	1	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	Dia 29. Prospero 1 semilla. Crecimiento lento (~4 mm).
+fa6216e5-1ad3-4e07-bb13-767ac05a0550	2d9eae3f-0093-40d3-83b3-76809074ffc4	40a58428-7a27-4462-87f1-4d4f07443de9	\N	2026-09-02 00:00:00	0.4	\N	\N	\N	1	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	Dia 29. Prospero 1 semilla. Crecimiento lento (~4 mm).
 \.
 
 
@@ -879,6 +853,22 @@ ea2110aa-694f-4303-94ac-c83908434af1	b2a0a1c8-e4ab-4b02-9aab-419476620339	Hipót
 --
 
 COPY public.sustratos (id, codigo_formulacion, tipo, nombre, descripcion, componentes, ph_teorico, conductividad_teorica, formulacion_id, lote_id, created_at) FROM stdin;
+\.
+
+
+--
+-- Data for Name: tratamiento_nivel; Type: TABLE DATA; Schema: public; Owner: lbms
+--
+
+COPY public.tratamiento_nivel (tratamiento_id, nivel_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: tratamientos; Type: TABLE DATA; Schema: public; Owner: lbms
+--
+
+COPY public.tratamientos (id, experimento_id, codigo, nombre, es_control, descripcion) FROM stdin;
 \.
 
 
@@ -983,6 +973,14 @@ ALTER TABLE ONLY public.experimentos
 
 
 --
+-- Name: factores_experimentales factores_experimentales_pkey; Type: CONSTRAINT; Schema: public; Owner: lbms
+--
+
+ALTER TABLE ONLY public.factores_experimentales
+    ADD CONSTRAINT factores_experimentales_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: formulacion_componentes formulacion_componentes_pkey; Type: CONSTRAINT; Schema: public; Owner: lbms
 --
 
@@ -1039,6 +1037,14 @@ ALTER TABLE ONLY public.lotes_preparados
 
 
 --
+-- Name: niveles_factor niveles_factor_pkey; Type: CONSTRAINT; Schema: public; Owner: lbms
+--
+
+ALTER TABLE ONLY public.niveles_factor
+    ADD CONSTRAINT niveles_factor_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: protocolos protocolos_pkey; Type: CONSTRAINT; Schema: public; Owner: lbms
 --
 
@@ -1084,6 +1090,22 @@ ALTER TABLE ONLY public.sustratos
 
 ALTER TABLE ONLY public.sustratos
     ADD CONSTRAINT sustratos_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: tratamiento_nivel tratamiento_nivel_pkey; Type: CONSTRAINT; Schema: public; Owner: lbms
+--
+
+ALTER TABLE ONLY public.tratamiento_nivel
+    ADD CONSTRAINT tratamiento_nivel_pkey PRIMARY KEY (tratamiento_id, nivel_id);
+
+
+--
+-- Name: tratamientos tratamientos_pkey; Type: CONSTRAINT; Schema: public; Owner: lbms
+--
+
+ALTER TABLE ONLY public.tratamientos
+    ADD CONSTRAINT tratamientos_pkey PRIMARY KEY (id);
 
 
 --
@@ -1224,10 +1246,24 @@ CREATE UNIQUE INDEX ix_experimentos_codigo ON public.experimentos USING btree (c
 
 
 --
+-- Name: ix_factores_experimentales_experimento_id; Type: INDEX; Schema: public; Owner: lbms
+--
+
+CREATE INDEX ix_factores_experimentales_experimento_id ON public.factores_experimentales USING btree (experimento_id);
+
+
+--
 -- Name: ix_lineas_especie_id; Type: INDEX; Schema: public; Owner: lbms
 --
 
 CREATE INDEX ix_lineas_especie_id ON public.lineas USING btree (especie_id);
+
+
+--
+-- Name: ix_niveles_factor_factor_id; Type: INDEX; Schema: public; Owner: lbms
+--
+
+CREATE INDEX ix_niveles_factor_factor_id ON public.niveles_factor USING btree (factor_id);
 
 
 --
@@ -1284,6 +1320,13 @@ CREATE INDEX ix_resultados_investigacion_experimento_id ON public.resultados_inv
 --
 
 CREATE INDEX ix_resultados_investigacion_fecha ON public.resultados_investigacion USING btree (fecha);
+
+
+--
+-- Name: ix_tratamientos_experimento_id; Type: INDEX; Schema: public; Owner: lbms
+--
+
+CREATE INDEX ix_tratamientos_experimento_id ON public.tratamientos USING btree (experimento_id);
 
 
 --
@@ -1484,6 +1527,14 @@ ALTER TABLE ONLY public.experimentos
 
 
 --
+-- Name: factores_experimentales factores_experimentales_experimento_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: lbms
+--
+
+ALTER TABLE ONLY public.factores_experimentales
+    ADD CONSTRAINT factores_experimentales_experimento_id_fkey FOREIGN KEY (experimento_id) REFERENCES public.experimentos(id);
+
+
+--
 -- Name: formulacion_componentes formulacion_componentes_formulacion_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: lbms
 --
 
@@ -1529,6 +1580,14 @@ ALTER TABLE ONLY public.lotes_preparados
 
 ALTER TABLE ONLY public.lotes_preparados
     ADD CONSTRAINT lotes_preparados_preparado_por_id_fkey FOREIGN KEY (preparado_por_id) REFERENCES public.usuarios(id);
+
+
+--
+-- Name: niveles_factor niveles_factor_factor_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: lbms
+--
+
+ALTER TABLE ONLY public.niveles_factor
+    ADD CONSTRAINT niveles_factor_factor_id_fkey FOREIGN KEY (factor_id) REFERENCES public.factores_experimentales(id);
 
 
 --
@@ -1604,6 +1663,30 @@ ALTER TABLE ONLY public.sustratos
 
 
 --
+-- Name: tratamiento_nivel tratamiento_nivel_nivel_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: lbms
+--
+
+ALTER TABLE ONLY public.tratamiento_nivel
+    ADD CONSTRAINT tratamiento_nivel_nivel_id_fkey FOREIGN KEY (nivel_id) REFERENCES public.niveles_factor(id);
+
+
+--
+-- Name: tratamiento_nivel tratamiento_nivel_tratamiento_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: lbms
+--
+
+ALTER TABLE ONLY public.tratamiento_nivel
+    ADD CONSTRAINT tratamiento_nivel_tratamiento_id_fkey FOREIGN KEY (tratamiento_id) REFERENCES public.tratamientos(id);
+
+
+--
+-- Name: tratamientos tratamientos_experimento_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: lbms
+--
+
+ALTER TABLE ONLY public.tratamientos
+    ADD CONSTRAINT tratamientos_experimento_id_fkey FOREIGN KEY (experimento_id) REFERENCES public.experimentos(id);
+
+
+--
 -- Name: validaciones_protocolo validaciones_protocolo_experimento_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: lbms
 --
 
@@ -1646,5 +1729,5 @@ REVOKE USAGE ON SCHEMA public FROM PUBLIC;
 -- PostgreSQL database dump complete
 --
 
-\unrestrict AIoNZqdzAwnq0fCg6TJxkigS3W5jXAeeT8GmDThUkfNsamJgVhijJSbrzQbNqIr
+\unrestrict QGqouw7I1q7dCIFoLdnc5cg2ZzTjrdJPbym9gVU6akAPqZhDGqfiAKGpfKI1Juc
 

@@ -48,6 +48,8 @@ export default function ExperimentoDetail() {
         <p style={{color:'var(--theme-text)',fontSize:'0.95rem',margin:0,lineHeight:1.4}}>{exp.hipotesis || 'Sin hipótesis definida.'}</p>
       </div>
 
+      <MetodologiaCard config={exp.config_estandar} />
+
       {showConfig && (
         <ExpConfigForm
           exp={exp}
@@ -109,6 +111,73 @@ export default function ExperimentoDetail() {
            </div>
          )}
       </div>
+    </div>
+  )
+}
+
+// Etiquetas amigables (icono + nombre en español) para las claves de config_estandar.
+const CONFIG_LABELS = {
+  medio: ['🧪', 'Medio de cultivo'],
+  protocolo_desinfeccion: ['🧼', 'Desinfección'],
+  protocolo_siembra: ['🌾', 'Protocolo de siembra'],
+  n_semillas: ['🔢', 'Nº de semillas'],
+  luz: ['💡', 'Luz'],
+  propagacion: ['🔀', 'Propagación'],
+  pretratamiento: ['⏳', 'Pretratamiento'],
+  temperatura_c: ['🌡️', 'Temperatura (°C)'],
+  humedad_relativa_pct: ['💧', 'Humedad relativa (%)'],
+  ph_sustrato: ['⚗️', 'pH objetivo'],
+  luz_lux: ['🔆', 'Luz (lux)'],
+  npk: ['🧯', 'NPK'],
+  ppm: ['📈', 'Nutrición (PPM)'],
+  estante: ['🗄️', 'Estante'],
+  fecha_siembra: ['📅', 'Fecha de siembra'],
+  registrado: ['🕒', 'Registrado'],
+  condiciones_cultivo: ['🌤️', 'Condiciones de cultivo'],
+}
+
+// Convierte una clave desconocida (ej. "dias_riego") en texto legible ("Días Riego").
+function humanizeKey(key) {
+  return key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
+}
+
+function MetodologiaRow({ k, v }) {
+  const [icon, label] = CONFIG_LABELS[k] || ['•', humanizeKey(k)]
+  return (
+    <div style={{display:'flex',justifyContent:'space-between',gap:12,padding:'6px 0',borderBottom:'1px solid var(--theme-border)',fontSize:'0.85rem'}}>
+      <span style={{color:'var(--theme-text-muted)'}}>{icon} {label}</span>
+      <span style={{color:'var(--theme-text)',fontWeight:600,textAlign:'right'}}>{String(v)}</span>
+    </div>
+  )
+}
+
+// Muestra TODO lo guardado en config_estandar (conocido o no), para que ningún dato quede escondido.
+export function MetodologiaCard({ config }) {
+  if (!config || typeof config !== 'object') return null
+  const entries = Object.entries(config).filter(([, v]) => v !== null && v !== undefined && v !== '')
+  const simple = entries.filter(([, v]) => typeof v !== 'object')
+  const nested = entries.filter(([, v]) => typeof v === 'object' && v !== null && !Array.isArray(v))
+
+  return (
+    <div style={{background:'var(--theme-surface)',padding:'1rem',borderRadius:12}}>
+      <h4 style={{color:'var(--theme-secondary)',fontSize:'0.75rem',fontWeight:700,textTransform:'uppercase',letterSpacing:1,margin:'0 0 8px 0'}}>🧫 Metodología</h4>
+      {simple.length === 0 && nested.length === 0 ? (
+        <p style={{color:'var(--theme-text-muted)',fontSize:'0.9rem',margin:0}}>Sin metodología registrada aún.</p>
+      ) : (
+        <>
+          {simple.map(([k, v]) => <MetodologiaRow key={k} k={k} v={v} />)}
+          {nested.map(([k, obj]) => {
+            const [icon, label] = CONFIG_LABELS[k] || ['•', humanizeKey(k)]
+            const sub = Object.entries(obj).filter(([, v]) => v !== null && v !== undefined && v !== '')
+            return (
+              <div key={k} style={{marginTop:12,background:'var(--theme-background)',borderRadius:8,padding:'0.7rem'}}>
+                <div style={{color:'var(--theme-primary)',fontSize:'0.8rem',fontWeight:700,marginBottom:4}}>{icon} {label}</div>
+                {sub.map(([sk, sv]) => <MetodologiaRow key={sk} k={sk} v={sv} />)}
+              </div>
+            )
+          })}
+        </>
+      )}
     </div>
   )
 }
