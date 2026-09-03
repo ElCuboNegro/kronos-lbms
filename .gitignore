@@ -7,3 +7,5 @@ __pycache__/
 venv/
 uploads/
 .DS_Store
+.superpowers/
+.labels_preview/
