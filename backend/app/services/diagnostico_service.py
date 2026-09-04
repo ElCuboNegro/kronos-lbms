@@ -91,15 +91,17 @@ class DiagnosticoService:
             est = DiagnosticoService._estandar(especie_obj)
             germinado = DiagnosticoService.esta_germinado(metas)
 
-            # ── Contaminación
+            # ── Contaminación (por meta o por estado del espécimen)
             estado_cont = None
             for m in metas:
                 if m.get("contaminacion") in ("confirmada", "sospechosa"):
                     estado_cont = m["contaminacion"]
                     break
-            if estado_cont:
+            contaminado = bool(estado_cont) or sp.estado == "contaminado"
+            if contaminado:
                 contaminacion.append({"especimen_id": str(sp.id), "uid": sp.uid,
-                                     "especie": nombre_especie, "estado": estado_cont})
+                                     "especie": nombre_especie,
+                                     "estado": estado_cont or "confirmada"})
 
             # ── Germinación tardía
             if DiagnosticoService.germinacion_tardia(
@@ -132,6 +134,7 @@ class DiagnosticoService:
             g["estados"].append(estado_crec)
 
             # ── Método ↔ resultado (usa el evento de sanitización del espécimen)
+            # Nota: los especímenes sin evento de sanitización no entran en el cruce método↔resultado.
             san = next((e for e in eventos if e.tipo == "sanitizacion"), None)
             if san:
                 metodo = DiagnosticoService.etiqueta_metodo(san.meta)
@@ -139,7 +142,7 @@ class DiagnosticoService:
                 ms["tandas"] += 1
                 if germinado:
                     ms["germinaron"] += 1
-                if estado_cont:
+                if contaminado:
                     ms["contaminadas"] += 1
 
         metodo_resultado = [
