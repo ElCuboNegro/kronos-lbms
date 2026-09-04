@@ -32,7 +32,7 @@ Los números **siempre salen de los registros reales** (no se inventan). Si aún
 Motivación: lo "esperado" no puede estar fijo; debe ser **configurable y reutilizable** para cualquier usuario/especie. Elegido: **la usuaria define los valores** (no aprendizaje automático por ahora).
 
 **Por especie** (la usuaria captura):
-- **Días esperados para germinar** — dispara "germinación tardía".
+- **Días esperados para germinar** — dispara "germinación tardía". **Valor sugerido por defecto: ~21 días (3 semanas)**, porque en cultivo *in vitro* la germinación es más lenta. Editable por especie (alguna puede tardar más o menos).
 - **Altura esperada (opcional): N mm a los M días** — dispara "crecimiento lento". Se puede dejar en blanco.
 
 **Global del laboratorio** (no por especie):
@@ -61,7 +61,7 @@ Todas operan solo sobre especímenes en estado `activo`.
 - **`especimenes`** → `especie_id`, `uid`, `estado`, `fecha_ingreso` (siembra).
 - **`especies.ficha`** (JSONB existente) → guardar los valores esperados por especie bajo una nueva clave `estandar`, p. ej.:
   ```json
-  "estandar": { "dias_germinar": 10, "altura_esperada": { "mm": 4, "dias": 30 } }
+  "estandar": { "dias_germinar": 21, "altura_esperada": { "mm": 4, "dias": 30 } }
   ```
   Se usa `ficha` (columna JSONB ya existente) **para no requerir migración** (la usuaria no tiene permisos para migrar BD).
 - **Revisión semanal (miércoles):** constante de configuración del backend en v1 (`DIA_REVISION_SEMANAL = "miercoles"`). Se podrá mover a una tabla de settings más adelante sin cambiar la interfaz.
