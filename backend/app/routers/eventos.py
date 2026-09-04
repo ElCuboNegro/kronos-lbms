@@ -54,6 +54,11 @@ def registrar(
         if esp:
             esp.estado = "contaminado"
 
+    if payload.meta and payload.meta.get("contaminacion") == "descartada" and payload.especimen_id:
+        esp = db.query(models.Especimen).filter(models.Especimen.id == payload.especimen_id).first()
+        if esp:
+            esp.estado = "activo"
+
     db.commit()
     db.refresh(evento)
 

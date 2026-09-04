@@ -21,7 +21,8 @@ def _exp_out(exp: models.Experimento) -> schemas.ExperimentoOut:
             linea_nombre=e.linea_rel.nombre if e.linea_rel else None,
             variegacion_nombre=e.variegacion_rel.nombre if e.variegacion_rel else None,
             estado=e.estado,
-            fecha_ingreso=e.fecha_ingreso
+            fecha_ingreso=e.fecha_ingreso,
+            notas=e.notas
         ))
 
     return schemas.ExperimentoOut(
@@ -135,3 +136,42 @@ def agregar_resultado(
     db.commit()
     db.refresh(res)
     return res
+
+
+# ── Diseño factorial ──────────────────────────────────────────────────────────
+
+@router.post("/{experimento_id}/factores", response_model=schemas.FactorOut, status_code=201)
+def crear_factor(experimento_id: UUID, payload: schemas.FactorCreate,
+                 db: Session = Depends(get_db), _=Depends(auth.get_current_user)):
+    exp = db.query(models.Experimento).filter(models.Experimento.id == experimento_id).first()
+    if not exp:
+        raise HTTPException(status_code=404, detail="Experimento no encontrado")
+    factor = models.Factor(experimento_id=experimento_id, nombre=payload.nombre,
+                           unidad=payload.unidad, tipo=payload.tipo, descripcion=payload.descripcion)
+    for nv in payload.niveles:
+        factor.niveles.append(models.NivelFactor(
+            etiqueta=nv.etiqueta, valor_num=nv.valor_num, orden=nv.orden))
+    db.add(factor)
+    db.commit()
+    db.refresh(factor)
+    return factor
+
+
+@router.get("/{experimento_id}/factores", response_model=list[schemas.FactorOut])
+def listar_factores(experimento_id: UUID, db: Session = Depends(get_db),
+                    _=Depends(auth.get_current_user)):
+    return db.query(models.Factor).filter(models.Factor.experimento_id == experimento_id).all()
+
+
+@router.post("/{experimento_id}/tratamientos/generar",
+             response_model=list[schemas.TratamientoOut], status_code=201)
+def generar_tratamientos(experimento_id: UUID, db: Session = Depends(get_db),
+                         _=Depends(auth.get_current_user)):
+    return ExperimentService.generar_tratamientos(db, experimento_id)
+
+
+@router.get("/{experimento_id}/tratamientos", response_model=list[schemas.TratamientoOut])
+def listar_tratamientos(experimento_id: UUID, db: Session = Depends(get_db),
+                        _=Depends(auth.get_current_user)):
+    return db.query(models.Tratamiento).filter(
+        models.Tratamiento.experimento_id == experimento_id).all()

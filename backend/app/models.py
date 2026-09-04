@@ -24,6 +24,12 @@ experimento_elemento = Table(
     Column("elemento_id", UUID(as_uuid=True), ForeignKey("elementos.id"), primary_key=True),
 )
 
+tratamiento_nivel = Table(
+    "tratamiento_nivel", Base.metadata,
+    Column("tratamiento_id", UUID(as_uuid=True), ForeignKey("tratamientos.id"), primary_key=True),
+    Column("nivel_id", UUID(as_uuid=True), ForeignKey("niveles_factor.id"), primary_key=True),
+)
+
 
 # ── Core ──────────────────────────────────────────────────────────────────────
 
@@ -216,6 +222,7 @@ class Experimento(Base):
     variegacion_id = Column(UUID(as_uuid=True), ForeignKey("variegaciones.id"), nullable=True)
 
     config_estandar = Column(JSONB, nullable=True, default=dict)
+    tipo_diseno = Column(String(20), nullable=True, default="factorial")  # dca | factorial | bloques
     notas = Column(Text, nullable=True)
     created_at = Column(DateTime, default=datetime.now(timezone.utc))
 
@@ -227,6 +234,51 @@ class Experimento(Base):
     resultados = relationship("ResultadoInvestigacion", back_populates="experimento",
                               order_by="ResultadoInvestigacion.fecha.desc()")
     eventos = relationship("Evento", foreign_keys="Evento.experimento_id", back_populates="experimento")
+    factores = relationship("Factor", back_populates="experimento", cascade="all, delete-orphan")
+    tratamientos = relationship("Tratamiento", back_populates="experimento", cascade="all, delete-orphan")
+
+
+# ── Diseño factorial (ADR-0001) ───────────────────────────────────────────────
+
+class Factor(Base):
+    __tablename__ = "factores_experimentales"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    experimento_id = Column(UUID(as_uuid=True), ForeignKey("experimentos.id"), nullable=False, index=True)
+    nombre = Column(String(120), nullable=False)
+    unidad = Column(String(40), nullable=True)
+    tipo = Column(String(20), nullable=False, default="categorico")  # categorico | continuo
+    descripcion = Column(Text, nullable=True)
+
+    experimento = relationship("Experimento", back_populates="factores")
+    niveles = relationship("NivelFactor", back_populates="factor",
+                           cascade="all, delete-orphan", order_by="NivelFactor.orden")
+
+
+class NivelFactor(Base):
+    __tablename__ = "niveles_factor"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    factor_id = Column(UUID(as_uuid=True), ForeignKey("factores_experimentales.id"), nullable=False, index=True)
+    etiqueta = Column(String(120), nullable=False)
+    valor_num = Column(Float, nullable=True)
+    orden = Column(Integer, nullable=False, default=0)
+
+    factor = relationship("Factor", back_populates="niveles")
+
+
+class Tratamiento(Base):
+    __tablename__ = "tratamientos"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    experimento_id = Column(UUID(as_uuid=True), ForeignKey("experimentos.id"), nullable=False, index=True)
+    codigo = Column(String(40), nullable=False)
+    nombre = Column(String(255), nullable=True)
+    es_control = Column(Boolean, nullable=False, default=False)
+    descripcion = Column(Text, nullable=True)
+
+    experimento = relationship("Experimento", back_populates="tratamientos")
+    niveles = relationship("NivelFactor", secondary=tratamiento_nivel)
 
 
 # ── Resultado de investigación ────────────────────────────────────────────────

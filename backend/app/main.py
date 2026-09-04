@@ -16,7 +16,7 @@ from app.limiter import limiter
 from app.routers import (
     auth as auth_router, especimenes, elementos, eventos, scan,
     especies, protocolos, experimentos, evolucion, printer,
-    sustratos, reactivos, science, agent
+    sustratos, reactivos, science, agent, diagnostico
 )
 from app import models, auth
 
@@ -65,6 +65,7 @@ app.include_router(sustratos.router)
 app.include_router(reactivos.router)
 app.include_router(science.router)
 app.include_router(agent.router)
+app.include_router(diagnostico.router)
 
 
 @app.get("/health")

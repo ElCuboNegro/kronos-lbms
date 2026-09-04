@@ -295,8 +295,25 @@ def experimentos_de_especie(id: UUID, db: Session = Depends(get_db),
         .all()
     )
 
-    result = []
+    # Experimentos ligados directamente a la especie por FK (Experimento.especie_id),
+    # aunque todavía no tengan especímenes (p. ej. experimentos "planificado").
+    exps_directos = (
+        db.query(models.Experimento)
+        .filter(models.Experimento.especie_id == id)
+        .options(joinedload(models.Experimento.director))
+        .all()
+    )
+
+    # Combinar ambas fuentes sin duplicar; num_especimenes = 0 si solo viene por FK.
+    por_id = {}
     for exp, num_esp in exps_with_counts:
+        por_id[exp.id] = (exp, num_esp)
+    for exp in exps_directos:
+        if exp.id not in por_id:
+            por_id[exp.id] = (exp, 0)
+
+    result = []
+    for exp, num_esp in por_id.values():
         result.append(schemas.EspecieExperimentoItem(
             id=exp.id,
             nombre=exp.nombre,
@@ -339,9 +356,18 @@ def protocolos_de_especie(id: UUID, db: Session = Depends(get_db),
         .all()
     )
 
+    # Protocolos via experimentos ligados directamente a la especie por FK,
+    # aunque el experimento aún no tenga especímenes (p. ej. "planificado").
+    proto_via_exp_directo = (
+        db.query(models.Protocolo)
+        .join(models.Experimento, models.Experimento.protocolo_id == models.Protocolo.id)
+        .filter(models.Experimento.especie_id == id)
+        .all()
+    )
+
     seen = set()
     result = []
-    for p in proto_via_exp + proto_via_evol:
+    for p in proto_via_exp + proto_via_evol + proto_via_exp_directo:
         if p.id not in seen:
             seen.add(p.id)
             result.append(schemas.EspecieProtocoloItem(
