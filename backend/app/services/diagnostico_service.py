@@ -105,17 +105,26 @@ class DiagnosticoService:
             est = DiagnosticoService._estandar(especie_obj)
             germinado = DiagnosticoService.esta_germinado(metas)
 
-            # ── Contaminación (por meta o por estado del espécimen)
-            estado_cont = None
-            for m in metas:
-                if m.get("contaminacion") in ("confirmada", "sospechosa"):
-                    estado_cont = m["contaminacion"]
+            # ── Contaminación: el evento de contaminación más reciente manda (permite "deshacer")
+            estado_cont = tipo_cont = fecha_cont = None
+            resuelto = False
+            for e in eventos:  # más reciente primero
+                c = (e.meta or {}).get("contaminacion")
+                if c is not None:
+                    resuelto = True
+                    if c in ("confirmada", "sospechosa"):
+                        estado_cont = c
+                        tipo_cont = (e.meta or {}).get("tipo_contaminante")
+                        fecha_cont = (e.meta or {}).get("fecha_deteccion") or (
+                            e.timestamp.date().isoformat() if e.timestamp else None)
                     break
-            contaminado = bool(estado_cont) or sp.estado == "contaminado"
+            contaminado = bool(estado_cont) or (not resuelto and sp.estado == "contaminado")
             if contaminado:
                 contaminacion.append({"especimen_id": str(sp.id), "uid": sp.uid,
                                      "especie": nombre_especie,
-                                     "estado": estado_cont or "confirmada"})
+                                     "estado": estado_cont or "confirmada",
+                                     "tipo_contaminante": tipo_cont,
+                                     "fecha": fecha_cont})
 
             # ── Germinación tardía
             if DiagnosticoService.germinacion_tardia(

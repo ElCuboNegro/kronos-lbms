@@ -119,3 +119,44 @@ def test_contaminacion_por_estado_sin_meta(db):
     payload = DS.construir_diagnostico(db, hoy=date(2026, 8, 30))
     uids = [a["uid"] for a in payload["alertas"]["contaminacion"]]
     assert "EST-1" in uids
+
+
+def test_deshacer_contaminacion_quita_la_alerta(db):
+    u = _usuario(db)
+    esp = models.Especie(nombre_cientifico="Deshacer test", nombre_comun="DeshT")
+    db.add(esp); db.flush()
+    sp = models.Especimen(uid="UNDO-1", especie="DeshT", especie_id=esp.id,
+                         estado="contaminado", fecha_ingreso=date(2026, 8, 1))
+    db.add(sp); db.flush()
+    # Evento original de contaminación...
+    db.add(models.Evento(tipo="contaminacion", descripcion="c", especimen_id=sp.id,
+                        usuario_id=u.id, timestamp=datetime(2026, 8, 20),
+                        meta={"contaminacion": "confirmada"}))
+    # ...y un evento MÁS RECIENTE que la deshace
+    db.add(models.Evento(tipo="observacion", descripcion="deshacer", especimen_id=sp.id,
+                        usuario_id=u.id, timestamp=datetime(2026, 8, 22),
+                        meta={"contaminacion": "descartada"}))
+    db.flush()
+
+    payload = DS.construir_diagnostico(db, hoy=date(2026, 8, 30))
+    uids = [a["uid"] for a in payload["alertas"]["contaminacion"]]
+    assert "UNDO-1" not in uids
+
+
+def test_contaminacion_incluye_tipo_y_fecha(db):
+    u = _usuario(db)
+    esp = models.Especie(nombre_cientifico="TipoFecha test", nombre_comun="TipoF")
+    db.add(esp); db.flush()
+    sp = models.Especimen(uid="TIPO-1", especie="TipoF", especie_id=esp.id,
+                         estado="activo", fecha_ingreso=date(2026, 8, 1))
+    db.add(sp); db.flush()
+    db.add(models.Evento(tipo="contaminacion", descripcion="c", especimen_id=sp.id,
+                        usuario_id=u.id, timestamp=datetime(2026, 8, 20),
+                        meta={"contaminacion": "confirmada", "tipo_contaminante": "hongo",
+                              "fecha_deteccion": "2026-08-25"}))
+    db.flush()
+
+    payload = DS.construir_diagnostico(db, hoy=date(2026, 8, 30))
+    fila = next(a for a in payload["alertas"]["contaminacion"] if a["uid"] == "TIPO-1")
+    assert fila["tipo_contaminante"] == "hongo"
+    assert fila["fecha"] == "2026-08-25"
