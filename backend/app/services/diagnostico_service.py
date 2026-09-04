@@ -68,6 +68,20 @@ class DiagnosticoService:
         return f"{metodo}: {germinaron} germinaron, {contaminadas} contaminadas de {tandas}."
 
     @staticmethod
+    def mejor_metodo(filas: list[dict]) -> dict | None:
+        """El mejor método = menor proporción de contaminación, luego mayor germinación."""
+        candidatos = [f for f in filas if f["tandas"] > 0]
+        if not candidatos:
+            return None
+        def clave(f):
+            return (f["contaminadas"] / f["tandas"], -f["germinaron"] / f["tandas"])
+        mejor = min(candidatos, key=clave)
+        return {
+            "metodo": mejor["metodo"],
+            "motivo": f"{mejor['germinaron']} germinaron y {mejor['contaminadas']} contaminadas de {mejor['tandas']}",
+        }
+
+    @staticmethod
     def _estandar(especie) -> dict:
         cfg = (especie.config_estandar or {}) if especie else {}
         return cfg.get("diagnostico", {}) or {}
@@ -173,5 +187,6 @@ class DiagnosticoService:
                         "germinacion_tardia": germinacion_tardia,
                         "sin_revisar": sin_revisar},
             "metodo_resultado": metodo_resultado,
+            "mejor_metodo": DiagnosticoService.mejor_metodo(metodo_resultado),
             "germinacion_crecimiento": germinacion_crecimiento,
         }

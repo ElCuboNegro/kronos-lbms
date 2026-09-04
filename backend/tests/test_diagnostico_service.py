@@ -88,3 +88,25 @@ class TestMetaHelpers:
     def test_hallazgo_todo_contaminado(self):
         h = DS.hallazgo("alcohol+clorox", tandas=6, germinaron=0, contaminadas=6)
         assert "contaminó" in h
+
+
+class TestMejorMetodo:
+    def test_elige_el_de_menor_contaminacion(self):
+        filas = [
+            {"metodo": "alcohol+clorox", "tandas": 6, "germinaron": 0, "contaminadas": 6},
+            {"metodo": "agua oxigenada 3%", "tandas": 5, "germinaron": 5, "contaminadas": 0},
+        ]
+        mejor = DS.mejor_metodo(filas)
+        assert mejor["metodo"] == "agua oxigenada 3%"
+        assert "5" in mejor["motivo"]
+
+    def test_desempata_por_mas_germinacion(self):
+        filas = [
+            {"metodo": "A", "tandas": 4, "germinaron": 1, "contaminadas": 0},
+            {"metodo": "B", "tandas": 4, "germinaron": 4, "contaminadas": 0},
+        ]
+        assert DS.mejor_metodo(filas)["metodo"] == "B"
+
+    def test_sin_datos_devuelve_none(self):
+        assert DS.mejor_metodo([]) is None
+        assert DS.mejor_metodo([{"metodo": "X", "tandas": 0, "germinaron": 0, "contaminadas": 0}]) is None
