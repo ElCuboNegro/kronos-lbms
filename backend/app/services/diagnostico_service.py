@@ -32,3 +32,35 @@ class DiagnosticoService:
         if altura_mm is None:
             return "por_definir"
         return "a_tiempo" if altura_mm >= esperada_mm else "lento"
+
+    @staticmethod
+    def esta_germinado(metas: list[dict]) -> bool:
+        for m in metas:
+            if not m:
+                continue
+            if (m.get("semillas_germinadas") or 0) > 0:
+                return True
+            g = m.get("germinacion")
+            if g and g != "sin_germinacion":
+                return True
+        return False
+
+    @staticmethod
+    def etiqueta_metodo(meta: dict | None) -> str:
+        meta = meta or {}
+        if meta.get("protocolo_familia"):
+            return meta["protocolo_familia"]
+        if meta.get("protocolo"):
+            return meta["protocolo"]
+        agentes = meta.get("agentes")
+        if agentes:
+            return " + ".join(agentes)
+        return "método no especificado"
+
+    @staticmethod
+    def hallazgo(metodo: str, tandas: int, germinaron: int, contaminadas: int) -> str:
+        if tandas and contaminadas == 0:
+            return f"con tus datos, {metodo} no dio contaminación."
+        if tandas and contaminadas == tandas:
+            return f"con tus datos, {metodo} contaminó todas las tandas."
+        return f"{metodo}: {germinaron} germinaron, {contaminadas} contaminadas de {tandas}."

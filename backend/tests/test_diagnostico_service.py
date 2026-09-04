@@ -56,3 +56,35 @@ class TestEvaluadores:
         # edad < esperada_dias: todavía no se juzga como lento
         assert DS.crecimiento_estado(
             altura_mm=1, esperada_mm=4, esperada_dias=30, edad_dias=10) == "a_tiempo"
+
+
+class TestMetaHelpers:
+    def test_esta_germinado_por_semillas_germinadas(self):
+        assert DS.esta_germinado([{"semillas_germinadas": 2}]) is True
+
+    def test_esta_germinado_falso_si_sin_germinacion(self):
+        assert DS.esta_germinado([{"germinacion": "sin_germinacion"}]) is False
+
+    def test_esta_germinado_por_marca_de_germinacion(self):
+        assert DS.esta_germinado([{"germinacion": "germino"}]) is True
+
+    def test_esta_germinado_vacio(self):
+        assert DS.esta_germinado([]) is False
+
+    def test_metodo_desde_protocolo_familia(self):
+        assert DS.etiqueta_metodo({"protocolo_familia": "DESINF-02"}) == "DESINF-02"
+
+    def test_metodo_desde_agentes(self):
+        etq = DS.etiqueta_metodo({"agentes": ["hipoclorito (clorox)", "etanol (alcohol)"]})
+        assert "clorox" in etq and "alcohol" in etq
+
+    def test_metodo_desconocido(self):
+        assert DS.etiqueta_metodo({}) == "método no especificado"
+
+    def test_hallazgo_sin_contaminacion(self):
+        h = DS.hallazgo("agua oxigenada 3%", tandas=5, germinaron=5, contaminadas=0)
+        assert "no dio contaminación" in h
+
+    def test_hallazgo_todo_contaminado(self):
+        h = DS.hallazgo("alcohol+clorox", tandas=6, germinaron=0, contaminadas=6)
+        assert "contaminó" in h
