@@ -1,11 +1,10 @@
 import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { api } from '../api/client'
 
 export default function Home() {
-  const navigate = useNavigate()
   const [data, setData] = useState(null)
   const [error, setError] = useState(null)
+  const [marcando, setMarcando] = useState(false)
 
   async function cargar() {
     setError(null)
@@ -18,13 +17,19 @@ export default function Home() {
   useEffect(() => { cargar() }, [])
 
   async function marcarContaminado(especimen_id) {
-    await api.post('/eventos', {
-      tipo: 'contaminacion',
-      descripcion: 'Marcado como contaminado desde el tablero de diagnóstico',
-      especimen_id,
-      meta: { contaminacion: 'confirmada' },
-    })
-    await cargar()
+    if (marcando) return
+    setMarcando(true)
+    try {
+      await api.post('/eventos', {
+        tipo: 'contaminacion',
+        descripcion: 'Marcado como contaminado desde el tablero de diagnóstico',
+        especimen_id,
+        meta: { contaminacion: 'confirmada' },
+      })
+      await cargar()
+    } finally {
+      setMarcando(false)
+    }
   }
 
   if (error) return (
@@ -47,10 +52,10 @@ export default function Home() {
                 render={(a) => `${a.uid} — ${a.especie} (${a.estado})`} />
         <Bloque titulo="🟡 Germinación tardía" items={alertas.germinacion_tardia}
                 render={(a) => `${a.uid} — ${a.especie}: ${a.dias} días (esperado ${a.esperado})`}
-                onMarcar={marcarContaminado} />
+                onMarcar={marcarContaminado} marcando={marcando} />
         <Bloque titulo="🔵 Sin revisar" items={alertas.sin_revisar}
                 render={(a) => `${a.uid} — ${a.especie}: ${a.dias_sin_registro} días sin registro`}
-                onMarcar={marcarContaminado} />
+                onMarcar={marcarContaminado} marcando={marcando} />
       </section>
 
       <section style={s.card}>
@@ -74,7 +79,7 @@ export default function Home() {
   )
 }
 
-function Bloque({ titulo, items, render, onMarcar }) {
+function Bloque({ titulo, items, render, onMarcar, marcando }) {
   return (
     <div style={{ marginBottom: '0.6rem' }}>
       <div style={s.bloqueTitulo}>{titulo}</div>
@@ -84,7 +89,8 @@ function Bloque({ titulo, items, render, onMarcar }) {
             <div key={it.especimen_id} style={s.item}>
               <span>{render(it)}</span>
               {onMarcar && (
-                <button style={s.btnMini} onClick={() => onMarcar(it.especimen_id)}>
+                <button style={s.btnMini} disabled={marcando}
+                        onClick={() => onMarcar(it.especimen_id)}>
                   Marcar contaminado
                 </button>)}
             </div>))}

@@ -39,4 +39,5 @@ test('marcar contaminado hace POST y recarga', async () => {
   await waitFor(() => expect(api.post).toHaveBeenCalledWith('/eventos', expect.objectContaining({
     tipo: 'contaminacion', especimen_id: '9',
   })))
+  await waitFor(() => expect(api.get.mock.calls.length).toBeGreaterThanOrEqual(2))
 })
