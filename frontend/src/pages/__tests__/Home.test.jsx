@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react'
+import { render, screen, waitFor, fireEvent } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { vi } from 'vitest'
 import Home from '../Home'
@@ -20,4 +20,23 @@ test('muestra el recordatorio y la alerta de contaminación', async () => {
   render(<MemoryRouter><Home /></MemoryRouter>)
   await waitFor(() => expect(screen.getByText(/día de revisión/i)).toBeInTheDocument())
   expect(screen.getByText(/MOSB-1/)).toBeInTheDocument()
+})
+
+test('marcar contaminado hace POST y recarga', async () => {
+  const conPendiente = {
+    ...PAYLOAD,
+    alertas: {
+      contaminacion: [],
+      germinacion_tardia: [{ especimen_id: '9', uid: 'ZINN-9', especie: 'Zinnia', dias: 30, esperado: 21 }],
+      sin_revisar: [],
+    },
+  }
+  api.get.mockResolvedValue(conPendiente)
+  api.post.mockResolvedValue({})
+  render(<MemoryRouter><Home /></MemoryRouter>)
+  await waitFor(() => expect(screen.getByText(/ZINN-9/)).toBeInTheDocument())
+  fireEvent.click(screen.getByRole('button', { name: /marcar contaminado/i }))
+  await waitFor(() => expect(api.post).toHaveBeenCalledWith('/eventos', expect.objectContaining({
+    tipo: 'contaminacion', especimen_id: '9',
+  })))
 })
